@@ -23,10 +23,14 @@ watch(
 
 <template> 
   <div :class="['leftBar',state]">
+    <!--调整侧栏状态-->
     <iconToClick @click="state= (state=='short')?'wide':'short'">
       <i class="bi bi-list"></i>
     </iconToClick>
+
     <h1>我的音乐</h1>
+
+    <!--音乐库-->
     <iconWithText @click="router.push('/')" :type="(state=='short')?'hidden':null" >
       <template #svg>
         <i class="bi bi-house-fill"></i>
@@ -35,10 +39,32 @@ watch(
         音乐库
       </template>
     </iconWithText>
+
+    <h1>设置区</h1>
+
+    <!--音乐目录-->
+    <iconWithText @click="router.push('/musicFolder/')" :type="(state=='short')?'hidden':null" >
+      <template #svg>
+        <i class="bi bi-folder-fill"></i>
+      </template>
+      <template #text>
+        本地音乐目录管理
+      </template>
+    </iconWithText>
+
+    <iconWithText @click="router.push('/musicFolder/')" :type="(state=='short')?'hidden':null" >
+      <template #svg>
+        <i class="bi bi-gear-fill"></i>
+      </template>
+      <template #text>
+        设置
+      </template>
+    </iconWithText>
+    
   </div>
 </template>
 
-<style scoped>
+<style>
 .leftBar{
   --width: 38px;
   width: var(--width);
@@ -47,10 +73,15 @@ watch(
   display: flex;
   flex-direction: column;
   margin: 0 7px;
+  gap: 7px;
 }
 .leftBar.wide{
   --width: 200px
 }
+
+</style>
+
+<style scoped>
 
 h1{
   font-size: 15px;
@@ -58,7 +89,7 @@ h1{
   color: #0000;
   white-space: nowrap;
   height: 0px;
-  margin: 2.5px;
+  margin: -7px 0 0 0;
   transition: all 0.125s cubic-bezier(.5,.3,.2,1)  0.125s,color 0.125s  cubic-bezier(.5,.3,.2,1);
 
 }

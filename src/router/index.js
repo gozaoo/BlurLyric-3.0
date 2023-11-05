@@ -4,6 +4,9 @@ const router =[
     },
     {
         path: '/allmusic/', component: ()=>import('./routers/allMusic.vue')
+    },
+    {
+        path: '/musicFolder/', component: ()=>import('./routers/musicFolder.vue')
     }
 ]
 
