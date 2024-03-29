@@ -48,7 +48,7 @@ watch(
         <i class="bi bi-folder-fill"></i>
       </template>
       <template #text>
-        本地音乐目录管理
+        音乐来源
       </template>
     </iconWithText>
 
@@ -72,7 +72,11 @@ watch(
   user-select: none;
   display: flex;
   flex-direction: column;
-  margin: 0 7px;
+  padding: 50px 7px 0 7px;
+  margin-top: -50px;
+  z-index: 1;
+
+  background-color: #eee;
   gap: 7px;
 }
 .leftBar.wide{

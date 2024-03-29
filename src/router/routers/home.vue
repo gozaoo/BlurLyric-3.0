@@ -17,15 +17,4 @@ const route = useRoute()
 </template>
 
 <style scoped>
-    .buttom{
-        height: 34px;
-        width: 38px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        border-radius: 7px;
-    }
-    .buttom:hover{
-        background-color: #00000008;
-    }
 </style>

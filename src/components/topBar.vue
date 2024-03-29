@@ -21,7 +21,7 @@ const route = useRoute()
       <div  data-tauri-drag-region :style="(leftBarState == 'short')?'margin-left:18px':null" class="title">BlurLyric</div> 
     </div>
     <div>
-      <div>关闭</div>
+      <!-- <div>关闭</div> -->
     </div>
   </div>
 </template>
@@ -32,17 +32,22 @@ const route = useRoute()
     display: flex;
     align-items: center;
     gap: 7px;
+    /* height: calc(100% + 7px); */
+    width: calc(100% + 16px);
+    margin: -8px 0 0 -8px;
+    z-index: 10;
+    padding: 7px;
+    position: relative;
     user-select: none;
   }
 
   .drag{
     -webkit-app-drag:drag;
     display: block;
-    height: 34px;
+    height: calc(100% + 16px);
     flex: 1;
     display: flex;
     align-items: center;
-
   }
   .title{
     font-size: 15px;

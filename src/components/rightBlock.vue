@@ -1,25 +1,26 @@
 <script setup>
 import iconToClick from './iconToClick.vue'
+import scrollRow from './scrollRow.vue'
 
 
 </script>
 
 <template>
-  <div class="router">
+  <scrollRow  class="router">
     <router-view></router-view>
-  </div>
+  </scrollRow>
+
 </template>
 
 <style scoped>
   .router{
     display: block;
-    background-color: #eee;
+    background-color: var(--mainBlockBackground);
     flex: 1;
     height: 100%;
     width: calc(100% + 7px);
     padding: 10px 16px;
-    border-radius: 8px 0 0 0;
-    box-shadow: 0px 0px 2px #0002;
+    /* border-radius: 8px 0 0 0; */
     position: relative;
   }
 </style>

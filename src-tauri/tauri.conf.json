@@ -65,11 +65,11 @@
     },
     "windows": [
       {
-        "height": 700,
+        "height": 600,
         "title": "BlurLyric",
-        "width": 1000,
+        "width": 900,
         "resizable": true,
-        "transparent": true,
+        "transparent": false,
         "center": true,
         "decorations": false
       }

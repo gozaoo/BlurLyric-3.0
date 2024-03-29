@@ -3,13 +3,16 @@ body{
   padding: none;
   margin: none;
   font-family: Misans;
-  /* backdrop-filter: blur(15px); */
+  /* background-color: rgb(238,238,238); */
   overflow: hidden;
-}
-main {
-  background: transparent;
 }
 @font-face {
   font-family: MiSans;
   src: local('MiSans'), url('./assets/MiSans-Normal.ttf');
+}
+:root{
+    --mainBlockBackground: #ddd
+}
+body{
+  background-color: var(--mainBlockBackground);
 }

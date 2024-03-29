@@ -1,23 +1,18 @@
 <script setup>
-    import flexColumnRow from '../../components/flexColumnRow.vue';
-    import musicCard from '../../components/musicCard.vue';
-    import iconToClick from '../../components/iconToClick.vue';
-import iconWithText from '../../components/iconWithText.vue'
-
+    import folder from '../../components/tracks/folder.vue';
 </script>
 
 <template>
-    <h1>本地音乐目录管理</h1>
-    <!-- <div class="buttomTrack">
-        <iconWithText type="background" @click="" >
-            <template #svg>
-                <i class="bi bi-play-fill"></i>
-            </template>
-            <template #text>
-                播放全部
-            </template>
-        </iconWithText>
-    </div> -->
+    <h1>音乐来源</h1>
+    <h2>本地文件夹</h2>
+    <folder>
+        <template v-slot:name>
+                用户音乐目录
+        </template>
+        <template v-slot:path>
+                C:\Users\Administrator\Music\
+        </template>
+    </folder>
 </template>
 
 <style scoped>
