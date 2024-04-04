@@ -25,7 +25,7 @@ pub async fn run_server() -> std::io::Result<()> {
             .service(index)
             .service(submit)
     })
-    .bind("127.0.0.1:8080")?
+    .bind("127.0.0.1:18777")?
     .run()
     .await
 }

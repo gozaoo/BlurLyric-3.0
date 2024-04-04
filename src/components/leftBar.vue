@@ -52,7 +52,7 @@ watch(
       </template>
     </iconWithText>
 
-    <iconWithText @click="router.push('/musicFolder/')" :type="(state=='short')?'hidden':null" >
+    <iconWithText @click="router.push('/setting/')" :type="(state=='short')?'hidden':null" >
       <template #svg>
         <i class="bi bi-gear-fill"></i>
       </template>

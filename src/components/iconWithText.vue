@@ -29,6 +29,7 @@
         box-sizing: border-box;
         padding: 0 11px ;
         cursor: pointer;
+        overflow: hidden;
     }
     .buttom:hover{
         background-color: #00000008;
