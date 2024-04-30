@@ -5,12 +5,12 @@ use methods::webserver::run_server;
 use tauri::Manager;
 // use methods::webserver;
 #[tokio::main]
-async fn main() -> std::io::Result<()> {
+async fn main() {
+  run_server();
+
   tauri::Builder::default()
-    // .setup(setup::init)
     .run(tauri::generate_context!())
     .expect("error while running tauri application");
 
-  run_server().await
 }
 

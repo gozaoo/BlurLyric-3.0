@@ -60,6 +60,14 @@ watch(
         设置
       </template>
     </iconWithText>
+    <iconWithText @click="router.push('/demo/')" :type="(state=='short')?'hidden':null" >
+      <template #svg>
+        <i class="bi bi-bug-fill"></i>
+      </template>
+      <template #text>
+        组件测试
+      </template>
+    </iconWithText>
     
   </div>
 </template>

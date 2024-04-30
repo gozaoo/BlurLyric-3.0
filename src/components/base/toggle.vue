@@ -4,10 +4,18 @@
             return {currentState: false}
         },
         props:{
-            state:Boolean
+            state:Boolean,
+            type: String
+            /**
+             * normal: 正常
+             * unavailable: 不启用
+             * 
+             * *default=normal 正常
+             */
         },
         methods:{
             changeState(){
+                if(this.type == 'unavailable') return;
                 this.currentState= !this.currentState
                 this.$emit('changeState',this.currentState)
             }
@@ -26,8 +34,9 @@
 </script>
 
 <template>
-    <div @click="changeState" :class="['box',currentState?'active':'']">
+    <div @click="changeState" :class="['box',currentState?'active':'',type]">
         <div class="point"></div>
+	<!-- {{type}} -->
     </div>
 </template>
 
@@ -58,4 +67,11 @@
         /* background: #fff; */
         margin-left: 20px;
     }
+    .box.unavailable{
+        cursor: not-allowed;
+        background: #aaa;
+    }
+	.box.unavailable .point{
+		background: #ccc;
+	}
 </style>

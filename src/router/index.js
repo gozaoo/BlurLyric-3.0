@@ -10,6 +10,9 @@ const router =[
     },
     {
         path: '/setting/', component: ()=>import('./routers/setting.vue')
+    },
+    {
+        path: '/demo/',component:()=>import('./routers/demo.vue')
     }
 ]
 
