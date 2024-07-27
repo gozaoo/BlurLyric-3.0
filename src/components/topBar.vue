@@ -60,9 +60,9 @@ const route = useRoute()
     padding-top: 24px;
     font-weight: 900;
     color: #222;
-    transform: translateY(max(0px,calc(var(--paddingTop) - 14px)));
+    transform: translateY(max(0px,calc(var(--paddingTop) - 15px)));
     padding-left: 16px;
-    transition: 0.20s cubic-bezier(.5,.3,.2,1);
+    transition: 0.25s cubic-bezier(.5,.3,.2,1);
     width: 100%;
   }
   .blur{
@@ -70,7 +70,7 @@ const route = useRoute()
     height: 100px;
     width: 100%;
     left: 52px;
-
+    background-color: #fff8;
     backdrop-filter: blur(12px);
     transition: 0.25s cubic-bezier(.5,.3,.2,1);
     z-index: -1;
@@ -81,7 +81,7 @@ const route = useRoute()
   }
   .wide .title{
     
-    padding-left: 168px;
+    padding-left: 164px;
 
   }
 </style>

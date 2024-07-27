@@ -10,6 +10,9 @@
         }
       }
     },
+    props:{
+      leftBarState: String
+    },
     components: {
       scrollRow
     },
@@ -19,7 +22,7 @@
 </script>
 
 <template>
-  <scrollRow @update-scroll-state="(value)=>{
+  <scrollRow :class="[leftBarState]" @update-scroll-state="(value)=>{
     this.scrollTopState = value
   }" class="router">
     <router-view />
@@ -31,12 +34,14 @@
   .router {
     display: block;
     background-color: var(--mainBlockBackground);
-    min-width: calc(100vw - 50px);
+    width: calc(100vw - 52px);
+    min-width:  calc(100vw - 52px);
     padding: 10px 16px;
     box-sizing: border-box;
     /* padding-top: 48px; */
-    height: calc(100vh + 17px);
+    height: calc(100vh + 17px);flex-shrink:0;
     margin-top: -48px;
     position: relative;
   }
+
 </style>

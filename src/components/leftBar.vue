@@ -39,7 +39,7 @@ watch(
 .leftBar{
   --width: 52px;
   width: var(--width);
-  transition: width 0.25s cubic-bezier(.5,.3,.2,1);
+  transition:  0.25s cubic-bezier(.5,.3,.2,1);
   user-select: none;
   display: flex;
   flex-direction: column;
@@ -47,9 +47,10 @@ watch(
   margin-top: -50px;
   z-index: 1;
   background-color: #eee;
-  gap: 7px;
+  gap: 7px;flex-shrink:0;
   overflow: hidden;
   max-height: 100vh;
+  /* min-width: 54px; */
   box-sizing: border-box;
   position: relative;
 }
@@ -58,6 +59,7 @@ watch(
 }
 .leftBar.wide{
   --width: 200px
+
 }
 
 .title{

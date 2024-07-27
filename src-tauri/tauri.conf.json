@@ -3,7 +3,7 @@
   "build": {
     "beforeBuildCommand": "npm run build",
     "beforeDevCommand": "npm run dev",
-    "devPath": "http://localhost:18776",
+    "devPath": "http://localhost:18780",
     "distDir": "../dist"
   },
   "package": {
@@ -69,8 +69,6 @@
         "title": "BlurLyric",
         "width": 900,
         "resizable": true,
-        "transparent": false,
-        "center": true,
         "decorations": false
       }
     ]

@@ -47,6 +47,9 @@
             </template>
         </toggle_lineRow>
     </tracksRow>
+    <bodytitle text="关于" />
+    <h2>BlurLyric</h2>
+
 </template>
 
 <style scoped>

@@ -40,9 +40,6 @@
     <br>
     <br>
     <bodytitle :text="'测试3'" />
-    <bodytitle :text="'测试4'" />
-    <h2>列表组件</h2>
-    <h2>列表组件</h2>
 
     <h2>列表组件</h2>
     <div>

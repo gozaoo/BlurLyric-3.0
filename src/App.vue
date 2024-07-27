@@ -103,7 +103,7 @@
                 </iconWithText>
             </template>
         </leftBar>
-        <rightBlock @update-scroll-state="(value)=>{this.scrollState = value;
+        <rightBlock :leftBarState="leftBarState" @update-scroll-state="(value)=>{this.scrollState = value;
         }"></rightBlock>
 
     </div>
