@@ -97,7 +97,7 @@ export default {
 <style scoped>
 .image-container {
   position: relative;
-  border-radius: 5%;
+  /* border-radius: 5%; */
   overflow: hidden;	box-shadow: var(--Shadow-value-normal);
   }
 .placeholder {

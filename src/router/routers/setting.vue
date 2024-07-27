@@ -23,7 +23,8 @@
 </script>
 
 <template>
-    <h1>设置</h1>
+    <bodytitle text="设置" />
+
     <h2>显示</h2>
     <tracksRow>
         <toggle_lineRow @changeState="test" :state="false">

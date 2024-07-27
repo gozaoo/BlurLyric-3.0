@@ -7,7 +7,8 @@ import iconWithText from '../../components/iconWithText.vue'
 </script>
 
 <template>
-    <h1>全部音乐</h1>
+    <bodytitle text="全部音乐" />
+
     <div class="buttomTrack">
         <iconWithText type="background" @click="" >
             <template #svg>

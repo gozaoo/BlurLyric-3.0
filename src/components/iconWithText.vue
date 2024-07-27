@@ -20,7 +20,7 @@
 
 <style scoped>
     .buttom{
-        height: 34px;
+        height: 36px;
         width: 100%;
         display: flex;
         gap: 7px;
@@ -30,6 +30,7 @@
         padding: 0 11px ;
         cursor: pointer;
         overflow: hidden;
+        min-height: 36px;
     }
     .buttom:hover{
         background-color: #00000008;
@@ -38,6 +39,7 @@
         white-space: nowrap;
         color: #000e;
         --delay:0.125s;
+        padding-left: 5px;
         transition: all 0.125s cubic-bezier(.5,.3,.2,1) var(--delay)
     }
 </style>

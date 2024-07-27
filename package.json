@@ -24,8 +24,10 @@
     "express": "^4.18.2",
     "jss": "^10.10.0",
     "jss-preset-default": "^10.10.0",
+    "primevue": "^4.0.0-beta.4",
     "vue": "^3.3.4",
-    "vue-router": "^4.2.4"
+    "vue-router": "^4.2.4",
+    "vuex": "^4.0.2"
   },
   "devDependencies": {
     "@tauri-apps/cli": "^1.4.0",

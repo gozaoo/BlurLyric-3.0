@@ -48,6 +48,7 @@
                 return line.startTime >= currentTime
             },
             updateActiveLines(currentTime) {
+                console.log(1)
                 const activeLines = this.lyric.lines.filter(line =>
                     this.shouldActivateLine(line, currentTime)
                 );
@@ -67,6 +68,8 @@
             },
             // 计算当前应该激活的歌词行
             LyricCalculate() {
+                console.log(0)
+                
                 if (this.lyric.type !== 'none') {
                     this.state.nowTime = this.audioDom.currentTime+0.2;
                     this.updateActiveLines(this.state.nowTime);
@@ -98,6 +101,7 @@
                 return true;
             },
             LyricListRender() {
+                console.log(2)
                 let rendingLine = {}
                 let centerTop = window.innerHeight * 0.35
                 let lastTop = centerTop,
@@ -157,6 +161,7 @@
                 return rendingLine
             },
             LyricLineRender(useAnimation, newrendingLine, oldrendingLine) {
+                console.log(3)
 
                 let lines = document.querySelectorAll("div>#lyricLine")
                 const self = this

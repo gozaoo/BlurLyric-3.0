@@ -3,7 +3,8 @@
 </script>
 
 <template>
-    <h1>音乐来源</h1>
+    <bodytitle text="音乐来源" />
+
     <h2>本地文件夹</h2>
     <folder>
         <template v-slot:name>

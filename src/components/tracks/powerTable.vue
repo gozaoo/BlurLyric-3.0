@@ -15,7 +15,7 @@
 		<!--内容位置-->
 		<div v-for="(line,line_index) in currentTable.cellArray" class="table-row">
 
-			<div :style="{
+			<div  :style="{
 					['flex'+((item.sizing)?('-'+item.sizing):'')]: (item.sizingValue)?item.sizingValue:1,
 					...item.spacialStyle
 				}" v-for="(item,index) in currentTable.cellName" :class="['table-cell',item.type]">
@@ -27,9 +27,9 @@
 				</span>
 				<!--图片类型-->
 				<lazy-load-cover-image-vue v-if="item.type=='image'" :src='line[item.path]'
-					style="left:0;top:0;height: 100%;width: 100%;position: absolute;"></lazy-load-cover-image-vue>
-
+					style="border-radius: 5%;left:0;top:0;height: 100%;width: 100%;position: absolute;"></lazy-load-cover-image-vue>
 			</div>
+
 		</div>
 		<!-- 其他行 -->
 	</div>
@@ -114,6 +114,7 @@
 <script>
 	import lazyLoadCoverImageVue from '../base/lazyLoadCoverImage.vue'
 	export default {
+		inject:['scrollState'],
 		data() {
 			return {
 				tempTableData: {},
@@ -177,7 +178,67 @@
 							imgSrc: 'http://p1.music.126.net/RWIGyShmnjmUxizXco6fVg==/109951168505830245.jpg',
 							trackOrdinalNumber: '3',
 							duration: '002',
-						}
+						},{
+							name: '时间线',
+							artist: 'HOYO-MIX',
+							album: '崩坏星穹铁道-失控 Out of Control',
+							imgSrc: 'http://p1.music.126.net/RWIGyShmnjmUxizXco6fVg==/109951168505830245.jpg',
+							trackOrdinalNumber: '1',
+							duration: '02:02',
+						},
+						{
+							name: '时间线b',
+							artist: 'HOYO-MaIX',
+							album: 'c崩坏星穹铁道-失控 Out of Control',
+							imgSrc: 'http://p1.music.126.net/RWIGyShmnjmUxizXco6fVg==/109951168505830245.jpg',
+							trackOrdinalNumber: '3',
+							duration: '002',
+						},{
+							name: '时间线',
+							artist: 'HOYO-MIX',
+							album: '崩坏星穹铁道-失控 Out of Control',
+							imgSrc: 'http://p1.music.126.net/RWIGyShmnjmUxizXco6fVg==/109951168505830245.jpg',
+							trackOrdinalNumber: '1',
+							duration: '02:02',
+						},
+						{
+							name: '时间线b',
+							artist: 'HOYO-MaIX',
+							album: 'c崩坏星穹铁道-失控 Out of Control',
+							imgSrc: 'http://p1.music.126.net/RWIGyShmnjmUxizXco6fVg==/109951168505830245.jpg',
+							trackOrdinalNumber: '3',
+							duration: '002',
+						},{
+							name: '时间线',
+							artist: 'HOYO-MIX',
+							album: '崩坏星穹铁道-失控 Out of Control',
+							imgSrc: 'http://p1.music.126.net/RWIGyShmnjmUxizXco6fVg==/109951168505830245.jpg',
+							trackOrdinalNumber: '1',
+							duration: '02:02',
+						},
+						{
+							name: '时间线b',
+							artist: 'HOYO-MaIX',
+							album: 'c崩坏星穹铁道-失控 Out of Control',
+							imgSrc: 'http://p1.music.126.net/RWIGyShmnjmUxizXco6fVg==/109951168505830245.jpg',
+							trackOrdinalNumber: '3',
+							duration: '002',
+						},{
+							name: '时间线',
+							artist: 'HOYO-MIX',
+							album: '崩坏星穹铁道-失控 Out of Control',
+							imgSrc: 'http://p1.music.126.net/RWIGyShmnjmUxizXco6fVg==/109951168505830245.jpg',
+							trackOrdinalNumber: '1',
+							duration: '02:02',
+						},
+						{
+							name: '时间线b',
+							artist: 'HOYO-MaIX',
+							album: 'c崩坏星穹铁道-失控 Out of Control',
+							imgSrc: 'http://p1.music.126.net/RWIGyShmnjmUxizXco6fVg==/109951168505830245.jpg',
+							trackOrdinalNumber: '3',
+							duration: '002',
+						},
 					]
 				}
 			}
@@ -193,10 +254,15 @@
 				this.currentTable.cellArray[0].imgSrc =
 					"http://p2.music.126.net/USxHosVXMbDjxI1cO5-9JA==/109951169507879008.jpg"
 			}, 1500)
-			
-			
-			
+			// setIn
 		},
-		methods: {}
+		methods: {},
+		watch:{
+			scrollState:{
+				handler(newValue,oldValue){
+					console.log(newValue);
+				}
+			}
+		}
 	}
 </script>

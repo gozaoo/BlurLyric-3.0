@@ -17,8 +17,6 @@
 - [LyricEase](https://apps.microsoft.com/store/detail/lyricease/9N1MKDF0F4GT?hl=zh-cn&gl=CN)
 - [Apple Music](https://www.apple.com/apple-music/)
 - [Spotify](https://www.spotify.com/)
-- [JetBrains](https://www.jetbrains.com/)
-- [Cloudflare](https://www.cloudflare.com/)
 
 ## 应用内截图一览 
 <span>浏览版本为3.0.0.240405</span>

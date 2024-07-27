@@ -4,8 +4,9 @@ import vue from '@vitejs/plugin-vue'
 export default defineConfig({
   clearScreen: false,
   server: {
+    host:'0.0.0.0',
     strictPort: true,
-    port: 18776
+    port: 18780
   },
   // to make use of `TAURI_PLATFORM`, `TAURI_ARCH`, `TAURI_FAMILY`,
   // `TAURI_PLATFORM_VERSION`, `TAURI_PLATFORM_TYPE` and `TAURI_DEBUG`

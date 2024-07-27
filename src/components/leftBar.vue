@@ -1,6 +1,5 @@
 <script setup>
 import iconToClick from './iconToClick.vue'
-import iconWithText from './iconWithText.vue'
 
 import {ref,watch} from 'vue'
 
@@ -28,92 +27,47 @@ watch(
       <i class="bi bi-list"></i>
     </iconToClick>
 
-    <h1>我的音乐</h1>
-
-    <!--音乐库-->
-    <iconWithText @click="router.push('/')" :type="(state=='short')?'hidden':null" >
-      <template #svg>
-        <i class="bi bi-house-fill"></i>
-      </template>
-      <template #text>
-        音乐库
-      </template>
-    </iconWithText>
-
-    <h1>设置区</h1>
-
-    <!--音乐目录-->
-    <iconWithText @click="router.push('/musicFolder/')" :type="(state=='short')?'hidden':null" >
-      <template #svg>
-        <i class="bi bi-folder-fill"></i>
-      </template>
-      <template #text>
-        音乐来源
-      </template>
-    </iconWithText>
-
-    <iconWithText @click="router.push('/setting/')" :type="(state=='short')?'hidden':null" >
-      <template #svg>
-        <i class="bi bi-gear-fill"></i>
-      </template>
-      <template #text>
-        设置
-      </template>
-    </iconWithText>
-    <iconWithText @click="router.push('/demo/')" :type="(state=='short')?'hidden':null" >
-      <template #svg>
-        <i class="bi bi-bug-fill"></i>
-      </template>
-      <template #text>
-        组件测试
-      </template>
-    </iconWithText>
+    <slot name="buttons"/>
     
+    <div v-if="state=='wide'" class="title">
+      BLURLYRIC
+    </div>
   </div>
 </template>
 
-<style>
+<style scoped>
 .leftBar{
-  --width: 38px;
+  --width: 52px;
   width: var(--width);
-  transition: 0.25s cubic-bezier(.5,.3,.2,1);
+  transition: width 0.25s cubic-bezier(.5,.3,.2,1);
   user-select: none;
   display: flex;
   flex-direction: column;
   padding: 50px 7px 0 7px;
   margin-top: -50px;
   z-index: 1;
-
   background-color: #eee;
   gap: 7px;
+  overflow: hidden;
+  max-height: 100vh;
+  box-sizing: border-box;
+  position: relative;
+}
+.leftBar::-webkit-scrollbar{
+  display: none;
 }
 .leftBar.wide{
   --width: 200px
 }
 
-</style>
-
-<style scoped>
-
-h1{
-  font-size: 15px;
-  padding-left: 10px;
-  color: #0000;
-  white-space: nowrap;
-  height: 0px;
-  margin: -7px 0 0 0;
-  transition: all 0.125s cubic-bezier(.5,.3,.2,1)  0.125s,color 0.125s  cubic-bezier(.5,.3,.2,1);
-
-}
-.wide h1{
-  transition: all 0.125s cubic-bezier(.5,.3,.2,1) ,color 0.125s  cubic-bezier(.5,.3,.2,1) .125s;
-  color: #0006;
-  margin-block-start: 0.67em;
-    margin-block-end: 0.67em;
-    margin-inline-start: 0px;
-    margin-inline-end: 0px;
-  height: 20px;
-
+.title{
+  position: absolute;
+  bottom: 10px;
+  font-weight: 900;
+  color: #aaa;
+  left: 50%;
+  font-size: 8px;
+  transform: translateX(-50%);
 }
 
 </style>
