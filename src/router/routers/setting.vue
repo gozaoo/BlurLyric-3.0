@@ -1,6 +1,7 @@
 <script>
     // import FlexColumnRow from '../../components/flexColumnRow.vue';
     import toggle_lineRow from '../../components/tracks/toggle-line.vue'
+    import linkLine from '../../components/tracks/link-line.vue';
     import tracksRow from '../../components/tracks/tracksRow.vue'
 
     export default {
@@ -9,13 +10,14 @@
         },
         components: {
             toggle_lineRow,
-            tracksRow
+            tracksRow,
+            linkLine
         },
         props: {
             state: Boolean
         },
         methods: {
-            test(state){
+            test(state) {
                 console.log(state);
             }
         }
@@ -32,20 +34,21 @@
                 <i class="bi bi-battery-full"></i>
             </template>
             <template #text>
-               省电模式
+                省电模式
             </template>
         </toggle_lineRow>
     </tracksRow>
     <h2>其他</h2>
     <tracksRow>
-        <toggle_lineRow @changeState="test" :state="true">
+
+        <linkLine @click="this.$router.push('/demo/')" :type="(leftBarState=='short')?'hidden':null">
             <template #icon>
                 <i class="bi bi-bug-fill"></i>
             </template>
             <template #text>
-                启用调试模式
+                进入调试面板
             </template>
-        </toggle_lineRow>
+        </linkLine>
     </tracksRow>
     <bodytitle text="关于" />
     <h2>BlurLyric</h2>

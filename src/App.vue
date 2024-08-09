@@ -93,14 +93,6 @@
                         设置
                     </template>
                 </iconWithText>
-                <iconWithText @click="this.$router.push('/demo/')" :type="(leftBarState=='short')?'hidden':null">
-                    <template #svg>
-                        <i class="bi bi-bug-fill"></i>
-                    </template>
-                    <template #text>
-                        组件测试
-                    </template>
-                </iconWithText>
             </template>
         </leftBar>
         <rightBlock :leftBarState="leftBarState" @update-scroll-state="(value)=>{this.scrollState = value;

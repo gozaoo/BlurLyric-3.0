@@ -12,9 +12,6 @@ import toggle from '../toggle.vue';
             state:Boolean
         },
         methods:{
-            changeState(state){
-                this.$emit('changeState',state)
-            }
         }
     }
 </script>
@@ -27,7 +24,7 @@ import toggle from '../toggle.vue';
                 <slot name="text" />
             </div>
         </div>
-        <toggle :state="state" @changeState="this.changeState" class="flexRight"></toggle>
+        <i class="bi bi-chevron-right flexRight"></i>
     </div>
 </template>
 <style scoped>
@@ -59,6 +56,7 @@ import toggle from '../toggle.vue';
         font-size: small;
     }
     .flexRight{
-        margin-left: auto
+        margin-left: auto;
+        color:#0007
     }
 </style>

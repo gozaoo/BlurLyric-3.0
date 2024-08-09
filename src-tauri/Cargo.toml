@@ -1,11 +1,11 @@
 [package]
-name = "app"
-version = "0.1.0"
-description = "A Tauri App"
+name = "BlurLyric"
+version = "3.0.0"
+description = "A Music Player With High-performance"
 authors = ["you"]
 license = ""
 repository = ""
-default-run = "app"
+default-run = "BlurLyric"
 edition = "2021"
 rust-version = "1.60"
 
@@ -15,13 +15,13 @@ rust-version = "1.60"
 tauri-build = { version = "1.4.0", features = [] }
 
 [dependencies]
-serde_json = "1.0"
 serde = { version = "1.0", features = ["derive"] }
-tauri = { version = "1.4.0", features = ["window-close", "window-hide", "window-maximize", "window-minimize", "window-show", "window-start-dragging", "window-unmaximize", "window-unminimize"] }
+serde_derive = "1.0"
+serde_json = "1.0"
+tauri = { version = "1.4.0", features = [ "window-start-dragging", "window-close", "window-maximize", "window-unminimize", "window-minimize", "window-hide", "window-unmaximize", "window-show"] }
 window-vibrancy = "0.4.0"
 tokio = { version = "1", features = ["full"] }
-actix-web = "4.0"
-actix-cors = "0.6"
+audiotags = "0.5.0"
 
 [features]
 # this feature is used for production builds or when `devPath` points to the filesystem and the built-in dev server is disabled.
