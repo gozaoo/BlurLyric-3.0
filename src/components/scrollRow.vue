@@ -1,5 +1,5 @@
 <script>
-import base from "../js/base";
+import baseMethods from "../js/baseMethods";
 export default {
     name: 'scrollRow',
     data() {
@@ -10,6 +10,7 @@ export default {
             }
         }
     },
+    inject:['setScrollState'],
     mounted() {
         // 监听滚动事件
         this.$refs.scrollRow.addEventListener('scroll', this.handleScroll);
@@ -26,7 +27,8 @@ export default {
                 // 更新当前的滚动高度
                 this.scrollTopState.scrollTop = event.srcElement.scrollTop;
                 // 发送自定义事件给父组件，并传递滚动状态对象
-                this.$emit('update-scroll-state', this.scrollTopState);
+                
+                this.setScrollState(this.scrollTopState);
             // }, 60)();
 
         },

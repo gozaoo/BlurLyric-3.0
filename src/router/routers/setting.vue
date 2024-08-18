@@ -1,25 +1,22 @@
 <script>
-    // import FlexColumnRow from '../../components/flexColumnRow.vue';
+    import FlexColumnRow from '../../components/flexColumnRow.vue';
     import toggle_lineRow from '../../components/tracks/toggle-line.vue'
     import linkLine from '../../components/tracks/link-line.vue';
     import tracksRow from '../../components/tracks/tracksRow.vue'
 
     export default {
         data() {
-            return {}
+            return {
+                test: false
+            }
         },
         components: {
             toggle_lineRow,
             tracksRow,
             linkLine
         },
-        props: {
-            state: Boolean
-        },
         methods: {
-            test(state) {
-                console.log(state);
-            }
+
         }
     }
 </script>
@@ -29,7 +26,7 @@
 
     <h2>显示</h2>
     <tracksRow>
-        <toggle_lineRow @changeState="test" :state="false">
+        <toggle_lineRow v-model="test">
             <template #icon>
                 <i class="bi bi-battery-full"></i>
             </template>
@@ -41,7 +38,7 @@
     <h2>其他</h2>
     <tracksRow>
 
-        <linkLine @click="this.$router.push('/demo/')" :type="(leftBarState=='short')?'hidden':null">
+        <linkLine @click="this.$router.push('/demo/')">
             <template #icon>
                 <i class="bi bi-bug-fill"></i>
             </template>

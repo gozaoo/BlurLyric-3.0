@@ -1,19 +1,28 @@
 <script>
-import toggle from '../toggle.vue';
-
     export default {
         data() {
-            return{}
+            return {
+                value:false
+            }
         },
-        components:{
-            toggle
+        props: {
+            modelValue: Boolean // 使用 modelValue 作为 v-model 的绑定值
         },
-        props:{
-            state:Boolean
+        emits: ['update:modelValue'], // 声明组件会发出的事件
+        methods: {
         },
-        methods:{
-            changeState(state){
-                this.$emit('changeState',state)
+        // computed:{
+            // value(){return this.modelValue}
+        // },
+        created(){
+            this.value = this.modelValue
+        },
+        watch:{
+            value:{
+                handler(){
+                    this.$emit('update:modelValue', this.value); // 使用 update:modelValue 代替 changeState
+
+                }
             }
         }
     }
@@ -27,11 +36,10 @@ import toggle from '../toggle.vue';
                 <slot name="text" />
             </div>
         </div>
-        <toggle :state="state" @changeState="this.changeState" class="flexRight"></toggle>
+        <toggle v-model="value" class="flexRight"></toggle>
     </div>
 </template>
 <style scoped>
-
     .row {
         /* background-color: #0001; */
         height: 32px;
@@ -58,7 +66,8 @@ import toggle from '../toggle.vue';
     .path {
         font-size: small;
     }
-    .flexRight{
+
+    .flexRight {
         margin-left: auto
     }
 </style>

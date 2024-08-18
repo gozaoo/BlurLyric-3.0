@@ -8,7 +8,7 @@ import App from './App.vue';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import iconToClickVue from './components/iconToClick.vue';
 import iconWithTextVue from './components/iconWithText.vue';
-import toggleVue from './components/toggle.vue';
+import toggleVue from './components/base/toggle.vue';
 // import toggleVue from './components/toggle.vue';
 import textspawnVue from './components/base/text-spawn.vue';
 import bodytitleVue from './components/base/bodytitle.vue'

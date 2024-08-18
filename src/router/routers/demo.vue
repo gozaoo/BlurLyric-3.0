@@ -17,6 +17,7 @@
             contextMenu,
             text_contextMenu
         },
+        inject: ['audioManager','audioState','currentMusicInfo'],
         props: {},
         methods: {
 
@@ -26,13 +27,50 @@
 
 <template>
     <bodytitle :text="'测试区域'" />
+    <bodytitle :text="'音乐测试'"/>
+
+    
+    <h2>
+        <span style="font-size: 0.8em;">曲名:</span><br>    
+        <textspawn :text="currentMusicInfo.name" />
+    </h2>
+    {{audioState.currentTime}}，{{audioState.duration}}<br>
+    进度：{{ ((audioState.currentTime/audioState.duration)*100).toFixed(2) + '%' }}
+    
+    <iconWithText v-if="audioState.playing==false" style="width: fit-content;" @click="audioManager.play()" type="background">
+        <template #text>
+            播放
+        </template>
+        <template #svg>
+            <i class="bi bi-play-circle-fill"></i>
+        </template>
+    </iconWithText>    
+    <iconWithText v-if="audioState.playing==true" style="width: fit-content;" @click="audioManager.pause()" type="background">
+        <template #text>
+            暂停
+        </template>
+        <template #svg>
+            <i class="bi bi-pause-circle-fill"></i>
+        </template>
+    </iconWithText>
+
     <bodytitle :text="'组件测试'" />
 
-    <div>
-        可用开关
-        <toggle :type="'normal'" :state="state" @changeState="this.state==!this.state" />
-        不可用开关
-        <toggle :type="'unavailable'" :state="true" @changeState="this.state==!this.state" />
+    <div style="display: flex; gap: 2em;">
+        <div>
+            <div>
+                可用开关
+            </div>
+            <toggle :type="'normal'" v-model="state"/>
+        </div>
+        <div>
+            <div>
+                不可用开关
+            </div>
+            <toggle :type="'unavailable'" v-model="state" />
+
+        </div>
+        
     </div>
     <br>
     <contextMenu :menuItems="[

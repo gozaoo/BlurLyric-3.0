@@ -1,6 +1,6 @@
 <script>
-import { onMounted } from 'vue'
-    import lyricVue from "../lyric.vue";
+    import { onMounted } from 'vue'
+    import lyricVue from "./lyric.vue";
 
     export default {
         data() {
@@ -9,6 +9,10 @@ import { onMounted } from 'vue'
         components:{
             lyricVue,
         },
+        inject: [
+            'currentMusicInfo',
+            'audioState'
+        ],
         methods:{
             
             formTime(sec) { //秒数转化为mm:ss
@@ -17,18 +21,17 @@ import { onMounted } from 'vue'
                 return min + ':' + s
             },
         },
-        props:{
-            musicInfo: Object,
-            controls: Object,
-            playerState: Object,
-            lyric: Object,
-            audio: HTMLAudioElement
-        },
+        // props:{
+        //     musicInfo: Object,
+        //     controls: Object,
+        //     playerState: Object,
+        //     lyric: Object,
+        //     audio: HTMLAudioElement
+        // },
         created(){
             this.$nextTick(()=>{
             this.$emit('bindRef',{path:'menu',element:this.$refs.menu})
             this.$emit('bindRef',{path:'coverImagePlaceHolder',element:this.$refs.coverImagePlaceHolder})
-        
 
             })},
         onMounted(){
@@ -48,26 +51,26 @@ import { onMounted } from 'vue'
             <div class="musicInfo">
                 <div style="display: flex;">
                     <div style="display: flex; flex: 1 1 0%; flex-direction: column; min-width: 0px;">
-                        <div class="musicname">{{ musicInfo.name }}</div>
+                        <div class="musicname">{{ currentMusicInfo.name }}</div>
 
 
                         <div class="artists">
-                            <span v-for="(item,index) in musicInfo.ar"> <span>{{ item.name }}</span> <span
-                                    v-if="musicInfo.ar.length -1 != index">&</span> </span>
+                            <span v-for="(item,index) in currentMusicInfo.ar"> <span>{{ item.name }}</span> <span
+                                    v-if="currentMusicInfo.ar.length -1 != index">&</span> </span>
                         </div>
 
                     </div><button type="button" class="moreButtom"><i class="bi bi-three-dots"></i></button>
                 </div>
                 <div class="progressControl">
                     <div id="audioProgress" class="slider ">
-                        <div :style="{'--musicProgressPercent': (playerState.icurrentTime / playerState.durationTime)}"
+                        <div :style="{'--musicProgressPercent': (audioState.currentTime / audioState.duration)}"
                             class="inner">
                             <div class="thumb"></div>
                         </div>
                     </div>
                     <div class="progressTips">
-                        <div>{{formTime(playerState.icurrentTime)}}</div>
-                        <div>{{formTime(playerState.durationTime)}}</div>
+                        <div>{{formTime(audioState.currentTime_round)}}</div>
+                        <div>{{formTime(audioState.duration_round)}}</div>
                     </div>
                 </div>
                 <div class="musicControls">
@@ -75,7 +78,7 @@ import { onMounted } from 'vue'
                     <button @click="controls.prevTrack()" style="font-size: 1.3em"><i
                             class="bi bi-skip-backward-fill"></i></button>
                     <button @click="controls.play()" style="font-size: 2.3em" class="am-music-play">
-                        <i :class="['bi',(playerState.audioState)?'bi-pause-fill':'bi-play-fill']"></i>
+                        <i :class="['bi',(audioState.playing)?'bi-pause-fill':'bi-play-fill']"></i>
                     </button>
                     <button @click="controls.nextTrack()" style="font-size: 1.3em"><i
                             class="bi bi-skip-forward-fill"></i></button>
@@ -91,10 +94,10 @@ import { onMounted } from 'vue'
 
 
             </div>
-            <lyricVue class="lyricRow" :importedConfig="{
+            <!-- <lyricVue class="lyricRow" :importedConfig="{
     usingwfwLyric: true,
     energySavingMode: false
-}" :audioDom="audio" :lyricText="lyric" />
+}" :audioDom="audio" :lyricText="lyric" /> -->
         </div>
     </div>
 </template>

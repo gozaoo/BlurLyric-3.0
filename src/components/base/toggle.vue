@@ -1,43 +1,30 @@
 <script>
-    export default {
-        data() {
-            return {currentState: false}
-        },
-        props:{
-            state:Boolean,
-            type: String
-            /**
-             * normal: 正常
-             * unavailable: 不启用
-             * 
-             * *default=normal 正常
-             */
-        },
-        methods:{
-            changeState(){
-                if(this.type == 'unavailable') return;
-                this.currentState= !this.currentState
-                this.$emit('changeState',this.currentState)
-            }
-        },
-        created(){
-            this.currentState = this.state;
-        },
-        watch:{
-            state:{
-                handler(){
-                    this.currentState = state
-                }
-            }
-        }
+export default {
+  props: {
+    modelValue: Boolean,
+    type: {
+      type: String,
+      default: 'normal' // 设置默认值为 'normal'
     }
+  },
+  emits: ['update:modelValue'],
+  methods: {
+    changeState() {
+      if (this.type === 'unavailable') return;
+      this.$emit('update:modelValue', !this.modelValue);
+    }
+  },
+  data(){
+    return {
+    }
+  }
+}
 </script>
 
 <template>
-    <div @click="changeState" :class="['box',currentState?'active':'',type]">
-        <div class="point"></div>
-	<!-- {{type}} -->
-    </div>
+  <div @click="changeState" :class="['box', modelValue ? 'active' : '', type]">
+    <div class="point"></div>
+  </div>
 </template>
 
 <style scoped>

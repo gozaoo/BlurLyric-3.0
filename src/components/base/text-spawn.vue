@@ -46,7 +46,7 @@
   .box{
     position: relative;
     width: inherit;
-    display: block;
+    display: inline;
   }
   .oldText{
     position: absolute;

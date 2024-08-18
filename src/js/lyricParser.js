@@ -140,5 +140,86 @@ export default {
             lines:lyrics
         };
 
+    },
+    parseBLFlyric(blfContent) {
+        const blfLyric = JSON.parse(blfContent);
+    
+        const parsedLyric = {
+            type: 'exact',
+            headers: blfLyric.headers,
+            lines: []
+        };
+    
+        blfLyric.lines.forEach(line => {
+            const parsedLine = {
+                startTime: line.startTime,
+                duration: line.duration,
+                endTime:line.startTime + line.duration,
+                words: [],
+                text: ''
+            };
+    
+            line.words.forEach(word => {
+                const parsedWord = {
+                    startTime: word[0],
+                    duration: word[1],
+                    endTime: word[0] + word[1],
+                    word: word[2]
+                };
+                parsedLine.words.push(parsedWord);
+                parsedLine.text += parsedWord.word;
+            });
+    
+            parsedLyric.lines.push(parsedLine);
+        });
+    
+        return parsedLyric;
+    },
+    toBLFfile(parsedLyric) {
+        const blfLyric = {
+            type: 'exact',
+            headers: parsedLyric.headers,
+            lines: []
+        };
+    
+        parsedLyric.lines.forEach(line => {
+            const blfLine = {
+                startTime: line.startTime,
+                duration: line.duration,
+                endTime: line.endTime,
+                words: []
+            };
+    
+            line.words.forEach(word => {
+                blfLine.words.push([word.startTime, word.duration, word.word]);
+            });
+    
+            blfLyric.lines.push(blfLine);
+        });
+    
+        return JSON.stringify(blfLyric, null, 2); // 使用两个空格缩进格式化JSON
     }
+}
+let tempBLF = {
+    type: "exact",
+    headers: {
+        ar: 'artist name',
+        ti: 'song title',
+        al: 'album Name',
+        ly: 'lyric '
+    },
+    lines: [
+      {
+        "startTime": 0,
+        "duration": 2,
+        "words": [[0,1,'Hello'],[1.5,0.5,'Hello']
+        ],
+      },
+      {
+        "startTime": 1.5,
+        "duration": 2,
+        "words": [[0,1,'Second'],[1.5,0.5,'line']
+        ],
+    }
+    ]
 }

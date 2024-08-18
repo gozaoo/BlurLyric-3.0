@@ -26,3 +26,11 @@ body{
 body{
   background-color: var(--mainBlockBackground);
 }
+.global_backgroundblur_light{
+  backdrop-filter: blur(30px);
+  background-color: #fffa;
+}
+.global_backgroundblur_dark{
+  backdrop-filter: blur(30px);
+  background-color: #fffa;
+}

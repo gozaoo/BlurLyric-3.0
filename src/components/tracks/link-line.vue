@@ -1,19 +1,5 @@
-<script>
-import toggle from '../toggle.vue';
+<script setup>
 
-    export default {
-        data() {
-            return{}
-        },
-        components:{
-            toggle
-        },
-        props:{
-            state:Boolean
-        },
-        methods:{
-        }
-    }
 </script>
 <template>
     <div class="row">

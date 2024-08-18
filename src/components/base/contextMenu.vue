@@ -1,9 +1,9 @@
 <template>
-    <div class="context-menu-container" @click="hideMenu">
+    <div  class="context-menu-container" @click="hideMenu">
         <div @contextmenu="handleContextMenu" class="slot">
             <slot></slot>
         </div>
-        <div v-if="visible" :style="{ top: position.y + 'px', left: position.x + 'px' }" class="vue-context-menu">
+        <div v-if="visible" :style="{ top: position.y + 'px', left: position.x + 'px' }" class="vue-context-menu global_backgroundblur_light">
             <div :style="{
                 maxHeight: '32px'
             }" v-for="(item, index) in menuItems" :key="index" @click="item.handleClick">
@@ -110,19 +110,18 @@ import hoverMenu from './hoverMenu.vue';
         z-index: 9999;
         border-radius: 9px;
         max-width: 200px;
-        background-color: #fffa;
+
         box-sizing: border-box;
         padding: 6px;
         display: flex;
         flex-direction: column;
         font-size: 15px;
-        backdrop-filter: blur(12px);
         transition: 0.3s cubic-bezier(.3, .7, .2, 1);
         gap: 5px;
         width: max-content;
         user-select: none;
         border: 1px solid #0002;
-        box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 0px 15px rgba(0, 0, 0, 0.14);
         transform-origin: 0% 0%;
         animation: spawn_context_menu 0.4s cubic-bezier(.3, .7, .2, 1)
     }

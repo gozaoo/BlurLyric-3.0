@@ -28,6 +28,7 @@
         border-radius: 7px;
         box-sizing: border-box;
         padding: 0 11px ;
+        user-select: none;
         cursor: pointer;
         overflow: hidden;
         min-height: 36px;

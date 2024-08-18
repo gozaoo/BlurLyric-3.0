@@ -165,7 +165,7 @@
 
 <script>
 	import contextMenu from '../base/contextMenu.vue';
-	import base from '../../js/base';
+	import baseMethods from '../../js/baseMethods';
 	import lazyLoadCoverImageVue from '../base/lazyLoadCoverImage.vue'
 	export default {
 		inject: ['scrollState'],
@@ -231,13 +231,12 @@
 		components: {
 			lazyLoadCoverImageVue,
 			contextMenu,
-			base
 		},
 		props: {
 			tableData: Object,
 		},
 		methods: {
-			copy: base.copy
+			copy: baseMethods.copy
 		},
 		watch: {
 			scrollState: {

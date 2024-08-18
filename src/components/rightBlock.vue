@@ -3,12 +3,7 @@
 
   export default {
     data() {
-      return {
-        scrollTopState: {
-          scrollTop: 0,
-          scrollSize: 0
-        }
-      }
+      return {}
     },
     props:{
       leftBarState: String
@@ -22,9 +17,7 @@
 </script>
 
 <template>
-  <scrollRow :class="[leftBarState]" @update-scroll-state="(value)=>{
-    this.scrollTopState = value
-  }" class="router">
+  <scrollRow style="padding-bottom: 100px;" :class="[leftBarState]" class="router">
     <router-view />
   </scrollRow>
 

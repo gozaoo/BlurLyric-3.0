@@ -1,421 +1,281 @@
 <script>
-    import "bootstrap-icons/font/bootstrap-icons.css";
-    import background from "./background.vue";
-    import elemListener from "../js/elemListener.js"
-    import anime from 'animejs/lib/anime.es.js';
-    import lyricVue from "./lyric.vue";
-    import landscapeVue from "./musicInfoPageComponents/landscape.vue";
-    import portraitVue from './musicInfoPageComponents/portrait.vue'
+    import lazyLoadCoverImage from './base/lazyLoadCoverImage.vue';
+    import buttom_icon_circleBackground from './base/buttom_icon_circleBackground.vue';
+    import playModeSvg from './musicInfoPageComponents/playModeSvg.vue';
+    import drag from '../js/drag';
+    import textSpawn from './base/text-spawn.vue';
+import anime  from 'animejs';
     export default {
         data() {
             return {
-                displayState: 'buttom',
-                oriDisplayState: 'buttom',
-                eventTempCache: (args) => {
-                    switch (args.direction) {
-                        case "up":
-                        case "down":
-                            this.changeDisplayState(args.direction, Number((args.speed * 0.15).toFixed(0)))
-                            break;
-                        case "left":
-                        case "right":
-                            break;
-                        default:
-                            break;
+                style: {
+                    musicInfoPageRow: {
+                        transformY: -88
+                    },
+                    musicDetailRender:{
+                        transformX: 0,
                     }
                 },
-                slideEventReturn: {
-                    removeSlideEvent: () => {}
-                },
-                windowsResizeReturn: {
-                    removeWindowsResize: () => {}
-                },
-                tempSetTimeoutSaver: setTimeout(() => {}, 0),
-                screenMode: 'landscape',
-                childRefs: {}
+                eventListenerRemovers:[],
+                dragInfo: null
             }
         },
         components: {
-            background,
-            lyricVue,
-            landscapeVue,
-            portraitVue
-
+            lazyLoadCoverImage,
+            buttom_icon_circleBackground,
+            playModeSvg,
+            textSpawn
         },
-        methods: {
-            changeDisplayState(area, speed) {
-                speed = Math.abs(speed).toFixed(0);
-                if (speed > 15) speed = 15;
-                if (speed === NaN) speed = 5
-                const self = this
-                switch (area) {
-                    case 'up':
-                        if (this.displayState == 'top') return
-                        this.displayState = 'top'
-                        this.oriDisplayState = 'top'
-                        anime({
-                            targets: this.$refs.player,
-                            height: [this.$refs.player.offsetHeight + "px", window.innerHeight + "px"],
-                            backgroundColor: "#ddddddff",
-                            easing: 'spring(1,100, 60, ' + speed + ')',
-                        })
-                        anime({
-                            targets: this.childRefs.menu,
-                            easing: 'linear',
-                            duration: 100,
-                            opacity: 1,
-                        })
-                        anime({
-                            targets: this.$refs.miniControlBar,
-                            opacity: 0,
-                            right: ['0px', '-' + this.$refs.miniControlBar.offsetWidth + 'px'],
-                            easing: 'spring(1,100, 60, ' + speed + ')',
-                        })
-                        anime({
-                            easing: 'spring(1, 100, 60,  ' + speed + ')',
-                            targets: this.$refs.coverImage,
-                            left: this.childRefs.coverImagePlaceHolder.offsetLeft,
-                            top: this.childRefs.coverImagePlaceHolder.offsetTop,
-                            height: this.childRefs.coverImagePlaceHolder.offsetWidth + 'px',
-                        })
-                        this.slideEventReturn.removeSlideEvent()
-                        this.slideEventReturn = elemListener.addSlideEvent(this.$refs.coverImage, this.eventTempCache, {
-                            threshold: 100
-                        })
-                        this.tempSetTimeoutSaver = setTimeout(() => {
-                            this.$nextTick(() => {
-                                this.$refs.player.style.height = '100%'
-                                this.$refs.highQualityView.style.display = 'block'
-                            })
-                        }, 1300);
-                        setTimeout(() => {
-                            this.$nextTick(() => {
-                                this.$refs.highQualityView.style.display = 'block'
-                            })
-                        }, 400);
-                        this.windowsResizeReturn = elemListener.onWindowsResize(() => {
-
-                        anime({
-                            easing: 'spring(1, 100, 60,  10)',
-                            targets: this.$refs.coverImage,
-                            left: this.childRefs.coverImagePlaceHolder.offsetLeft,
-                            top: this.childRefs.coverImagePlaceHolder.offsetTop,
-                            height: this.childRefs.coverImagePlaceHolder.offsetWidth + 'px',
-                        })
-                        })
-                        break;
-
-                    case 'down':
-                        clearTimeout(this.tempSetTimeoutSaver)
-                        if (this.displayState == 'buttom') return
-                        this.displayState = 'buttom'
-                        this.oriDisplayState = 'buttom'
-
-                        this.$refs.highQualityView.style.display = 'none'
-
-                        anime({
-                            targets: this.$refs.player,
-                            height: [this.$refs.player.offsetHeight + "px", '100px'],
-                            easing: 'spring(1, 100, 60,' + speed + ')',
-                            finished: () => {
-                                anime({
-                                    targets: self.$refs.player,
-                                    backgroundColor: "#dddddd55",
-                                    easing: 'spring(1, 100, 60,  ' + speed + ')',
-                                })
-                            }
-                        })
-                        anime({
-                            targets: this.childRefs.menu,
-                            easing: 'linear',
-                            duration: 100,
-                            opacity: 0,
-                        })
-                        anime({
-                            targets: this.$refs.miniControlBar,
-                            opacity: 1,
-                            right: '0px',
-                            duration: 300,
-                            easing: 'spring(1, 100, 60,  ' + speed + ')',
-                        })
-
-                        anime({
-                            targets: this.$refs.coverImage,
-                            left: 0,
-                            easing: 'spring(1, 100, 60,  ' + speed + ')',
-                            top: 0,
-                            height: '58px',
-                        })
-
-                        this.slideEventReturn.removeSlideEvent()
-                        this.slideEventReturn = elemListener.addSlideEvent(this.$refs.player, this.eventTempCache, {
-                            threshold: 100
-                        })
-                        this.windowsResizeReturn.removeWindowsResize()
-                        break;
-
-                    default:
-                        break;
+        inject: ['currentMusicInfo', 'audioState', 'audioManager', 'changePlayMode','trackState'],
+        mounted(){
+            let musicControlBar_animeJsCallBack = null
+            let lastTransformX
+            let callBack_drag =  drag.create(this.$refs.musicControlBar,
+            (info)=>{
+                if(info.offsetDirectionX != 'none'){
+                    if(musicControlBar_animeJsCallBack!=null) musicControlBar_animeJsCallBack.pause()
+                    lastTransformX = this.style.musicDetailRender.transformX
                 }
+                this.dragInfo = info
             },
+            (info)=>{
+                if(info.offsetDirectionX != 'none'){
+                    this.style.musicDetailRender.transformX = info.offsetX + lastTransformX
+                }
 
-            formTime(sec) { //秒数转化为mm:ss
-                let s = sec % 60 < 10 ? ('0' + sec % 60) : sec % 60
-                let min = Math.floor(sec / 60) < 10 ? ('0' + Math.floor(sec / 60)) : Math.floor(sec / 60)
-                return min + ':' + s
+                this.dragInfo = info
+
             },
-            bindChildRefs(info) {
-                console.log(info);
-                this.childRefs[info.path] = info.element
-            }
-        },
-        props: {
-            musicInfo: Object,
-            controls: Object,
-            playerState: Object,
-            lyric: Object,
-            audio: HTMLAudioElement
-        },
-        watch: {
-            musicInfo: {
-                handler: async function (newVal) {},
-                deep: true
-            }
-        },
-        created() {
-            const self = this
-            this.$nextTick(() => {
-                elemListener.addOnhoverListener(this.$refs.player, (state) => {
-                    if (this.displayState == "top") return;
-                    this.displayState = (state) ? 'wait' : this.oriDisplayState
-                })
-                this.slideEventReturn = elemListener.addSlideEvent(this.$refs.player, this.eventTempCache, {
-                    threshold: 100
-                })
+            (info)=>{
+                
+                musicControlBar_animeJsCallBack = anime({
+                    targets: this.style.musicDetailRender,
+                    transformX: 0,
+                    easing:'spring(1, 80, 14,0)'
+                }
+                )
+
+                this.dragInfo = null
+
             })
+
+            this.eventListenerRemovers.push(callBack_drag.destroy)
+        },
+        beforeUnmount(){
+            this.eventListenerRemovers.map((value)=>{value()})
         }
     }
 </script>
-
 <template>
-    <div ref="player" :class="['player',displayState]">
-        <div id="audioProgress" v-if="displayState!='top'" class="processbar">
-            <div :style="{'width': (playerState.icurrentTime / playerState.durationTime * 100).toFixed(2) + '%'}"
-                class="progress"></div>
-            <!-- <span>{{ playerState.currentTime }}</span> -->
-        </div>
-        <div class="relativeRow">
-            <background :dynamic="false" :imgSrc="musicInfo.al.picUrl" :mainDisplay="displayState" />
+    <div :style="{
+        transform: 'translateY('+style.musicInfoPageRow.transformY+'px)'
+        }" class="global_backgroundblur_light musicInfoPageRow">
 
-            <div ref="coverImage" class="alPicTure">
-                <div class="relativeRow">
-
-                    <img class="blur" :src="musicInfo.al.picUrl + '?param=128y128'" alt="" srcset="">
-                    <img ref="highQualityView" class="highQualityView" :src="musicInfo.al.picUrl + '?param=1024y1024'"
-                        alt="">
-                    <img class="view" :src="musicInfo.al.picUrl + '?param=128y128'" alt="" srcset="">
-
+        <div class="relativeBox">
+            
+            <!-- <div class="cover">
+                    <lazyLoadCoverImage class="blur" :src="currentMusicInfo.al.picUrl"></lazyLoadCoverImage>
+                    <lazyLoadCoverImage :src="currentMusicInfo.al.picUrl"></lazyLoadCoverImage>
+                </div> -->
+            <div ref="musicControlBar" class="musicControlBar">
+                <div class="cover">
+                    <lazyLoadCoverImage class="blur" :src="currentMusicInfo.al.picUrl"></lazyLoadCoverImage>
+                    <lazyLoadCoverImage :src="currentMusicInfo.al.picUrl"></lazyLoadCoverImage>
+                </div>
+                <div class="detail"> 
+                    <div :style="{
+                        transform:'translateX('+style.musicDetailRender.transformX+'px)'
+                    }" class="dragRender">
+                        <div class="prev">
+                            <div class="event">上一首</div>
+                            <div class="name">{{currentMusicInfo.name}}</div>
+                        </div>
+                        <div class="currentMusic">
+                            <div class="name">
+                                <textSpawn :text="currentMusicInfo.name" />
+                            
+                            </div>
+                            <div class="artists"> 
+                                <span v-for="(value,index) in currentMusicInfo.ar">
+                                    <textSpawn :text="value.name + ((index!=currentMusicInfo.ar.length-1)?'/':'')" /> 
+                                </span> - {{  currentMusicInfo.al.name }}
+                                
+                            </div>
+                        </div>
+                        <div class="next">
+                            <div class="event">下一首</div>
+                            <div v-if="trackState.playMode != 'randomPlay'" class="name">{{currentMusicInfo.name}}</div>
+                            <div v-if="trackState.playMode == 'randomPlay'" class="name">随机播放</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="control">
+                    <buttom_icon_circleBackground>
+                        <template #icon>
+                            <i class="bi bi-skip-start-fill"></i>
+                        </template>
+                    </buttom_icon_circleBackground>
+                    <buttom_icon_circleBackground class="playButtom">
+                        <template #icon>
+                            <div style="transform: scale(1.5) translateX(5%);transform-origin: 50% 50%;">
+                                <i class="bi bi-play-fill"></i>
+                            </div>
+                        </template>
+                    </buttom_icon_circleBackground>
+                    <buttom_icon_circleBackground>
+                        <template #icon>
+                            <i class="bi bi-skip-end-fill"></i>
+                        </template>
+                    </buttom_icon_circleBackground>
+                    <buttom_icon_circleBackground @click="changePlayMode">
+                        <template #icon>
+                            <playModeSvg style="transform: scale(.7) translateY(1%);transform-origin: 50% 50%;">
+                            </playModeSvg>
+                        </template>
+                    </buttom_icon_circleBackground>
+                    <buttom_icon_circleBackground>
+                        <template #icon>
+                            <i style="transform: scale(.7) translateY(1%);transform-origin: 50% 50%;"
+                                class="bi-volume-up bi"></i>
+                            <!-- <playModeSvg  style="transform: scale(.7) translateY(1%);transform-origin: 50% 50%;"></playModeSvg> -->
+                        </template>
+                    </buttom_icon_circleBackground>
                 </div>
             </div>
-            <div ref="miniControlBar" class="hiddenControlBar">
-                <div class="flexRow">
-                    <div class="info">
-                        <h1 class="title">{{ musicInfo.name }}</h1>
-                        <h2 class="artist"><span v-for="(item,e,index) in musicInfo.ar">{{ item.name + ' ' }}</span>
-                        </h2>
-                    </div>
-                    <div class="bottoms">
-                        <i @click="controls.prevTrack()" class="bi bi-skip-start-fill"></i>
-                        <i @click="controls.play()"
-                            :class="['bi',(playerState.audioState)?'bi-pause-fill':'bi-play-fill','notice']"></i>
-                        <i @click="controls.nextTrack()" class="bi bi-skip-end-fill"></i>
-                    </div>
-                </div>
-            </div>
-            <landscapeVue
-            @bindRef="bindChildRefs"
-            :playerState="
-    playerState
-  " :controls="
-    controls
-  " :audio="audio" :lyric="lyric" :musicInfo="musicInfo"></landscapeVue>
         </div>
-
     </div>
 </template>
 <style scoped>
-    .player {
+    .musicInfoPageRow {
         position: absolute;
-        user-select: none;
-        -webkit-user-drag: none;
-        bottom: 0;
-        left: 0px;
-        width: 100vw;
-        border-top: #ddd9 solid 1px;
-        height: 100px;
-        box-sizing: border-box;
-        padding: var(--adaptiveSize);
-        overflow: hidden;
-        background-color: #ddd5;
-        backdrop-filter: blur(6vmin) saturate(200%);
-        --adaptiveSize: min(2.5vh, 2vw);
-        z-index: 9999;
-        box-shadow: 0 0 5vmin #00000005;
-        transition: background-color .3s, backdrop-filter 0s 0s,var(--adaptiveSize) 0s;
-    }
-
-    .player:hover {
-        background-color: #ddd;
-    }
-
-    .player.top,
-    .player.wait {
-        backdrop-filter: blur(0) saturate(0);
-        background-color: #ddd;
-        transition: background-color .3s, backdrop-filter 0s 0.3s;
-    }
-
-    .processbar {
-        position: absolute;
-        top: 0px;
-        left: 0;
-        height: 5px;
-        /* background: #ddd; */
-        /* box-shadow: rgba(0, 0, 0, 0.4) 0px 16px 32px; */
-        width: 100%;
-    }
-
-    .processbar>.progress {
-        height: 5px;
-        /* transition: width 1s linear; */
-        background: #0005;
-    }
-
-    .player>.relativeRow {
-        width: 100%;
         height: 100%;
+        width: 100%;
+        left: 0;
+        top: 100%;
+        background-color: #0001;
+        -webkit-user-drag: none !important;
+        user-select: none;
+        z-index: 100;
+        box-sizing: border-box;
+        border: 1px solid #0001;
+        box-shadow: 0 0px 15px rgba(0, 0, 0, 0.14);
+        /* transform: translateY() */
     }
 
-    .relativeRow {
+    .relativeBox {
+        display: relative;
+        height: 100%;
+        width: 100%;
+    }
+
+    .musicControlBar {
         position: relative;
-    }
-
-    .alPicTure {
-        height: 58px;
-        aspect-ratio: 1 / 1;
-        left: 0px;
-        position: absolute;
-    }
-
-    .alPicTure>.relativeRow {
-        aspect-ratio: 1 / 1;
-        height: inherit;
-    }
-
-    .alPicTure img {
-        /* border-radius: 1%; */
-        border-radius: 1%;
-        height: inherit;
-        z-index: -1;
-        -webkit-user-drag: none;
-    }
-
-    .alPicTure img.view {
-        border: #0001 solid 1px;
-
-    }
-
-    .alPicTure img.blur {
-        position: absolute;
-        z-index: -1;
-
-        filter: blur(1.5vmin) saturate(200%)
-    }
-
-    .alPicTure img.highQualityView {
-        position: absolute;
-        z-index: 2;
-        /* filter: blur(2vmin) */
-        border: #0001 solid 1px;
-        display: none;
-        /* transition: display 0 0s; */
-
-    }
-
-    /*
-     img.highQualityView{
-        display: block;
-        transition: display 0 0.3s;
-    } */
-
-    .hiddenControlBar {
-        display: block;
-        position: absolute;
-        right: 0px;
-        /* top: 20px; */
-        height: 60px;
-        width: calc(100% - 60px);
-        z-index: 2;
-    }
-
-    .hiddenControlBar .info {
+        height: 88px;
+        width: 100%;
+        box-sizing: border-box;
         display: flex;
-        align-items: flex-start;
+        gap: 17px;
+        padding: 17px;
+        overflow: hidden;
+    }
+
+    .cover {
+        height: 54px !important;
+        width: 54px !important;
+        user-select: none;
+        position: relative;
+        flex: 0 1 0;
+    }
+
+    .cover>* {
+        border-radius: 1%;
+        overflow: hidden;
+        height: inherit;
+        width: inherit;
+    }
+
+    .cover>.blur {
+        filter: blur(12px);
+        position: absolute;
+        transform-origin: 50% 100%;
+        transform: scale(0.85);
+    }
+
+    .detail {
+        display: flex;
         flex-direction: column;
         justify-content: center;
-        height: 60px;
-    }
-
-    .flexRow {
-        display: flex;
-        padding-left: 16px;
-    }
-
-    .hiddenControlBar h1.title {
-        margin: 0;
-        font-size: 19px;
-    }
-
-    .hiddenControlBar h2.artist {
-        margin: 0;
-        font-size: 16px;
-        color: #000b;
-
-    }
-
-    .hiddenControlBar .bottoms {
+        height: 100%;
         position: relative;
-        display: flex;
-        align-items: center;
-        margin-left: auto;
-        font-size: 28px;
-        margin-right: 20px;
-        justify-content: center;
-        color: #000d;
-        height: 60px;
-        gap: 20px;
-    }
-
-    .hiddenControlBar .bottoms .notice {
-        font-size: 40px;
-    }
-
-    .hiddenControlBar .bottoms>* {
-        position: relative;
-
-    }
-
-    div.musicControls>button:hover::after,
-    .hiddenControlBar .bottoms>*:hover::after {
-        position: absolute;
-        background-color: #0001;
         width: 100%;
-        border-radius: 50%;
-        /* height: 100%; */
-        aspect-ratio: 1/1;
-        left: 0;
-        top: 50%;
-        transform: translate(0, -50%) scale(1.3);
-        content: "";
+        flex: 1 0 1;
+        margin: 0 -10px;
+        padding: 0 10px;
+        user-select: none;
+        mask-image: linear-gradient(90deg,#0000 0%,#000f 10px,#000f calc(100% - 10px),#0000 100%)
+
+    }
+    
+    .detail>.dragRender{
+        position: absolute;
+        display: flex;
+        width: inherit;
+    }  
+    .prev{
+        position: absolute;
+        text-align: end;
+        transform: translateX(calc(-100% - 10px))
+    }
+    .next{
+        transform: translateX(-10px);
+        position: absolute;
+        width: max-content;
+        left: 100%;
+    }
+    .prev .event,.next .event{
+        font-weight: 900;
+        font-size: 18px;
+        color: #0066cd;
+    }
+    .currentMusic>.name {
+        font-size: 18px;
+        font-weight: 900;
+        color: #333;
+    }
+
+    .currentMusic>.artists,.prev>.name,.next>.name {
+        font-size: 14px;
+        /* font-weight: 900; */
+        color: #676767;
+
+    }
+
+    .control {
+        display: flex;
+        color: #333;
+        align-items: center;
+        gap: 6px;
+        flex: 0 1 0;
+        margin-left: auto;
+        font-size: 25px;
+    }
+
+    .control>* {
+        flex-shrink: 0;
+        height: 30px;
+    }
+
+    .playButtom {
+        font-size: 28px;
+        height: 30px;
+        padding: 0.4em;
+    }
+    @media screen and (max-width: 560px){
+        .control>*{
+            display: none;
+        }
+        .control>*.playButtom{
+            display: inline-flex;
+        }
     }
 </style>

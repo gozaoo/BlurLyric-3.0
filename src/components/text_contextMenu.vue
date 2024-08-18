@@ -1,7 +1,7 @@
 <script>
 import contextMenu from './base/contextMenu.vue';
 
-import base from '../js/base';
+import baseMethods from '../js/baseMethods';
 export default{
     data(){
         return{
@@ -12,7 +12,7 @@ export default{
         contextMenu
     },
     methods:{
-        copy:base.copy
+        copy:baseMethods.copy
     },
     mounted(){
         console

@@ -1,15 +1,25 @@
-<script setup>
+<script>
 
-defineProps({
-  leftBarState: String,
-  titleOffsetTop: Number
-})
+export default{
+  data(){
+    return {}
+  },
+  props:{
+    titleOffsetTop: Number
+  },
+  inject: ['leftBarState'],
 
-import { useRouter, useRoute } from 'vue-router'
+}
+// defineProps({
+//   leftBarState: String,
+//   titleOffsetTop: Number
+// })
 
-const router = useRouter()
-const route = useRoute()
-// const count = ref(0)
+// import { useRouter, useRoute } from 'vue-router'
+
+// const router = useRouter()
+// const route = useRoute()
+// // const count = ref(0)
 </script>
 
 <template>

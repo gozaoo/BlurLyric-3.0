@@ -5,7 +5,6 @@
         data(){
             return{
                 anime: undefined,
-                config,
                 position:[
                   {},
                   {},

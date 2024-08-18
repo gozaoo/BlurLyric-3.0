@@ -1,5 +1,4 @@
 <script>
-    import app from '../../main.js'
     export default{
         data() {
             return {
@@ -8,7 +7,7 @@
                 hiddenTop: 70
             }
         },
-        inject: ['scrollState'],
+        inject: ['scrollState','setTitle'],
         mounted(){
             this.offsetTop = this.$refs.title.offsetTop
             this.height = this.$refs.title.offsetHeight
@@ -29,9 +28,8 @@
         methods:{
             check(){
                 if(this.offsetTop -  this.scrollState.scrollTop < this.hiddenTop){
-                        app._instance.data.title = this.text
-                        app._instance.data.titleOffsetTop = this.offsetTop -  this.scrollState.scrollTop
-                    }
+                    this.setTitle( this.text,this.offsetTop -  this.scrollState.scrollTop)
+                }
             }
         }
     }
