@@ -4,7 +4,7 @@
     import playModeSvg from './musicInfoPageComponents/playModeSvg.vue';
     import drag from '../js/drag';
     import textSpawn from './base/text-spawn.vue';
-import anime  from 'animejs';
+    import anime  from 'animejs';
     export default {
         data() {
             return {
@@ -17,7 +17,8 @@ import anime  from 'animejs';
                     }
                 },
                 eventListenerRemovers:[],
-                dragInfo: null
+                dragInfo: null,
+                musicInfoPagePosition: 'bottom'
             }
         },
         components: {
@@ -26,19 +27,23 @@ import anime  from 'animejs';
             playModeSvg,
             textSpawn
         },
-        inject: ['currentMusicInfo', 'audioState', 'audioManager', 'changePlayMode','trackState'],
+        inject: ['currentMusicInfo', 'audioState', 'audioManager', 'changePlayMode','trackState','musicTrack','nextMusic','prevMusic','getNextMusicIndex','getPrevMusicIndex'],
         mounted(){
             let musicControlBar_animeJsCallBack = null
             let lastTransformX
             let callBack_drag =  drag.create(this.$refs.musicControlBar,
             (info)=>{
+                lastTransformX = this.style.musicDetailRender.transformX
+                if(musicControlBar_animeJsCallBack!=null) musicControlBar_animeJsCallBack.pause()
+
                 if(info.offsetDirectionX != 'none'){
-                    if(musicControlBar_animeJsCallBack!=null) musicControlBar_animeJsCallBack.pause()
-                    lastTransformX = this.style.musicDetailRender.transformX
+                    this.style.musicDetailRender.transformX = info.offsetX + lastTransformX
+
                 }
                 this.dragInfo = info
             },
             (info)=>{
+                
                 if(info.offsetDirectionX != 'none'){
                     this.style.musicDetailRender.transformX = info.offsetX + lastTransformX
                 }
@@ -48,6 +53,14 @@ import anime  from 'animejs';
             },
             (info)=>{
                 
+                if(info.offsetX< - 100 || info.speedX < -1) {
+                    if(navigator.vibrate) navigator.vibrate(50);
+                    this.nextMusic()
+                }
+                if(info.offsetX> 100 || info.speedX > 1) {
+                    if(navigator.vibrate) navigator.vibrate(50);
+                    this.prevMusic()
+                }
                 musicControlBar_animeJsCallBack = anime({
                     targets: this.style.musicDetailRender,
                     transformX: 0,
@@ -63,6 +76,14 @@ import anime  from 'animejs';
         },
         beforeUnmount(){
             this.eventListenerRemovers.map((value)=>{value()})
+        },
+        methods:{
+            toTop(){
+
+            },
+            toBottom(){
+
+            }
         }
     }
 </script>
@@ -88,7 +109,7 @@ import anime  from 'animejs';
                     }" class="dragRender">
                         <div class="prev">
                             <div class="event">上一首</div>
-                            <div class="name">{{currentMusicInfo.name}}</div>
+                            <div class="name">{{ musicTrack[getNextMusicIndex()].name}}</div>
                         </div>
                         <div class="currentMusic">
                             <div class="name">
@@ -104,25 +125,26 @@ import anime  from 'animejs';
                         </div>
                         <div class="next">
                             <div class="event">下一首</div>
-                            <div v-if="trackState.playMode != 'randomPlay'" class="name">{{currentMusicInfo.name}}</div>
+                            <div v-if="trackState.playMode != 'randomPlay'" class="name">{{ musicTrack[getNextMusicIndex()].name}}</div>
                             <div v-if="trackState.playMode == 'randomPlay'" class="name">随机播放</div>
                         </div>
                     </div>
                 </div>
                 <div class="control">
-                    <buttom_icon_circleBackground>
+                    <buttom_icon_circleBackground @click="prevMusic()">
                         <template #icon>
                             <i class="bi bi-skip-start-fill"></i>
                         </template>
                     </buttom_icon_circleBackground>
-                    <buttom_icon_circleBackground class="playButtom">
+                    <buttom_icon_circleBackground @click="(audioState.playing == true)?audioManager.pause():audioManager.play()" class="playButtom">
                         <template #icon>
-                            <div style="transform: scale(1.5) translateX(5%);transform-origin: 50% 50%;">
-                                <i class="bi bi-play-fill"></i>
+                            <div style="transform: scale(1.5);transform-origin: 50% 50%;">
+                                <i v-if="audioState.playing == true" class="bi bi-pause-fill"></i>
+                                <i v-if="audioState.playing == false" class="bi bi-play-fill"></i>
                             </div>
                         </template>
                     </buttom_icon_circleBackground>
-                    <buttom_icon_circleBackground>
+                    <buttom_icon_circleBackground @click="nextMusic()">
                         <template #icon>
                             <i class="bi bi-skip-end-fill"></i>
                         </template>
@@ -210,6 +232,7 @@ import anime  from 'animejs';
         width: 100%;
         flex: 1 0 1;
         margin: 0 -10px;
+        white-space:nowrap;
         padding: 0 10px;
         user-select: none;
         mask-image: linear-gradient(90deg,#0000 0%,#000f 10px,#000f calc(100% - 10px),#0000 100%)

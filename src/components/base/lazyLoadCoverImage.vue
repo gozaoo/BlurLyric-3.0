@@ -60,7 +60,7 @@ export default {
     },
     handleImageError(error) {
       // 当图片加载失败时，可以处理错误
-      console.error("Image load error:", error);
+      // console.error("Image load error:", error);
       this.$emit("imageError", error); // 触发imageError事件，传递错误对象
     },
     fadeOutImage() {

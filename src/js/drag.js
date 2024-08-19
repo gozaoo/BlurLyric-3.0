@@ -48,7 +48,28 @@ export default {
         let onDragEnd = () => {
             // 在这里处理拖拽结束的逻辑
             moveEndCallBack(info);
-
+            info= {
+                screenX: null,
+                screenY: null,
+                originScreenX: null,
+                originScreenY: null,
+    
+                offsetX: null,
+                offsetY: null,
+    
+                speedX: 0,
+                speedY: 0,
+    
+                speedDirectionX: 'none',
+                speedDirectionY: 'none',
+                offsetDirectionX: 'none',
+                offsetDirectionY: 'none',
+    
+                lastScreenX: null,
+                lastScreenY: null,
+                lastTime: null
+    
+            };
             // 移除mousemove和mouseup事件监听器
             document.removeEventListener('mousemove', onMouseMove);
             document.removeEventListener('mouseup', onMouseUp);

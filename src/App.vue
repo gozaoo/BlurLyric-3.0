@@ -179,7 +179,12 @@
                 setTitle: this.setTitle,
 
                 trackState: computed(() => this.trackState),
-                changePlayMode:this.changePlayMode
+                changePlayMode:this.changePlayMode,
+                nextMusic: this.nextMusic,
+                prevMusic: this.prevMusic,
+                getNextMusicIndex: this.getNextMusicIndex,
+                getPrevMusicIndex:this.getPrevMusicIndex,
+
 
             };
         },
@@ -200,7 +205,8 @@
             },
 
             audioManagerConstruct(url) {
-                const newAudio = new Audio(url);
+                const newAudio = document.createElement('audio');
+                newAudio.src  = url
                 this.setupMediaSession();
                 const {
                     audioState
@@ -249,13 +255,16 @@
 
                 // 检查音频是否可播放并播放
                 const checkAndPlay = () => {
-                    console.log(this);
 
                     if (newAudio.readyState >= 4) { // HAVE_ENOUGH_DATA
                         newAudio.play();
                     } else {
                         newAudio.addEventListener('canplay', () => {
-                            newAudio.play();
+                            try {
+                                newAudio.play();
+                            } catch {
+
+                            }
                         });
                     }
                 };
@@ -274,7 +283,6 @@
                 });
 
                 const cancelListener = () => {
-                    console.log('des');
                     // 移除所有事件监听
                     newAudio.removeEventListener('loadeddata', () => {
                         loadeddataHandler()
@@ -355,6 +363,42 @@
 
                 this.trackState.playMode = allPlayModes[nextIndex]
 
+            },
+            getNextMusicIndex(){
+                switch (this.trackState.playMode) {
+                    case 'loopPlaylist':
+                        let nextIndex = this.musicTrackIndex+1
+                        if(nextIndex >= this.musicTrack.length) nextIndex = 0
+                        return nextIndex
+                
+                    default:
+                        return 0
+
+                }
+            },
+            getPrevMusicIndex(){
+                switch (this.trackState.playMode) {
+                    case 'loopPlaylist':
+                        let nextIndex = this.musicTrackIndex-1
+                        if(nextIndex < 0 ) nextIndex = this.musicTrack.length - 1
+                        return nextIndex
+                
+                    default:
+                        return 0
+
+                }
+            },
+            nextMusic(){
+                this.musicTrackIndex = this.getNextMusicIndex();
+                this.audioManager.destroyThisManager()
+                this.audioManagerConstruct(this.musicTrack[this.musicTrackIndex].src)
+                this.audioManager.play()
+            },
+            prevMusic(){
+                this.musicTrackIndex = this.getPrevMusicIndex();
+                this.audioManager.destroyThisManager()
+                this.audioManagerConstruct(this.musicTrack[this.musicTrackIndex].src)
+                this.audioManager.play()
             }
         },
         computed: {
