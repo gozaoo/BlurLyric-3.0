@@ -1,0 +1,46 @@
+name: BlurLyric Build
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  buildUbuntu:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        node_version: ['18.x', '20.x']
+        os: [ubuntu-latest, windows-latest, macOS-latest]
+
+    steps:
+    - name: Setup Node.js environment
+      uses: actions/setup-node@v4.0.3
+      with:
+        node-version: ${{ matrix.node_version }}
+
+    - uses: actions/checkout@v4
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Tauri build
+      run: npm run tauri build
+
+    - name: Run tests
+      run: cargo test --verbose
+
+    - name: Upload Build Artifact
+      if: success() # 仅在上一个步骤成功时执行此步骤
+      uses: actions/upload-artifact@v3
+      with:
+        name: BlurLyric-Build-${{ matrix.os }}-${{ matrix.node_version }}
+        path: |
+          # 这里添加构建产物的路径，例如构建的可执行文件或包
+          ./path/to/your/artifact/
+          # 如果有多个文件或目录，可以继续添加路径
+          ./another/path/if/needed/
