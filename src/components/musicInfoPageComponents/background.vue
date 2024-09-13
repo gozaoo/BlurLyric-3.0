@@ -1,10 +1,11 @@
 <script>
-            // import config from '../js/config.js'
+            import config from '../js/config.js'
 
     export default{
         data(){
             return{
                 anime: undefined,
+                config,
                 position:[
                   {},
                   {},
@@ -22,12 +23,12 @@
                 '--random-y':(Math.random() * 100) + '%'
               })
             }
-          //   setTimeout(() => {
+            setTimeout(() => {
 
-          //   if(this.dynFunctionRunning ==false&&this.mainDisplay!='buttom'&&config.setting().config.useAnimeBackground){
-          //         this.random()
-          //   }
-          // },3000)
+            if(this.dynFunctionRunning ==false&&this.mainDisplay!='buttom'&&config.setting().config.useAnimeBackground){
+                  this.random()
+            }
+          },3000)
 
         },
         methods:{
@@ -40,13 +41,13 @@
                 '--random-y':(Math.random() * 100) + '%'
               })
             }
-            // setTimeout(() => {
-            //   if(this.mainDisplay!='buttom'&&config.setting().config.useAnimeBackground){
-            //     this.random()
-            //   } else {
-            //     this.dynFunctionRunning =false
-            //   }
-            // }, 6*1000);
+            setTimeout(() => {
+              if(this.mainDisplay!='buttom'&&config.setting().config.useAnimeBackground){
+                this.random()
+              } else {
+                this.dynFunctionRunning =false
+              }
+            }, 6*1000);
           }
         },
         props: {
@@ -58,11 +59,11 @@
         watch: {
             mainDisplay:{
               handler: function (newVal,oldVal) {
-                    // if(this.dynFunctionRunning == false&&newVal!='buttom'&&config.setting().config.useAnimeBackground){
-                    //   this.$nextTick(()=>{
-                    //     this.random()
-                    //   })
-                    // }
+                    if(this.dynFunctionRunning == false&&newVal!='buttom'&&config.setting().config.useAnimeBackground){
+                      this.$nextTick(()=>{
+                        this.random()
+                      })
+                    }
                 },
                 deep: true
             }
@@ -77,13 +78,10 @@
   <!-- :style="{background: (colorData)?colorData[0].color:null}"  -->
     <div  v-if="(mainDisplay != 'buttom')" 
     
-     v-bind:class="['player-background',
-    //  (mainDisplay.
-    //  config.setting().config.useAnimeBackground == true)?'dyn':''
-     ]">
+     v-bind:class="['player-background',(mainDisplay,config.setting().config.useAnimeBackground == true)?'dyn':'']">
       <!-- {{ colorData }} -->
       <div v-for="n in 4" ref="block" :style="{
-        backgroundImage: 'url(' + imgSrc +')',
+        backgroundImage: 'url(' + imgSrc + '?param=128y128'+')',
         ...position[n]
       }">
         

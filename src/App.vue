@@ -28,11 +28,11 @@
                 leftBarState: 'short',
                 audioManager: null,
                 musicTrack: [{
-                    name: "UNDEAD",
-                    id: -1,
+                    name: "请选择您的音乐",
+                    id: -2,
                     ar: [{
-                        id: 0,
-                        name: "YOASOBI",
+                        id: -2,
+                        name: "享受 BlurLyric 为您带来的舒适体验",
                         alias: []
                     }],
                     lyric: {
@@ -58,53 +58,12 @@
                         }]
                     },
                     al: {
-                        id: 0,
-                        name: "UNDEAD",
-                        // picUrl: "&quot;&quot;",
-                        picUrl: cover,
-                    },
-                    src: music3
-                },{
-                    name: "60%的日常",
-                    id: -1,
-                    ar: [{
-                        id: 0,
-                        name: "三Z-studio",
-                        alias: []
-                    },{
-                        id: 0,
-                        name: "hoyo-mix",
-                        alias: []
-                    }],
-                    lyric: {
-                        type: "yrc",
-                        lines: [{
-                            startTime: 0,
-                            duration: 2,
-                            endTime: 2,
-                            words: [{
-                                    startTime: 0,
-                                    duration: 1,
-                                    endTime: 1,
-                                    word: "Hello "
-                                },
-                                {
-                                    startTime: 1,
-                                    duration: 0.5,
-                                    endTime: 1.5,
-                                    word: "World"
-                                }
-                            ],
-                            text: "Hello World"
-                        }]
-                    },
-                    al: {
-                        id: 0,
-                        name: "绝区零",
+                        id: -2,
+                        name: "",
                         picUrl: "&quot;&quot;",
                         // picUrl: cover,
                     },
-                    src: music1
+                    src: null
                 }],
 
                 musicTrackIndex: 0,
@@ -157,8 +116,19 @@
                 trackState: {
                     playMode: 'loopPlaylist',
                     allPlayModes: ['loopPlaylist', 'loopSingle', 'stopAfterSingle', 'randomPlay', 'smartRecommend']
+                },
+                appState:{
+                    isTauri: false,
+                    screenType: null, // ['landscape','portrai,'mini']
+                },
+                source:{
+                    local: [],
+                    online: [{
+                        name: 'API1',
+                        type: 'NeteaseCloudMusicApi',
+                        apiUrl: 'http://localhost:3000/'
+                    }]
                 }
-
             }
         },
         provide() {
@@ -179,16 +149,26 @@
                 setTitle: this.setTitle,
 
                 trackState: computed(() => this.trackState),
-                changePlayMode:this.changePlayMode,
+                changePlayMode: this.changePlayMode,
                 nextMusic: this.nextMusic,
                 prevMusic: this.prevMusic,
                 getNextMusicIndex: this.getNextMusicIndex,
-                getPrevMusicIndex:this.getPrevMusicIndex,
-
-
+                getPrevMusicIndex: this.getPrevMusicIndex,
+                appState: computed(()=>this.appState),
+                source: computed(()=>this.source)
             };
         },
         methods: {
+            handleResize() {
+                const width = window.innerWidth;
+                if (width >= 768) { // 假设768px及以上为横屏
+                    this.appState.screenType = 'landscape';
+                } else if (width >= 480) { // 假设480px到767px为竖屏
+                    this.appState.screenType = 'portrait';
+                } else { // 小于480px为迷你屏
+                    this.appState.screenType = 'mini';
+                }
+            },
             /**
              * 处理标题和主内容框滚动事件
              * @param value String
@@ -206,7 +186,7 @@
 
             audioManagerConstruct(url) {
                 const newAudio = document.createElement('audio');
-                newAudio.src  = url
+                newAudio.src = url
                 this.setupMediaSession();
                 const {
                     audioState
@@ -342,6 +322,10 @@
             },
 
             playAudio() {
+                if (this.checkMusicIsUsable(this.musicTrackIndex) == false) {
+                    return
+                }
+
                 if (this.audioManager && this.audioManager.audioDom) {
                     if (this.audioState.playing == false) {
                         this.audioManager.play();
@@ -353,52 +337,65 @@
                 this.audioManager.pause();
             },
 
-            changePlayMode(){
+            changePlayMode() {
                 const allPlayModes = this.trackState.allPlayModes
                 const playMode = this.trackState.playMode
 
-                let nextIndex = allPlayModes.findIndex((value)=>playMode == value) + 1
+                let nextIndex = allPlayModes.findIndex((value) => playMode == value) + 1
 
-                if(nextIndex==allPlayModes.length) nextIndex = 0;
+                if (nextIndex == allPlayModes.length) nextIndex = 0;
 
                 this.trackState.playMode = allPlayModes[nextIndex]
 
             },
-            getNextMusicIndex(){
+            getNextMusicIndex() {
                 switch (this.trackState.playMode) {
                     case 'loopPlaylist':
-                        let nextIndex = this.musicTrackIndex+1
-                        if(nextIndex >= this.musicTrack.length) nextIndex = 0
+                        let nextIndex = this.musicTrackIndex + 1
+                        if (nextIndex >= this.musicTrack.length) nextIndex = 0
                         return nextIndex
-                
+
                     default:
                         return 0
 
                 }
             },
-            getPrevMusicIndex(){
+            getPrevMusicIndex() {
                 switch (this.trackState.playMode) {
                     case 'loopPlaylist':
-                        let nextIndex = this.musicTrackIndex-1
-                        if(nextIndex < 0 ) nextIndex = this.musicTrack.length - 1
+                        let nextIndex = this.musicTrackIndex - 1
+                        if (nextIndex < 0) nextIndex = this.musicTrack.length - 1
                         return nextIndex
-                
+
                     default:
                         return 0
 
                 }
             },
-            nextMusic(){
+            nextMusic() {
                 this.musicTrackIndex = this.getNextMusicIndex();
+
+                if (this.checkMusicIsUsable(this.musicTrackIndex) == false) {
+                    return
+                }
+
                 this.audioManager.destroyThisManager()
                 this.audioManagerConstruct(this.musicTrack[this.musicTrackIndex].src)
                 this.audioManager.play()
             },
-            prevMusic(){
+            prevMusic() {
                 this.musicTrackIndex = this.getPrevMusicIndex();
+                if (this.checkMusicIsUsable(this.musicTrackIndex) == false) {
+                    return
+                }
                 this.audioManager.destroyThisManager()
                 this.audioManagerConstruct(this.musicTrack[this.musicTrackIndex].src)
                 this.audioManager.play()
+            },
+            checkMusicIsUsable(index) {
+                if (this.musicTrack[index].id == -2) {
+                    return false
+                }
             }
         },
         computed: {
@@ -406,26 +403,23 @@
                 return this.musicTrack[this.musicTrackIndex];
             }
         },
-        // updated(){
-        //     this.audioManager.destroyThisManager()
-
-        // }, 
         beforeUnmount() {
             this.audioManager.destroyThisManager()
-
-        },
-        beforeDestroy() {
-            this.audioManager.cancelListener()
-            console.log("beforedestroyer")
-            this.audioManager.destroyThisManager()
-        },
-        destroyed() {
-            this.audioManager.cancelListener()
-            this.audioManager.destroyThisManager()
-            console.log("destroyer")
         },
         created() {
+            // 检测 Tauri API 是否存在
+            if (window.tauri) {
+                this.appState.isTauri = true
+                console.log('应用是通过 Tauri 启动的。');
 
+                // 你可以进一步使用 Tauri 提供的 API
+                // 例如，获取Tauri版本
+                window.tauri.getVersion().then(version => {
+                    console.log(`Tauri 版本: ${version}`);
+                }).catch(error => {
+                    console.error('无法获取 Tauri 版本:', error);
+                });
+            }
         },
         mounted() {
             this.audioManagerConstruct(this.currentMusicInfo.src)
@@ -445,7 +439,7 @@
         <leftBar @leftBarChange="(newState)=>{leftBarState = newState}">
             <template #buttons>
                 <!--音乐库-->
-                <iconWithText @click="this.$router.push('/')" :type="(leftBarState=='short')?'hidden':null">
+                <iconWithText style="width: 100%;" @click="this.$router.push('/')" :type="(leftBarState=='short')?'hidden':null">
                     <template #svg>
                         <i class="bi bi-house-fill"></i>
                     </template>
@@ -455,7 +449,7 @@
                 </iconWithText>
 
                 <!--音乐目录-->
-                <iconWithText @click="this.$router.push('/musicFolder/')" :type="(leftBarState=='short')?'hidden':null">
+                <iconWithText style="width: 100%;" @click="this.$router.push('/musicFolder/')" :type="(leftBarState=='short')?'hidden':null">
                     <template #svg>
                         <i class="bi bi-folder-fill"></i>
                     </template>
@@ -464,7 +458,7 @@
                     </template>
                 </iconWithText>
 
-                <iconWithText @click="this.$router.push('/setting/')" :type="(leftBarState=='short')?'hidden':null">
+                <iconWithText style="width: 100%;" @click="this.$router.push('/setting/')" :type="(leftBarState=='short')?'hidden':null">
                     <template #svg>
                         <i class="bi bi-gear-fill"></i>
                     </template>

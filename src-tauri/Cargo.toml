@@ -28,3 +28,7 @@ audiotags = "0.5.0"
 # If you use cargo directly instead of tauri's cli you can use this feature flag to switch between tauri's `dev` and `build` modes.
 # DO NOT REMOVE!!
 custom-protocol = ["tauri/custom-protocol"]
+
+[patch.crates-io]
+tauri = { git = "https://github.com/tauri-apps/tauri", branch = "dev" }
+tauri-build = { git = "https://github.com/tauri-apps/tauri", branch = "dev" }

@@ -8,6 +8,7 @@
     <div :style="(type == 'background')?'background-color:#00000008':null" class="buttom">
         <div class="svg">
             <slot name="svg"></slot>
+            <slot name="icon"></slot>
         </div>
         
         <div class="text" :style="(type == 'hidden')?'color: #0000;--delay:0s':null">
@@ -21,7 +22,7 @@
 <style scoped>
     .buttom{
         height: 36px;
-        width: 100%;
+        width: fit-content;
         display: flex;
         gap: 7px;
         align-items: center;

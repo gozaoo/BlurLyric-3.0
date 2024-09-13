@@ -2,12 +2,14 @@
     import contextMenu from '../../components/base/contextMenu.vue';
     import toggle from '../../components/base/toggle.vue'
     import tracksRow from '../../components/tracks/tracksRow.vue'
-    import powerTableVue from '../../components/tracks/powerTable.vue'
+    import powerTableVue from '../../components/tracks/powerTable_,music.vue';
     import text_contextMenu from '../../components/text_contextMenu.vue';
+    import dialogVue from '../../components/base/dialog.vue'
     export default {
         data() {
             return {
-                state: true
+                state: true,
+                useDialog: false
             }
         },
         components: {
@@ -15,7 +17,7 @@
             tracksRow,
             powerTableVue,
             contextMenu,
-            text_contextMenu
+            text_contextMenu,dialogVue
         },
         inject: ['audioManager','audioState','currentMusicInfo'],
         props: {},
@@ -37,7 +39,7 @@
     {{audioState.currentTime}}，{{audioState.duration}}<br>
     进度：{{ ((audioState.currentTime/audioState.duration)*100).toFixed(2) + '%' }}
     
-    <iconWithText v-if="audioState.playing==false" style="width: fit-content;" @click="audioManager.play()" type="background">
+    <iconWithText v-if="audioState.playing==false"   @click="audioManager.play()" type="background">
         <template #text>
             播放
         </template>
@@ -45,7 +47,7 @@
             <i class="bi bi-play-circle-fill"></i>
         </template>
     </iconWithText>    
-    <iconWithText v-if="audioState.playing==true" style="width: fit-content;" @click="audioManager.pause()" type="background">
+    <iconWithText v-if="audioState.playing==true"   @click="audioManager.pause()" type="background">
         <template #text>
             暂停
         </template>
@@ -101,7 +103,18 @@
 
     </text_contextMenu>
     <br>
+    <iconWithText    @click="useDialog= !useDialog" type="background">
+        <template #text>
+            dialog 对话框启动测试
+        </template>
+        <template #svg>
+            <i class="bi bi-question-circle-fill"></i>
+        </template>
+    </iconWithText>
+    <dialogVue v-if="useDialog">
 
+    </dialogVue>
+    <br>
     <powerTableVue :tableData="{cellArray: [{
 							name: '音乐列表复制测试',
 							artist: '音乐人名',
