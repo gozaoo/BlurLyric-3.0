@@ -40,29 +40,16 @@
                 '--random-y':(Math.random() * 100) + '%'
               })
             }
-            // setTimeout(() => {
-            //   if(this.mainDisplay!='buttom'&&config.setting().config.useAnimeBackground){
-            //     this.random()
-            //   } else {
-            //     this.dynFunctionRunning =false
-            //   }
-            // }, 6*1000);
+
           }
         },
         props: {
-            imgSrc: String,
-            mainDisplay: String,
-            // colorData: Object,
-            dynamic: Boolean
+
         },
         watch: {
             mainDisplay:{
               handler: function (newVal,oldVal) {
-                    // if(this.dynFunctionRunning == false&&newVal!='buttom'&&config.setting().config.useAnimeBackground){
-                    //   this.$nextTick(()=>{
-                    //     this.random()
-                    //   })
-                    // }
+
                 },
                 deep: true
             }
