@@ -4,33 +4,27 @@
             return {
                 height: 0,
                 offsetTop: 0,
-                hiddenTop: 70
+                hiddenTop: 70,
+                cancelReg: null
             }
         },
-        inject: ['scrollState','setTitle'],
+        inject: ['scrollState','regTitle'],
         mounted(){
             this.offsetTop = this.$refs.title.offsetTop
             this.height = this.$refs.title.offsetHeight
-            this.check()
+            this.cancelReg = this.regTitle( this.text,this.offsetTop,this.hiddenTop).cancelReg
+
         },
         props: {
             text: String
         },
         watch:{
-            scrollState:{
-                handler(newvalue){
-                    this.check()
-                },
-                deep: true,
-
-            }
         },
         methods:{
-            check(){
-                if(this.offsetTop -  this.scrollState.scrollTop < this.hiddenTop){
-                    this.setTitle( this.text,this.offsetTop -  this.scrollState.scrollTop)
-                }
-            }
+
+        },
+        beforeUnmount(){
+            this.cancelReg()
         }
     }
 </script>

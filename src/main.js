@@ -2,6 +2,20 @@
 import { createApp } from 'vue';
 import { createRouter, createWebHashHistory } from 'vue-router';
 
+import { Window } from '@tauri-apps/api/window';
+
+const appWindow = new Window('main');
+
+document
+  .getElementById('titlebar-minimize')
+  ?.addEventListener('click', () => appWindow.minimize());
+document
+  .getElementById('titlebar-maximize')
+  ?.addEventListener('click', () => appWindow.toggleMaximize());
+document
+  .getElementById('titlebar-close')
+  ?.addEventListener('click', () => appWindow.close());
+
 // 导入应用程序样式和Vue组件
 import './style.css';
 import App from './App.vue';

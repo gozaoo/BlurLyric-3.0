@@ -7,6 +7,10 @@
     import anime from 'animejs';
 
     import Background from './background.vue';
+    import contain from './musicInfoPageComponents/contain.vue';
+    import {
+        computed,
+    } from 'vue'
     export default {
         data() {
             return {
@@ -25,7 +29,13 @@
             buttom_icon_circleBackground,
             playModeSvg,
             textSpawn,
-            Background
+            Background,
+            contain
+        },
+        provide(){
+            return {
+                musicInfoPagePositionState: computed(() => this.musicInfoPagePosition)
+            }
         },
         inject: ['currentMusicInfo', 'audioState', 'audioManager', 'changePlayMode', 'trackState', 'musicTrack',
             'nextMusic', 'prevMusic', 'getNextMusicIndex', 'getPrevMusicIndex'
@@ -52,7 +62,9 @@
                     translateY: -document.body.offsetHeight,
 
                     complete: (anim) => {
-
+                        anime.set(this.$refs.musicInfoPageRow, {
+                            translateY: '-100%',
+                        })
                     }
                 })
 
@@ -65,10 +77,13 @@
             },
             toBottom(info) {
                 // this.eventListenerRemovers.push(callBack_drag.destroy)
-                anime.set(this.style.musicDetailRender,{
+                anime.set(this.style.musicDetailRender, {
                     transformX: 0,
                 })
+                anime.set(this.$refs.musicInfoPageRow, {
+                    translateY: (-document.body.offsetHeight) + 'px',
 
+                })
                 this.eventListenerRemovers.map((value) => value())
                 anime({
                     targets: this.$refs.musicInfoPageRow,
@@ -265,17 +280,26 @@
                 </div>
             </div>
             <div class="mainContainer">
-             <!-- <background /> -->
+                <!-- <background /> -->
                 <div class="controlBar">
                     <div class="tapBar"></div>
                 </div>
 
+                <contain>
+                    <!-- a -->
+                </contain>
+                <contain>
+
+                </contain>
+                <contain>
+
+                </contain>
             </div>
         </div>
     </div>
 </template>
 <style scoped>
-    .tapBar{
+    .tapBar {
         margin: 0.6em auto;
         height: .8em;
         cursor: n-resize;
@@ -283,13 +307,16 @@
         border-radius: 1em;
         background-color: #0002
     }
-    .controlBar{
+
+    .controlBar {
         height: 2em
     }
-    .mainContainer{
+
+    .mainContainer {
         font-size: 1rem;
         z-index: 0;
     }
+
     .musicInfoPageRow {
         position: absolute;
         height: 100%;
@@ -301,7 +328,7 @@
         user-select: none;
         z-index: 100;
         box-sizing: border-box;
-        border: 1px solid #0001;
+        outline: 1px solid #d6d6d6;
         box-shadow: 0 0px 15px rgba(0, 0, 0, 0.14);
         /* transform: translateY() */
     }

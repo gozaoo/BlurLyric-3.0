@@ -9,13 +9,16 @@ body{
   font-family: MiSans;
   src: local('MiSans'), url('./assets/MiSans-Normal.ttf');
 }
+
+
+
 :root{
     --mainBlockBackground: rgb(249,249,249);
     --background-bar: rgb(243,243,243);
 
     --color-toggle-actived: rgb(0,122,204);
 	--Shadow-value-normal:0px 0px 3px #0005;
-	--Shadow-value-low:0px 0px 3px #0003;
+	--Shadow-value-low:0px 0px 5px #0002;
 	--fontColor-content-normal:#000;
 	--fontColor-content-unimportant:#555;
 	--fontColor-content-moreUnimportant:#888;

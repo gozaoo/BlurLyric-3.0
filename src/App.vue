@@ -9,11 +9,6 @@
         onMounted
     } from 'vue'
 
-    // 测试
-    import music1 from '/src/assets/60percent的日常.aac'
-    import music2 from '/src/assets/无尽的施工日.aac'
-    import music3 from '/src/assets/UNDEAD - YOASOBI.flac'
-    import cover from '/src/assets/109951169724367907.jpg'
 
     export default {
         name: 'app',
@@ -71,6 +66,9 @@
                     scrollTop: 0,
                     scrollSize: 0
                 },
+                titles: [
+
+                ],
                 title: '主页',
                 titleOffsetTop: 0,
                 config: {
@@ -117,11 +115,11 @@
                     playMode: 'loopPlaylist',
                     allPlayModes: ['loopPlaylist', 'loopSingle', 'stopAfterSingle', 'randomPlay', 'smartRecommend']
                 },
-                appState:{
+                appState: {
                     isTauri: false,
                     screenType: null, // ['landscape','portrai,'mini']
                 },
-                source:{
+                source: {
                     local: [],
                     online: [{
                         name: 'API1',
@@ -146,7 +144,7 @@
                 editConfig: this.editConfig,
 
                 setScrollState: this.setScrollState,
-                setTitle: this.setTitle,
+                regTitle: this.regTitle,
 
                 trackState: computed(() => this.trackState),
                 changePlayMode: this.changePlayMode,
@@ -154,8 +152,8 @@
                 prevMusic: this.prevMusic,
                 getNextMusicIndex: this.getNextMusicIndex,
                 getPrevMusicIndex: this.getPrevMusicIndex,
-                appState: computed(()=>this.appState),
-                source: computed(()=>this.source)
+                appState: computed(() => this.appState),
+                source: computed(() => this.source)
             };
         },
         methods: {
@@ -171,15 +169,55 @@
             },
             /**
              * 处理标题和主内容框滚动事件
-             * @param value String
+             * @param text String
+             * @param offsetTop Number
+             * @param minHiddenTop Number
              */
-            setTitle(text, offsetTop) {
-                this.title = text
-                this.titleOffsetTop = offsetTop
+            regTitle(text, offsetTop, minHiddenTop) {
+                let currentIndex = this.title.length;
+                this.titles.push({
+                    text,
+                    offsetTop,
+                    minHiddenTop
+                });
+
+                // Sort titles array by offsetTop to ensure they are in the correct order
+                this.titles.sort((a, b) => a.offsetTop - b.offsetTop);
+
+                this.updateTitle();
+
+                return {
+                    cancelReg: () => {
+                        const index = this.titles.findIndex(title => title.offsetTop === offsetTop);
+                        if (index !== -1) {
+                            this.titles.splice(index, 1);
+                        }
+                    }
+                };
             },
             setScrollState(state) {
-                this.scrollState = state
+                this.scrollState = state;
+                this.updateTitle();
             },
+            updateTitle() {
+                let activeTitle = null;
+                let titleOffsetTop = 0;
+
+                for (let title of this.titles) {
+                    if (title.offsetTop - this.scrollState.scrollTop < title.minHiddenTop) {
+                        activeTitle = title;
+                        titleOffsetTop = title.offsetTop - this.scrollState.scrollTop;
+                    } else {
+                        break; // Since titles are sorted by offsetTop, no need to continue once we find a title that doesn't qualify
+                    }
+                }
+
+                if (activeTitle) {
+                    this.title = activeTitle.text;
+                    this.titleOffsetTop = titleOffsetTop;
+                }
+            },
+
             editConfig(editEvent) {
                 this.config = editEvent(this.config)
             },
@@ -439,7 +477,8 @@
         <leftBar @leftBarChange="(newState)=>{leftBarState = newState}">
             <template #buttons>
                 <!--音乐库-->
-                <iconWithText style="width: 100%;" @click="this.$router.push('/')" :type="(leftBarState=='short')?'hidden':null">
+                <iconWithText style="width: 100%;" @click="this.$router.push('/')"
+                    :type="(leftBarState=='short')?'hidden':null">
                     <template #svg>
                         <i class="bi bi-house-fill"></i>
                     </template>
@@ -449,7 +488,8 @@
                 </iconWithText>
 
                 <!--音乐目录-->
-                <iconWithText style="width: 100%;" @click="this.$router.push('/musicFolder/')" :type="(leftBarState=='short')?'hidden':null">
+                <iconWithText style="width: 100%;" @click="this.$router.push('/musicFolder/')"
+                    :type="(leftBarState=='short')?'hidden':null">
                     <template #svg>
                         <i class="bi bi-folder-fill"></i>
                     </template>
@@ -458,7 +498,8 @@
                     </template>
                 </iconWithText>
 
-                <iconWithText style="width: 100%;" @click="this.$router.push('/setting/')" :type="(leftBarState=='short')?'hidden':null">
+                <iconWithText style="width: 100%;" @click="this.$router.push('/setting/')"
+                    :type="(leftBarState=='short')?'hidden':null">
                     <template #svg>
                         <i class="bi bi-gear-fill"></i>
                     </template>

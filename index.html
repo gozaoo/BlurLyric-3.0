@@ -1,14 +1,86 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Tauri + Vue 3 App</title>
-  </head>
 
-  <body>
-    <div id="app"></div>
-    <script type="module" src="/src/main.js"></script>
-  </body>
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tauri + Vue 3 App</title>
+</head>
+
+<body>
+  <div data-tauri-drag-region class="titlebar">
+    <div class="titlebar-button" id="titlebar-minimize">
+      <img src="./src/assets/windows/ChromeMinimize.png" alt="minimize" />
+    </div>
+    <div class="titlebar-button" id="titlebar-maximize">
+      <img src="./src/assets/windows/ChromeMaximize.png" alt="maximize" />
+    </div>
+    <div class="titlebar-button" id="titlebar-close">
+      <img src="./src/assets/windows/ChromeClose.png" alt="close" />
+    </div>
+  </div>
+  <div id="app"></div>
+  <style>
+    .titlebar {
+      height: 32px;
+      background-color: mica;
+      /* 根据实际应用调整 */
+      -webkit-app-region: drag;
+      /* 允许拖动 */
+      user-select: none;
+      /* 防止文本选择 */
+      z-index: 99999;
+      user-select: none;
+      display: flex;
+      justify-content: flex-end;
+      position: fixed;
+      top: 0;
+      padding: 4px;
+      left: 50px;
+      gap: 2px;
+      right: 0;
+      z-index: 99999;
+    }
+
+    .titlebar img {
+      display: block;
+      width: 10px;
+      height: 10px;
+      vertical-align: middle;
+      margin: 11px auto;
+    }
+
+    .titlebar-button {
+      -webkit-app-region: no-drag;
+      /* 防止拖动 */
+      cursor: pointer;
+      display: inline-block;
+      height: 32px;
+      border-radius: 7px;
+      width: 44px;
+      box-shadow: none;
+      transition: 0.1s linear;
+
+    }
+
+    .titlebar-button:hover {
+      background-color: rgba(0, 0, 0, 0.05);
+      /* 半透明背景 */
+    }
+
+    .titlebar-button:active {
+      background-color: rgba(0, 0, 0, 0.05);
+      /* 按下时的背景 */
+    }
+
+    .titlebar-button#titlebar-close:hover {
+      background-color: #e81123;
+      /* 半透明背景 */
+
+    }
+  </style>
+  <script type="module" src="/src/main.js"></script>
+</body>
+
 </html>

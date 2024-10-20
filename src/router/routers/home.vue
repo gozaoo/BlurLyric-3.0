@@ -51,7 +51,14 @@ export default {
     <h1>
         <span style="font-size: .7em;">{{ description }}</span>
     </h1>
-
+    <iconWithText @click="this.$router.push('/allmusic/')" type="background">
+        <template #svg>
+            <i class="bi bi-folder-fill"></i>
+        </template>
+        <template #text>
+            本地音乐
+        </template>
+    </iconWithText>
 
 
 </template>

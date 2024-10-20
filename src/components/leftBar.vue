@@ -39,7 +39,7 @@ watch(
 .leftBar{
   --width: 52px;
   width: var(--width);
-  transition:  0.25s cubic-bezier(.5,.3,.2,1);
+  transition: width 0.25s cubic-bezier(.5,.3,.2,1);
   user-select: none;
   display: flex;
   flex-direction: column;
