@@ -116,7 +116,8 @@
                     allPlayModes: ['loopPlaylist', 'loopSingle', 'stopAfterSingle', 'randomPlay', 'smartRecommend']
                 },
                 appState: {
-                    isTauri: false,
+                    runOnTauri: (window.__TAURI_INTERNALS__)? true: false,
+                    // runOnTauri: true,
                     screenType: null, // ['landscape','portrai,'mini']
                 },
                 source: {
@@ -134,7 +135,7 @@
                 scrollState: computed(() => this.scrollState),
                 leftBarState: computed(() => this.leftBarState),
                 config: computed(() => this.config),
-
+                // runOnTauri: (window.__TAURI_INTERNALS__)? true: false,
                 currentMusicInfo: computed(() => this.musicTrack[this.musicTrackIndex]),
                 musicTrack: computed(() => this.musicTrack),
                 musicTrackIndex: computed(() => this.musicTrackIndex),

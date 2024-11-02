@@ -3,6 +3,7 @@ body{
   padding: none;
   margin: none;
   font-family: Misans;
+  -webkit-font-smoothing: antialiased;
   overflow: hidden;
 }
 @font-face {

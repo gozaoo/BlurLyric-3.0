@@ -53,18 +53,18 @@
         },
         methods: {
             toTop(info) {
-                console.log(-info.speedY);
                 this.eventListenerRemovers.map((value) => value())
                 this.onTopListener()
                 anime({
                     targets: this.$refs.musicInfoPageRow,
-                    easing: 'spring(1, 80, 14,' + (-info.speedY).toFixed(2) + ')',
+                    easing: 'spring(1, 80, 16,' + (-info.speedY).toFixed(2) + ')',
                     translateY: -document.body.offsetHeight,
 
                     complete: (anim) => {
                         anime.set(this.$refs.musicInfoPageRow, {
                             translateY: '-100%',
                         })
+                        this.musicInfoPagePosition = "top" 
                     }
                 })
 
@@ -76,6 +76,8 @@
                 })
             },
             toBottom(info) {
+                this.musicInfoPagePosition = "toBottom" 
+
                 // this.eventListenerRemovers.push(callBack_drag.destroy)
                 anime.set(this.style.musicDetailRender, {
                     transformX: 0,
@@ -89,6 +91,9 @@
                     targets: this.$refs.musicInfoPageRow,
                     easing: 'spring(1, 80, 14,' + (info.speedY).toFixed(2) + ')',
                     translateY: -88,
+                    complete:()=>{
+                        this.musicInfoPagePosition = "bottom" 
+                    }
                 })
                 anime({
                     targets: this.$refs.barDetail,
@@ -169,7 +174,6 @@
                 let callBack_drag = drag.create(this.$refs.cover,
                     (info) => {
                         this.dragInfo = info
-                        console.log('a');
 
                     },
                     (info) => {
@@ -178,7 +182,6 @@
                             this.toBottom(info)
                         }
                         this.dragInfo = info
-                        console.log('a');
 
                     },
                     (info) => {
@@ -279,26 +282,40 @@
                     </buttom_icon_circleBackground>
                 </div>
             </div>
-            <div class="mainContainer">
+            <div v-show="musicInfoPagePosition=='top'" class="mainContainer">
                 <!-- <background /> -->
-                <div class="controlBar">
+                <div  class="controlBar">
                     <div class="tapBar"></div>
                 </div>
+                <div class="musicDetail">
+                    <div class="coverImagePlaceHolder">
+                    </div>
 
-                <contain>
-                    <!-- a -->
-                </contain>
-                <contain>
-
-                </contain>
-                <contain>
-
-                </contain>
+                    
+                </div>
             </div>
         </div>
     </div>
 </template>
 <style scoped>
+    .mainContainer{
+    user-select: none;
+    font-size: var(--adaptiveSize);
+    color: rgb(255, 255, 255);
+    aspect-ratio: 1/1;
+    grid-column: info-side;
+    grid-row: cover;
+    align-self: center;
+    justify-self: center;
+    width: min(50vh, 40vw);
+    height: min(50vh, 40vw);
+    background-position: center;
+    background-size: cover;
+    border-radius: 1%;
+    overflow: hidden;
+    image-rendering: auto;
+    }
+
     .tapBar {
         margin: 0.6em auto;
         height: .8em;

@@ -1,8 +1,4 @@
 <script>
-    // import flexColumnRow from '../../components/flexColumnRow.vue';
-    // import musicCard from '../../components/musicCard.vue';
-//     import iconToClick from '../../components/iconToClick.vue';
-// import iconWithText from '../../components/iconWithText.vue'
     import manager from '../../api/manager'
     export default{
         data(){
@@ -13,9 +9,11 @@
             }
         },
         created(){
-            manager.tauri.getMusicList().then((res)=>{
-                this.musicList = res;
-            });
+            if(runOnTauri) {
+                manager.tauri.getMusicList().then((res)=>{
+                this.musicList = [...this.musicList,...res]
+                });
+            }
             
         }
     }

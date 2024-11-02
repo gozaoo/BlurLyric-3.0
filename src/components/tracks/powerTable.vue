@@ -70,18 +70,18 @@
 		padding: 4px;
 	}
 
-	.table-name-cell:hover {
+	/* .table-name-cell:hover {
 		border-radius: 7px;
 		background-color: #00000007;
 		box-shadow: var(--Shadow-value-low);
 		color: var(--fontColor-content-normal);
-	}
+	} */
 
-	.table-row:hover {
+	/* .table-row:hover {
 		background-color: #0001;
 		border-radius: 9px;
 		box-shadow: var(--Shadow-value-normal);
-	}
+	} */
 
 	.table-cell {
 		display: flex;
@@ -103,12 +103,12 @@
 		white-space: nowrap;
 	}
 
-	.table-cell:hover {
+	/* .table-cell:hover {
 		border-radius: 7px;
 		background-color: #00000007;
 		box-shadow: var(--Shadow-value-low);
 		color: var(--fontColor-content-normal);
-	}
+	} */
 </style>
 
 <script>

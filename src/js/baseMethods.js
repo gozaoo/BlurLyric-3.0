@@ -1,4 +1,3 @@
-// base.js
 export default {
     debounce(func, wait) {
         let timeoutId = null;
@@ -20,5 +19,5 @@ export default {
         textarea.select();
         document.execCommand('copy');
         document.body.removeChild(textarea);
-      }
+      },
 };

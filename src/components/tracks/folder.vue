@@ -15,7 +15,10 @@
         <div class="path">
             <slot name="path"/>
         </div></div>
-
+        <iconToClick class="toRight">
+            <i class="bi bi-x"></i>
+        </iconToClick>
+        
     </div>
 </template>
 <style scoped>
@@ -29,10 +32,15 @@
         overflow: hidden;
         
     }
-    i{
-        font-size: 20px;
+    .bi-folder-fill{
         height: 25px;
         width: 25px;
+    }
+    i{
+        font-size: 20px;
+    }
+    .toRight{
+        margin: 0 0 0 auto;
     }
     .name{
         font-size: xx-small;
