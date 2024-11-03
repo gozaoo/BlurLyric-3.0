@@ -94,7 +94,7 @@
         transform:  scale(1) translateY(-50%);
         box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
         transform-origin: 0% 0%;
-        animation: spawn_context_menu 0.314s cubic-bezier(.3, .7, .2, 1)
+        animation: spawn_context_menu 0.2s cubic-bezier(.3, .7, .2, 1)
     }
 
     .vue-context-menu div.hr {
@@ -137,7 +137,7 @@
     }
     @keyframes spawn_context_menu {
         from {
-            transform: scale(.5) translate( -10px ,calc(-50% - 10px));
+            transform: scale(.7) translate( -10px ,calc(-50% - 10px));
             opacity: 0;
         }
 

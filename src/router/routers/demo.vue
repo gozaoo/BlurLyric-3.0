@@ -111,8 +111,8 @@
             <i class="bi bi-question-circle-fill"></i>
         </template>
     </iconWithText>
-    <dialogVue v-if="useDialog">
-
+    <dialogVue v-if="useDialog" :finish="()=>{useDialog=false}" :cancel="()=>{useDialog=false}">
+        <h2>对话框测试</h2>
     </dialogVue>
     <br>
     <powerTableVue :tableData="{cellArray: [{
@@ -138,14 +138,50 @@
     <h2>列表组件</h2>
     </text_contextMenu>
     <div>
-        <powerTableVue :tableData="{cellArray: [{
-							name: '时间线',
-							artist: 'HOYO-MIX',
-							album: '崩坏星穹铁道-失控 Out of Control',
-							imgSrc: 'http://p1.music.126.net/RWIGyShmnjmUxizXco6fVg==/109951168505830245.jpg',
-							trackOrdinalNumber: '1',
-							duration: '02:02',
-						}]}">
+
+        <powerTableVue :tableData="{cellArray: [ {
+                    name: '时间线',
+                    id: 0,
+                    artist: 'HOYO-MIX',
+                    album: '崩坏星穹铁道-失控 Out of Control',
+                    duration: '02:02',
+                    trackOrdinalNumber: '1',
+                    imgSrc: 'http://p1.music.126.net/RWIGyShmnjmUxizXco6fVg==/109951168505830245.jpg',
+
+                    ar: [{
+                        id: 0,
+                        name: 'HOYO-MIX',
+                        alias: []
+                    }],
+                    lyric: {
+                        type: 'yrc',
+                        lines: [{
+                            startTime: 0,
+                            duration: 2,
+                            endTime: 2,
+                            words: [{
+                                    startTime: 0,
+                                    duration: 1,
+                                    endTime: 1,
+                                    word: 'Hello '
+                                },
+                                {
+                                    startTime: 1,
+                                    duration: 0.5,
+                                    endTime: 1.5,
+                                    word: 'World'
+                                }
+                            ],
+                            text: 'Hello World'
+                        }]
+                    },
+                    al: {
+                        id: 0,
+                        name: '崩坏星穹铁道-失控 Out of Control',
+                        picUrl: 'http://p1.music.126.net/RWIGyShmnjmUxizXco6fVg==/109951168505830245.jpg',
+                    },
+                    src: null
+                }]}">
         </powerTableVue>
     </div>
 </template>

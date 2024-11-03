@@ -6,7 +6,7 @@
     import textSpawn from './base/text-spawn.vue';
     import anime from 'animejs';
 
-    import Background from './background.vue';
+    import background from './musicInfoPageComponents/background.vue';
     import contain from './musicInfoPageComponents/contain.vue';
     import {
         computed,
@@ -29,7 +29,7 @@
             buttom_icon_circleBackground,
             playModeSvg,
             textSpawn,
-            Background,
+            background,
             contain
         },
         provide(){
@@ -55,9 +55,11 @@
             toTop(info) {
                 this.eventListenerRemovers.map((value) => value())
                 this.onTopListener()
+                this.musicInfoPagePosition = "toTop" 
+                
                 anime({
                     targets: this.$refs.musicInfoPageRow,
-                    easing: 'spring(1, 80, 16,' + (-info.speedY).toFixed(2) + ')',
+                    easing: 'spring(1, 80, 16,' + Math.abs(info.speedY).toFixed(2) + ')',
                     translateY: -document.body.offsetHeight,
 
                     complete: (anim) => {
@@ -67,12 +69,47 @@
                         this.musicInfoPagePosition = "top" 
                     }
                 })
+                anime({
+                    targets: this.$refs.musicControlBar,
+                    opacity: 0,
+                    easing: 'linear',
+                    duration: 100
+
+                })
+                anime({
+                    targets: this.style.musicDetailRender,
+                    transformX: 1,
+                    // opacity: 0,
+                    easing: 'linear',
+                    duration: 100
+                })
 
                 anime({
-                    targets: this.$refs.barDetail,
+                    targets: this.$refs.musicInfoPageRow,
+                    background: 'rgba(0,0,0,0.0625)',
+                    easings: 'linear',
+                    // duration: 100
+                })
+                anime({
+                    targets: this.$refs.mainContainer,
+                    opacity: 1,
                     easing: 'linear',
-                    opacity: 0,
-                    duration: 100
+                    duration: 100,
+                    delay: 300,
+                })
+                this.$nextTick(()=>{
+                    let positionData = this.$refs.coverImagePlaceHolder.getBoundingClientRect()
+                    // console.log({                        translateY:  (this.$refs.coverImagePlaceHolder.offsetTop + 41) + 'px',
+                    // translateX: positionData.x + 'px'});
+                    
+                    anime({
+                        targets: this.$refs.cover,
+                        easing: 'spring(1, 80, 15,' + Math.abs(info.speedY).toFixed(2) + ')',
+                        width: positionData.width,
+                        height: positionData.height,
+                        translateY: (this.$refs.coverImagePlaceHolder.offsetTop + 41) + 'px',
+                        translateX: positionData.x + 'px'
+                    })
                 })
             },
             toBottom(info) {
@@ -89,19 +126,35 @@
                 this.eventListenerRemovers.map((value) => value())
                 anime({
                     targets: this.$refs.musicInfoPageRow,
-                    easing: 'spring(1, 80, 14,' + (info.speedY).toFixed(2) + ')',
+                    easing: 'spring(1, 80, 16,' + Math.abs(info.speedY).toFixed(2) + ')',
                     translateY: -88,
                     complete:()=>{
                         this.musicInfoPagePosition = "bottom" 
                     }
                 })
                 anime({
-                    targets: this.$refs.barDetail,
-                    easing: 'linear',
+                    targets: this.$refs.musicControlBar, 
                     opacity: 1,
-                    duration: 100
+                    easing: 'linear',
+                    duration: 100,
+                    delay: 300,
                 })
-
+                anime({
+                    targets: this.$refs.mainContainer,
+                    opacity: 0,
+                    easing: 'linear',
+                    duration: 100,
+                    // delay: 300,
+                })
+                anime({
+                    targets: this.$refs.cover,
+                    width: 54,
+                    height: 54,
+                    easing: 'spring(1, 80, 15,' + Math.abs(info.speedY).toFixed(2) + ')',
+                    translateY: 17,
+                    translateX: 17
+                })
+                // regResizeHandle()
                 this.onBottomListener()
             },
             onBottomListener() {
@@ -131,18 +184,18 @@
                         if (info.offsetDirectionX != 'none') {
                             this.style.musicDetailRender.transformX = info.offsetX + lastTransformX
                         }
-
-                        if (info.offsetY < -100) {
+                        // console.log(info.speedY);
+                        
+                        if (info.offsetY < -100 || info.speedY < -1.5) {
                             if (navigator.vibrate) navigator.vibrate(50);
                             this.toTop(info)
-
-
                         }
                         this.dragInfo = info
 
                     },
                     (info) => {
-
+                        // console.log('2');
+                        
                         if (info.offsetX < -100 || info.speedX < -1) {
                             if (navigator.vibrate) navigator.vibrate(50);
                             this.nextMusic()
@@ -177,7 +230,9 @@
 
                     },
                     (info) => {
-                        if (info.offsetY > 100) {
+                        // if (info.offsetY > 100) {
+                        if (info.offsetY < -100 || info.speedY > 1.5) {
+
                             if (navigator.vibrate) navigator.vibrate(50);
                             this.toBottom(info)
                         }
@@ -187,7 +242,7 @@
                     (info) => {
 
                     })
-
+                    // controlTapBar
                 this.eventListenerRemovers.push(callBack_drag.destroy)
             }
         }
@@ -199,7 +254,8 @@
         " class="global_backgroundblur_light musicInfoPageRow">
 
         <div class="relativeBox">
-            <div ref="cover" class="cover">
+        
+            <div ref="cover" style="transform: translateX(17px) translateY(17px); " class="cover">
                 <lazyLoadCoverImage class="blur" :src="currentMusicInfo.al.picUrl"></lazyLoadCoverImage>
                 <lazyLoadCoverImage :src="currentMusicInfo.al.picUrl"></lazyLoadCoverImage>
             </div>
@@ -208,7 +264,9 @@
                     <lazyLoadCoverImage class="blur" :src="currentMusicInfo.al.picUrl"></lazyLoadCoverImage>
                     <lazyLoadCoverImage :src="currentMusicInfo.al.picUrl"></lazyLoadCoverImage>
                 </div> -->
+            
             <div ref="musicControlBar" class="musicControlBar">
+                
                 <div class="cover placeholder">
                 </div>
                 <div ref="barDetail" class="detail">
@@ -240,7 +298,7 @@
                         </div>
                     </div>
                 </div>
-                <div v-show="currentMusicInfo.id != -2" class="control">
+                <div   v-show="currentMusicInfo.id != -2" class="control">
                     <buttom_icon_circleBackground @click="prevMusic()">
                         <template #icon>
                             <i class="bi bi-skip-start-fill"></i>
@@ -282,38 +340,133 @@
                     </buttom_icon_circleBackground>
                 </div>
             </div>
-            <div v-show="musicInfoPagePosition=='top'" class="mainContainer">
-                <!-- <background /> -->
+            <div v-show="musicInfoPagePosition!='bottom'" 
+            ref="mainContainer" class="mainContainer">
+                <background class="player-background" :imgSrc="currentMusicInfo.al.picUrl" :musicInfoPagePosition="musicInfoPagePosition" />
+
                 <div  class="controlBar">
-                    <div class="tapBar"></div>
+                    <div ref="controlTapBar" class="tapBar"></div>
                 </div>
                 <div class="musicDetail">
-                    <div class="coverImagePlaceHolder">
-                    </div>
-
                     
+                    <div ref="coverImagePlaceHolder" class="coverImagePlaceHolder">
+                    </div>
+                    <div class="musicInfo">
+                        <div class="name">
+                            <textSpawn :text="currentMusicInfo.name" />
+                        </div>
+                        <div class="artists">
+                            <span v-for="(value,index) in currentMusicInfo.ar">
+                                <textSpawn :text="value.name + ((index!=currentMusicInfo.ar.length-1)?'/':'')" />
+                            </span>
+                            <span v-if="currentMusicInfo.al.id != -2"> - </span>{{  currentMusicInfo.al.name }}
+                        </div>
+                
+                    </div>
+                    <div class="musicDetailButton">
+                        <buttom_icon_circleBackground @click="prevMusic()">
+                            <template #icon>
+                                <i class="bi bi-skip-start-fill"></i>
+                            </template>
+                        </buttom_icon_circleBackground>
+                        <buttom_icon_circleBackground
+                            @click="(audioState.playing == true)?audioManager.pause():audioManager.play()"
+                            class="playButtom">
+                            <template #icon>
+                                <div style="transform: scale(1.5);transform-origin: 50% 50%;">
+                                    <i v-if="audioState.playing == true" class="bi bi-pause-fill"></i>
+                                    <i v-if="audioState.playing == false" class="bi bi-play-fill"></i>
+                                </div>
+                            </template>
+                        </buttom_icon_circleBackground>
+                        <buttom_icon_circleBackground @click="nextMusic()">
+                            <template #icon>
+                                <i class="bi bi-skip-end-fill"></i>
+                            </template>
+                        </buttom_icon_circleBackground>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </template>
 <style scoped>
-    .mainContainer{
-    user-select: none;
-    font-size: var(--adaptiveSize);
-    color: rgb(255, 255, 255);
-    aspect-ratio: 1/1;
-    grid-column: info-side;
-    grid-row: cover;
-    align-self: center;
-    justify-self: center;
+.musicInfo > .name{
+    font-weight: 900;
+    color: #fffd;
+    font-size: 21px;
+}
+.musicInfo > .artists{
+    font-size: 14px;
+    color: #fff9
+}
+
+.prev .event,
+    .next .event {
+        font-weight: 900;
+        font-size: 18px;
+        color: #0066cd;
+    }
+
+    .currentMusic>.name {
+        font-size: 18px;
+        font-weight: 900;
+        color: #333;
+    }
+    .currentMusic>.artists,
+    .prev>.name,
+    .next>.name {
+        font-size: 14px;
+        /* font-weight: 900; */
+        color: #676767;
+
+    }
+
+.player-background{
+    position:absolute;
+    left:0;
+    top:0;
+    width:100%;
+    height:100%
+}
+.musicDetail{
+    position:absolute;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    box-sizing: border-box;
+    padding-bottom: 40px;
+    max-height: calc(100% - 48px);
+    left: 50%;
+    transform:translateX(-50%);
     width: min(50vh, 40vw);
-    height: min(50vh, 40vw);
-    background-position: center;
-    background-size: cover;
-    border-radius: 1%;
-    overflow: hidden;
-    image-rendering: auto;
+}
+.musicDetailButton {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+    .coverImagePlaceHolder{
+        grid-column: info-side;
+        grid-row: cover;
+        /* background-color: #000; */
+        align-self: center;
+        justify-self: center;
+        background-position: center;
+        background-size: cover;
+        border-radius: 1%;
+        overflow: hidden;
+        image-rendering: auto;
+        width: min(50vh, 40vw);
+        aspect-ratio: 1/1;
+        height: min(50vh, 40vw);
+    }
+    .mainContainer{
+        user-select: none;
+        font-size: var(--adaptiveSize);
+        color: rgb(255, 255, 255);
+
     }
 
     .tapBar {
@@ -372,9 +525,11 @@
     .cover {
         position: absolute;
         height: 54px;
-        left: 17px;
-        top: 17px;
+        width: 54px;
+        /* transform: translateX(17px) translateY(17px);  */
         z-index: 1;
+        top:0;
+        left:0;
         aspect-ratio: 1/1;
     }
 
@@ -391,6 +546,16 @@
         overflow: hidden;
         height: inherit;
         width: inherit;
+
+    }
+    .cover *{
+        -webkit-user-drag: none;
+
+-moz-user-drag: none;
+
+-ms-user-drag: none;
+
+user-drag: none;
     }
 
     .cover>.blur {
@@ -446,7 +611,6 @@
         font-weight: 900;
         color: #333;
     }
-
     .currentMusic>.artists,
     .prev>.name,
     .next>.name {

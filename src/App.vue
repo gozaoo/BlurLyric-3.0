@@ -9,20 +9,7 @@
         onMounted
     } from 'vue'
 
-
-    export default {
-        name: 'app',
-        components: {
-            topBar,
-            leftBar,
-            rightBlock,
-            musicInfoPage,
-        },
-        data() {
-            return {
-                leftBarState: 'short',
-                audioManager: null,
-                musicTrack: [{
+    let templateEmptyMusicTrack = [{
                     name: "请选择您的音乐",
                     id: -2,
                     ar: [{
@@ -56,10 +43,23 @@
                         id: -2,
                         name: "",
                         picUrl: "&quot;&quot;",
-                        // picUrl: cover,
                     },
                     src: null
-                }],
+                }]
+
+    export default {
+        name: 'app',
+        components: {
+            topBar,
+            leftBar,
+            rightBlock,
+            musicInfoPage,
+        },
+        data() {
+            return {
+                leftBarState: 'short',
+                audioManager: null,
+                musicTrack: templateEmptyMusicTrack,
 
                 musicTrackIndex: 0,
                 scrollState: {
@@ -116,8 +116,8 @@
                     allPlayModes: ['loopPlaylist', 'loopSingle', 'stopAfterSingle', 'randomPlay', 'smartRecommend']
                 },
                 appState: {
-                    runOnTauri: (window.__TAURI_INTERNALS__)? true: false,
-                    // runOnTauri: true,
+                    // runOnTauri: (window.__TAURI_INTERNALS__)? true: false,
+                    runOnTauri: false,
                     screenType: null, // ['landscape','portrai,'mini']
                 },
                 source: {
@@ -127,7 +127,8 @@
                         type: 'NeteaseCloudMusicApi',
                         apiUrl: 'http://localhost:3000/'
                     }]
-                }
+                },
+                resizeEvent: {},
             }
         },
         provide() {
@@ -137,6 +138,11 @@
                 config: computed(() => this.config),
                 // runOnTauri: (window.__TAURI_INTERNALS__)? true: false,
                 currentMusicInfo: computed(() => this.musicTrack[this.musicTrackIndex]),
+                pushMusic:this.pushMusic,
+                pushMusicTrack:this.pushMusicTrack,
+                coverMusicTrack:this.coverMusicTrack,
+                cleanUpMusicTrack:this.cleanUpMusicTrack,
+                checkMusicListIsEmpty:this.checkMusicListIsEmpty,
                 musicTrack: computed(() => this.musicTrack),
                 musicTrackIndex: computed(() => this.musicTrackIndex),
 
@@ -154,11 +160,45 @@
                 getNextMusicIndex: this.getNextMusicIndex,
                 getPrevMusicIndex: this.getPrevMusicIndex,
                 appState: computed(() => this.appState),
-                source: computed(() => this.source)
+                source: computed(() => this.source),
+                regResizeHandle:this.regResizeHandle,
             };
         },
         methods: {
+            checkMusicListIsEmpty(){
+                if(this.musicTrack[0].id == -2){
+                   return true
+                };
+                return false
+            },
+            cleanUpMusicTrack(){
+                this.musicTrack = templateEmptyMusicTrack
+            },
+            pushMusic(singleSong){
+                console.log(this);
+                
+                if(this.checkMusicListIsEmpty())  this.musicTrack.length = 0;
+                // console.log(singleSong);
+                // lo
+                this.musicTrack.push(singleSong)
+            },
+            pushMusicTrack(musicTrack){
+                if(this.checkMusicListIsEmpty())  this.musicTrack.length = 0;
+                this.musicTrack.concat(musicTrack)
+            },
+            coverMusicTrack(musicTrack){
+                this.musicTrack = musicTrack
+            },
+            regResizeHandle(key,event){
+                this.resizeEvent[key] = event;
+                return {cancelReg(){
+                    this.resizeEvent[key] = undefined
+                }}
+            },
             handleResize() {
+                for (const item of this.resizeEvent) {
+                    item()
+                }
                 const width = window.innerWidth;
                 if (width >= 768) { // 假设768px及以上为横屏
                     this.appState.screenType = 'landscape';
@@ -448,7 +488,7 @@
         created() {
             // 检测 Tauri API 是否存在
             if (window.tauri) {
-                this.appState.isTauri = true
+                this.appState.runOnTauri = true
                 console.log('应用是通过 Tauri 启动的。');
 
                 // 你可以进一步使用 Tauri 提供的 API
@@ -459,6 +499,9 @@
                     console.error('无法获取 Tauri 版本:', error);
                 });
             }
+            window.addEventListener('resize',()=>{
+                this.handleResize()
+            })
         },
         mounted() {
             this.audioManagerConstruct(this.currentMusicInfo.src)

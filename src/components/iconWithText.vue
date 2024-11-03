@@ -1,11 +1,24 @@
 <script setup>
     defineProps({
         type: String,
+        customColor: String
     })
+    const typeToStyle = {
+        background: {
+            backgroundColor:'#00000008',
+            // boxShadow: 'var(--Shadow-value-low)'
+        },
+        buttom_active: {
+            backgroundColor:'var(--color-button-active)',
+            color:'#fff',
+            boxShadow: 'var(--Shadow-value-low)'
+        },
+
+    }
 </script>
 
 <template>
-    <div :style="(type == 'background')?'background-color:#00000008':null" class="buttom">
+    <div :style="typeToStyle[type]" class="buttom">
         <div class="svg">
             <slot name="svg"></slot>
             <slot name="icon"></slot>
@@ -39,7 +52,8 @@
     }
     .text{
         white-space: nowrap;
-        color: #000e;
+        /* color: #000e; */
+        /* color: */
         --delay:0.125s;
         padding-left: 5px;
         transition: all 0.125s cubic-bezier(.5,.3,.2,1) var(--delay)

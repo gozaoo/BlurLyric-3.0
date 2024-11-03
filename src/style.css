@@ -11,13 +11,24 @@ body{
   src: local('MiSans'), url('./assets/MiSans-Normal.ttf');
 }
 
-
+h2 {
+  display: block;
+  font-size: 1.5em;
+  margin-block-start: 0.5em;
+  margin-block-end: 0.5em;
+  margin-inline-start: 0px;
+  margin-inline-end: 0px;
+  font-weight: bold;
+  unicode-bidi: isolate;
+}
 
 :root{
     --mainBlockBackground: rgb(249,249,249);
     --background-bar: rgb(243,243,243);
 
+    --color-button-active: rgb(0,144,220);
     --color-toggle-actived: rgb(0,122,204);
+	--Shadow-value-card-high:0px 5px 17px #0001;
 	--Shadow-value-normal:0px 0px 3px #0005;
 	--Shadow-value-low:0px 0px 5px #0002;
 	--fontColor-content-normal:#000;
@@ -29,6 +40,8 @@ body{
 }
 body{
   background-color: var(--mainBlockBackground);
+  /* margin: 0; */
+  /* padding: 0; */
 }
 .global_backgroundblur_light{
   backdrop-filter: blur(30px);
@@ -37,4 +50,10 @@ body{
 .global_backgroundblur_dark{
   backdrop-filter: blur(30px);
   background-color: #fffa;
+}
+#app{
+  /* position:relative; */
+  /* width:100vw; */
+  /* height:100vh; */
+  /* overflow: hidden; */
 }

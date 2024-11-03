@@ -8,8 +8,8 @@
 				}">{{item.name}}</div>
 		</div>
 
-		<contextMenu v-for="(line,line_index) in currentTable.cellArray" :menuItems="[
-			{ iconClass:['bi','bi-play-circle'], name: '插入单曲', handleClick: () => { console.log('点击了菜单项1'); } },
+		<contextMenu @click="doubleClick(line_index)" v-for="(line,line_index) in currentTable.cellArray" :menuItems="[
+			{ iconClass:['bi','bi-play-circle'], name: '插入单曲', handleClick: () => { pushMusic(line) } },
 			{
 				iconClass: ['bi','bi-music-note-list'],
 				name:'其他播放操作',
@@ -122,12 +122,7 @@
 		padding: 4px;
 	}
 
-	.table-name-cell:hover {
-		border-radius: 7px;
-		background-color: #00000007;
-		box-shadow: var(--Shadow-value-low);
-		color: var(--fontColor-content-normal);
-	}
+
 
 	.table-row:hover {
 		background-color: #0001;
@@ -155,12 +150,6 @@
 		white-space: nowrap;
 	}
 
-	.table-cell:hover {
-		border-radius: 7px;
-		background-color: #00000007;
-		box-shadow: var(--Shadow-value-low);
-		color: var(--fontColor-content-normal);
-	}
 </style>
 
 <script>
@@ -218,13 +207,52 @@
 						}
 					}],
 					cellArray: [{
-						name: 'error 未导入任何音乐',
-						artist: 'HOYO-MIX',
-						album: '崩坏星穹铁道-失控 Out of Control',
-						imgSrc: 'http://p1.music.126.net/RWIGyShmnjmUxizXco6fVg==/109951168505830245.jpg',
-						trackOrdinalNumber: '1',
-						duration: '02:02',
-					}]
+                    name: '时间线',
+                    id: 0,
+                    artist: 'HOYO-MIX',
+                    album: '崩坏星穹铁道-失控 Out of Control',
+                    duration: '02:02',
+                    trackOrdinalNumber: '1',
+                    imgSrc: 'http://p1.music.126.net/RWIGyShmnjmUxizXco6fVg==/109951168505830245.jpg',
+
+                    ar: [{
+                        id: -2,
+                        name: 'HOYO-MIX',
+                        alias: []
+                    }],
+                    lyric: {
+                        type: 'yrc',
+                        lines: [{
+                            startTime: 0,
+                            duration: 2,
+                            endTime: 2,
+                            words: [{
+                                    startTime: 0,
+                                    duration: 1,
+                                    endTime: 1,
+                                    word: 'Hello '
+                                },
+                                {
+                                    startTime: 1,
+                                    duration: 0.5,
+                                    endTime: 1.5,
+                                    word: 'World'
+                                }
+                            ],
+                            text: 'Hello World'
+                        }]
+                    },
+                    al: {
+                        id: -2,
+                        name: '崩坏星穹铁道-失控 Out of Control',
+                        picUrl: 'http://p1.music.126.net/RWIGyShmnjmUxizXco6fVg==/109951168505830245.jpg',
+                    },
+                    src: null
+                }]
+				},
+				lastClick:{
+					index: 0,
+					timeStamp: Date.now()
 				}
 			}
 		},
@@ -236,7 +264,19 @@
 			tableData: Object,
 		},
 		methods: {
-			copy: baseMethods.copy
+			copy: baseMethods.copy,
+			doubleClick(line_index){
+				let newTimestamp = Date.now();
+				// console.log("pushed",this.currentTable.cellArray[line_index]);
+
+				if(this.lastClick.index == line_index&&newTimestamp - this.lastClick.timeStamp<300){
+					this.pushMusic(this.currentTable.cellArray[line_index]);
+					// console.log("pushed",this.currentTable.cellArray[line_index]);
+					
+				}
+				this.lastClick.index = line_index
+				this.lastClick.timeStamp = newTimestamp
+			},
 		},
 		watch: {
 			scrollState: {
@@ -255,6 +295,7 @@
 				deep: true,
 				immediate: true
 			}
-		}
+		},
+		inject: ['pushMusic','pushMusicTrack','coverMusicTrack','cleanUpMusicTrack']
 	}
 </script>
