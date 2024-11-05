@@ -21,7 +21,8 @@
                 },
                 eventListenerRemovers: [],
                 dragInfo: null,
-                musicInfoPagePosition: 'bottom'
+                musicInfoPagePosition: 'bottom',
+                cancelCoverBindReg: ()=>{}
             }
         },
         components: {
@@ -38,7 +39,7 @@
             }
         },
         inject: ['currentMusicInfo', 'audioState', 'audioManager', 'changePlayMode', 'trackState', 'musicTrack',
-            'nextMusic', 'prevMusic', 'getNextMusicIndex', 'getPrevMusicIndex'
+            'nextMusic', 'prevMusic', 'getNextMusicIndex', 'getPrevMusicIndex','regResizeHandle'
         ],
         mounted() {
             this.onBottomListener()
@@ -97,25 +98,30 @@
                     duration: 100,
                     delay: 300,
                 })
-                this.$nextTick(()=>{
+                let cover_position_bind = (speed)=>{
                     let positionData = this.$refs.coverImagePlaceHolder.getBoundingClientRect()
                     // console.log({                        translateY:  (this.$refs.coverImagePlaceHolder.offsetTop + 41) + 'px',
                     // translateX: positionData.x + 'px'});
                     
                     anime({
                         targets: this.$refs.cover,
-                        easing: 'spring(1, 80, 15,' + Math.abs(info.speedY).toFixed(2) + ')',
+                        easing: 'spring(1, 80, 15,' +speed + ')',
                         width: positionData.width,
                         height: positionData.height,
                         translateY: (this.$refs.coverImagePlaceHolder.offsetTop + 41) + 'px',
                         translateX: positionData.x + 'px'
                     })
-                })
+                }
+                this.$nextTick(()=>{cover_position_bind(Math.abs(info.speedY).toFixed(2))})
+                this.cancelCoverBindReg = this.regResizeHandle('coverMove',()=>{cover_position_bind(0)}).cancelReg
+                
             },
             toBottom(info) {
                 this.musicInfoPagePosition = "toBottom" 
 
                 // this.eventListenerRemovers.push(callBack_drag.destroy)
+                this.cancelCoverBindReg()
+                this.cancelCoverBindReg = ()=>{}
                 anime.set(this.style.musicDetailRender, {
                     transformX: 0,
                 })
@@ -364,6 +370,13 @@
                 
                     </div>
                     <div class="musicDetailButton">
+                        <buttom_icon_circleBackground @click="changePlayMode">
+                        <template #icon>
+                            <playModeSvg style="transform: scale(.7) translateY(1%);transform-origin: 50% 50%;">
+                            </playModeSvg>
+                        </template>
+                    </buttom_icon_circleBackground>
+
                         <buttom_icon_circleBackground @click="prevMusic()">
                             <template #icon>
                                 <i class="bi bi-skip-start-fill"></i>
@@ -384,6 +397,13 @@
                                 <i class="bi bi-skip-end-fill"></i>
                             </template>
                         </buttom_icon_circleBackground>
+                        <buttom_icon_circleBackground>
+                        <template #icon>
+                            <i style="transform: scale(.7) translateY(1%);transform-origin: 50% 50%;"
+                                class="bi-volume-up bi"></i>
+                            <!-- <playModeSvg  style="transform: scale(.7) translateY(1%);transform-origin: 50% 50%;"></playModeSvg> -->
+                        </template>
+                    </buttom_icon_circleBackground>
                     </div>
                 </div>
             </div>
@@ -447,6 +467,11 @@
     justify-content: space-between;
     align-items: center;
 }
+.musicDetailButton>*{
+    flex-shrink:0;
+    font-size: 1em;
+
+}
     .coverImagePlaceHolder{
         grid-column: info-side;
         grid-row: cover;
@@ -501,6 +526,7 @@
         outline: 1px solid #d6d6d6;
         box-shadow: 0 0px 15px rgba(0, 0, 0, 0.14);
         /* transform: translateY() */
+        overflow: hidden
     }
 
     .relativeBox {

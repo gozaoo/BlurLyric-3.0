@@ -116,8 +116,7 @@
                     allPlayModes: ['loopPlaylist', 'loopSingle', 'stopAfterSingle', 'randomPlay', 'smartRecommend']
                 },
                 appState: {
-                    // runOnTauri: (window.__TAURI_INTERNALS__)? true: false,
-                    runOnTauri: false,
+                    runOnTauri: (window.__TAURI_INTERNALS__)? true: false,
                     screenType: null, // ['landscape','portrai,'mini']
                 },
                 source: {
@@ -191,14 +190,20 @@
             },
             regResizeHandle(key,event){
                 this.resizeEvent[key] = event;
-                return {cancelReg(){
-                    this.resizeEvent[key] = undefined
+                return {cancelReg:()=>{
+                    // this.resizeEvent[key] = undefined
+                    console.log(this.resizeEvent[key])
+                    delete this.resizeEvent[key]
                 }}
             },
             handleResize() {
-                for (const item of this.resizeEvent) {
-                    item()
+                for (const key in this.resizeEvent) { 
+                    if (Object.prototype.hasOwnProperty.call(this.resizeEvent, key)) {
+                        const element = this.resizeEvent[key];
+                        element()
+                    }
                 }
+
                 const width = window.innerWidth;
                 if (width >= 768) { // 假设768px及以上为横屏
                     this.appState.screenType = 'landscape';
@@ -487,18 +492,7 @@
         },
         created() {
             // 检测 Tauri API 是否存在
-            if (window.tauri) {
-                this.appState.runOnTauri = true
-                console.log('应用是通过 Tauri 启动的。');
 
-                // 你可以进一步使用 Tauri 提供的 API
-                // 例如，获取Tauri版本
-                window.tauri.getVersion().then(version => {
-                    console.log(`Tauri 版本: ${version}`);
-                }).catch(error => {
-                    console.error('无法获取 Tauri 版本:', error);
-                });
-            }
             window.addEventListener('resize',()=>{
                 this.handleResize()
             })
