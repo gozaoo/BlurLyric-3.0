@@ -10,5 +10,5 @@ import { invoke } from '@tauri-apps/api/core';
 
 // 使用命令
 export default {
-    getMusicList: async ()=>await invoke("getMusicList")
+    getMusicList: async ()=>await invoke("get_music_list")
 }

@@ -493,6 +493,8 @@
         created() {
             // 检测 Tauri API 是否存在
 
+            this.appState.runOnTauri = (window.__TAURI_INTERNALS__)? true: false;
+            
             window.addEventListener('resize',()=>{
                 this.handleResize()
             })

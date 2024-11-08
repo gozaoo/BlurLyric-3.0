@@ -70,7 +70,10 @@
 						<!--内容分类-->
 						<!--文本类型-->
 						<span v-if="item.type=='content'||item.type=='trackOrdinalNumber'">
-							{{line[item.path]}}
+							<!-- {{  -->
+								<!-- // (typeof(item.path)) -->
+								<!-- // }} -->
+							{{((typeof item.path)==Function)?item.path.call(this):line[item.path]}}
 						</span>
 						<!--图片类型-->
 						<lazy-load-cover-image-vue v-if="item.type=='image'" :src='line[item.path]'
@@ -164,7 +167,9 @@
 				currentTable: {
 					cellName: [{
 						type: 'trackOrdinalNumber',
-						path: 'trackOrdinalNumber',
+						path: ()=>{
+							return index;
+						},
 						name: '#',
 						sizing: 'basis',
 						sizingValue: '1.75em',

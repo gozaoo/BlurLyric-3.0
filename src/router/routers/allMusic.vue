@@ -1,5 +1,6 @@
 <script>
     import manager from '../../api/manager'
+    import powerTable_music from '../../components/tracks/powerTable_,music.vue';
     export default{
         data(){
             return {
@@ -8,6 +9,7 @@
                 ]
             }
         },
+        components:{powerTable_music},
         created(){
             if(this.appState.runOnTauri) {
                 manager.tauri.getMusicList().then((res)=>{
@@ -33,7 +35,10 @@
             </template>
         </iconWithText>
     </div>
-    {{ musicList }}
+    <br>
+    <powerTable_music :tableData="{
+        cellArray:this.musicList
+    }" />
 </template>
 
 <style scoped>

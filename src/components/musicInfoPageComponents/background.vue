@@ -21,12 +21,12 @@
                 '--random-y':(Math.random() * 100) + '%'
               })
             }
-            setTimeout(() => {
+          //   setTimeout(() => {
 
-            if(this.dynFunctionRunning ==false&&this.musicInfoPagePosition!='bottom'){
-                  this.random()
-            }
-          },3000)
+          //   if(this.dynFunctionRunning ==false&&this.musicInfoPagePosition!='bottom'){
+          //         this.random()
+          //   }
+          // },3000)
 
         },
         methods:{
@@ -39,13 +39,13 @@
                 '--random-y':(Math.random() * 100) + '%'
               })
             }
-            setTimeout(() => {
-              if(this.musicInfoPagePosition!='bottom'){
-                this.random()
-              } else {
-                this.dynFunctionRunning =false
-              }
-            }, 6*1000);
+            // setTimeout(() => {
+            //   if(this.musicInfoPagePosition!='bottom'&&this.dynamic == true){
+            //     this.random()
+            //   } else {
+            //     this.dynFunctionRunning =false
+            //   }
+            // }, 6*1000);
           }
         },
         props: {
@@ -90,7 +90,7 @@
 <style>
   .player-background{
     animation: spawnplayerbackground 0.3s linear;
-  filter: blur(8vmax) saturate(200%) contrast(40%) brightness(90%) ;
+  filter: blur(8vmin) saturate(200%) contrast(40%) brightness(90%) ;
   transition: background .4s;
   margin: -10vh 0 0 -10vw;
 
