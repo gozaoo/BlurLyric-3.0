@@ -41,7 +41,7 @@
                 return tableData
             },
         },
-        inject:['appState','source','runOnTauri']
+        inject:['appState','source']
     }
 </script>
 

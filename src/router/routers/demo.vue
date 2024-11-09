@@ -115,14 +115,7 @@
         <h2>对话框测试</h2>
     </dialogVue>
     <br>
-    <powerTableVue :tableData="{cellArray: [{
-							name: '音乐列表复制测试',
-							artist: '音乐人名',
-							album: '专辑名123',
-							imgSrc: 'http://p1.music.126.net/RWIGyShmnjmUxizXco6fVg==/109951168505830245.jpg',
-							trackOrdinalNumber: '1',
-							duration: '02:02',
-						}]}">
+    <powerTableVue>
     </powerTableVue>
 
     <bodytitle :text="'标题变化控制组件'" />

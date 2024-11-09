@@ -73,10 +73,15 @@
 							<!-- {{  -->
 								<!-- // (typeof(item.path)) -->
 								<!-- // }} -->
-							{{((typeof item.path)==Function)?item.path.call(this):line[item.path]}}
+								<!-- {{ item.path() }} -->
+							{{item.path.apply({
+								line,line_index,item,index
+							})}}
 						</span>
 						<!--图片类型-->
-						<lazy-load-cover-image-vue v-if="item.type=='image'" :src='line[item.path]'
+						<lazy-load-cover-image-vue v-if="item.type=='image'" :src='item.path.apply({
+								line,line_index,item,index
+							})'
 							style="border-radius: 5%;left:0;top:0;height: 100%;width: 100%;position: absolute;">
 						</lazy-load-cover-image-vue>
 
@@ -167,8 +172,8 @@
 				currentTable: {
 					cellName: [{
 						type: 'trackOrdinalNumber',
-						path: ()=>{
-							return index;
+						path: function(){
+							return this.line_index+1;
 						},
 						name: '#',
 						sizing: 'basis',
@@ -179,38 +184,57 @@
 						}
 					}, {
 						type: 'image',
-						path: 'imgSrc',
+						path:function(){
+							return this.line.al.picUrl;
+						},
 						name: '图像',
 						sizing: 'basis',
 						sizingValue: '38px'
 					}, {
 						type: 'content',
-						path: 'name',
+						path:function(){
+							return this.line.name;
+						},
 						name: '歌曲名',
 					}, {
 						type: 'content',
-						path: 'artist',
+						path:function(){
+							let first = false
+							return this.line.ar.map((ar,ar_index)=>{
+								// if(ar_index == this.line.ar.length-1){
+									return ar.name
+								// }
+								// return ar.name+'&'
+							}).join("&");
+						},
 						name: '歌手',
 						spacialStyle: {
 							color: 'var(--fontColor-content-unimportant)',
 						}
 					}, {
 						type: 'content',
-						path: 'album',
+						path:function(){
+							return this.line.al.name;
+						},
 						name: '专辑',
 						spacialStyle: {
 							color: 'var(--fontColor-content-unimportant)',
 						}
-					}, {
-						type: 'content',
-						path: 'duration',
-						name: '时长',
-						sizing: 'basis',
-						sizingValue: '40px',
-						spacialStyle: {
-							color: 'var(--fontColor-content-unimportant)',
-						}
-					}],
+					}
+					// ,
+					//  {
+					// 	type: 'content',
+					// 	path:function(){
+					// 		return this.line_index+1;
+					// 	},
+					// 	name: '时长',
+					// 	sizing: 'basis',
+					// 	sizingValue: '40px',
+					// 	spacialStyle: {
+					// 		color: 'var(--fontColor-content-unimportant)',
+					// 	}
+					// }
+				],
 					cellArray: [{
                     name: '时间线',
                     id: 0,
@@ -291,9 +315,9 @@
 			},
 			tableData: {
 				handler(newValue) {
-					if (newValue.cellName != undefined) {
+					if (newValue&&newValue.cellName != undefined) {
 						this.currentTable = newValue
-					} else if (newValue.cellArray != undefined) {
+					} else if (newValue&&newValue.cellArray != undefined) {
 						this.currentTable.cellArray = newValue.cellArray
 					}
 				},

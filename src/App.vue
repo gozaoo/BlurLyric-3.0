@@ -538,6 +538,16 @@
                     </template>
                 </iconWithText>
 
+
+                <iconWithText style="width: 100%;" @click="this.$router.push('/musicTrack/')"
+                    :type="(leftBarState=='short')?'hidden':null">
+                    <template #svg>
+                        <i class="bi bi-music-note-list"></i>
+                    </template>
+                    <template #text>
+                        播放列表
+                    </template>
+                </iconWithText>
                 <iconWithText style="width: 100%;" @click="this.$router.push('/setting/')"
                     :type="(leftBarState=='short')?'hidden':null">
                     <template #svg>
