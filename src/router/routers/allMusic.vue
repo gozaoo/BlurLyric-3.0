@@ -24,7 +24,7 @@
 
 <template>
     <bodytitle text="全部音乐" />
-
+    <h2>共 {{ musicList.length }} 首 </h2>
     <div class="buttomTrack">
         <iconWithText type="background" @click="" >
             <template #svg>

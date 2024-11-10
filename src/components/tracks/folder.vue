@@ -15,7 +15,7 @@
         <div class="path">
             <slot name="path"/>
         </div></div>
-        <iconToClick class="toRight">
+        <iconToClick @click="this.$emit('del')" class="toRight">
             <i class="bi bi-x"></i>
         </iconToClick>
         
@@ -23,8 +23,9 @@
 </template>
 <style scoped>
     .row{
-        background-color: #0001;
+        background-color:rgb(0, 0, 0,0.03);
         padding: 6px 12px;
+        margin: 1em 0;
         border-radius: 5px;
         display: flex;
         align-items: center;

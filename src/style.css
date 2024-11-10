@@ -36,7 +36,23 @@ h2 {
 	--fontColor-content-moreUnimportant:#888;
   --card-radio-backgroundColor-1:#ddd;
   --card-radio-backgroundColor-2:rgb(243,243,243);
+  --color-input-outline-normal: rgba(0, 0, 0, 0.08);
 
+}
+p.tips{
+  font-size: 12px;color:#0006;
+}
+input{
+  padding: 11px;
+  border-radius: 11px;
+  border: none;
+  background-color: rgba(0, 0, 0, 0.03);
+  /* outline: 0; */
+  outline:  var(--color-input-outline-normal) solid  2px;
+}
+input:focus{
+  box-shadow: var(--Shadow-value-card-high);
+  outline:  var(--color-button-active) solid  2px;
 }
 body{
   background-color: var(--mainBlockBackground);

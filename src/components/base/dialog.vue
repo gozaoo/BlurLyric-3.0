@@ -45,17 +45,20 @@
     .toRightEnd{
         width: fit-content;
         
-        margin: 0 0 0 auto;
+        margin: 11px 0 0 auto;
 
     }
     .container{
         background: #fff;
-		padding: 11px;
+		padding: 14px;
         min-width: min(240px,80vw);
         min-height: min(100px,60vh);
         width: fit-content;
         box-shadow: var(--Shadow-value-card-high);
 		border-radius: 11px;
         margin: 20vh auto;
+        position: relative;
+        box-sizing:content-box;
+        overflow: hidden;
     }
 </style>

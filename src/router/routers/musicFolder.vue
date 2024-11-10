@@ -1,90 +1,104 @@
 <script>
-    import folder from '../../components/tracks/folder.vue';
-    import dialog from '../../components/base/dialog.vue';
-    import powerTable from '../../components/tracks/powerTable.vue';
-    
-    export default {
-        data(){
-            return {
-                localFolders: [
-                    {
-                        name: "用户音乐文件",
-                        path: "C:\\Users\\Administrator\\Documents\\My Music"
-                    }
-                ]
+import folder from '../../components/tracks/folder.vue';
+import dialog from '../../components/base/dialog.vue';
+import powerTable from '../../components/tracks/powerTable.vue';
+import manager from '../../api/manager';
+export default {
+    data() {
+        return {
+            manager,
+            localFolders: [],
+            askAddLocalDirs: false,
+            addLocalDirInputValue: ""
+        }
+    },
+    components: {
+        dialog,
+        powerTable,
+        folder
+    },
+    computed: {
+        onlineSourceTableData() {
+            let tableData = {
+                cellName: [{
+                    type: 'content',
+                    path: 'name',
+                    name: '名称',
+                }, {
+                    type: 'content',
+                    path: 'apiUrl',
+                    name: 'api链接',
+                }, {
+                    type: 'content',
+                    path: 'type',
+                    name: '来源类型',
+                }],
+                cellArray: this.source.online,
             }
-        },
-        components:{
-            dialog,
-            powerTable,
-            folder
-        },
-        computed:{
-            onlineSourceTableData(){
-                let tableData ={
-                    cellName: [{
-						type: 'content',
-						path: 'name',
-						name: '名称',
-					},{
-						type: 'content',
-						path: 'apiUrl',
-						name: 'api链接',
-					},{
-						type: 'content',
-						path: 'type',
-						name: '来源类型',
-					}],
-                    cellArray: this.source.online,
-                }
 
-                return tableData
-            },
+            return tableData
         },
-        inject:['appState','source']
-    }
+    },
+    methods: {
+        async refreshDirs() {
+            let result = await manager.tauri.getAllMusicDirs()
+            this.localFolders = result;
+        }
+    },
+    async created() {
+        this.refreshDirs()
+    },
+    inject: ['appState', 'source']
+}
 </script>
 
 <template>
     <bodytitle text="音乐来源" />
-<div v-if="appState.runOnTauri == true">
-    
-    <h2>管理本地文件夹</h2>
-    <iconFlexRow>
+    <div v-if="appState.runOnTauri == true">
 
-        <iconWithText type="background">
-            <template #icon>
-                <i class="bi bi-arrow-clockwise"></i>
-            </template>
-            <template #text>扫描文件夹</template>
-        </iconWithText> 
-        <iconWithText type="background"> 
-            <template #icon>
-                <i class="bi bi-plus-circle-dotted"></i>
-            </template>
-            <template #text>添加</template>
-        </iconWithText>
-        <iconWithText @click="this.$router.push('/allmusic/')" type="background">
-        <template #svg>
-                <i class="bi bi-folder-fill"></i>
-            </template>
-            <template #text>
-                全部音乐
-            </template>
-        </iconWithText>
-    </iconFlexRow>
-    
-    <br>
-    <folder v-for="(item) in localFolders">
-        <template #name>
-            {{item.name}}
-        </template>
-        <template #path>
-            {{item.path}}
-        </template>
+        <h2>管理本地文件夹</h2>
+        <iconFlexRow>
 
-    </folder>
-</div>
+            <iconWithText @click="manager.tauri.refreshMusicCache(); refreshDirs()" type="background">
+                <template #icon>
+                    <i class="bi bi-arrow-clockwise"></i>
+                </template>
+                <template #text>刷新</template>
+            </iconWithText>
+            <iconWithText @click="askAddLocalDirs= true" type="background">
+                <template #icon>
+                    <i class="bi bi-plus-circle-dotted"></i>
+                </template>
+                <template #text>添加</template>
+            </iconWithText>
+            <iconWithText @click="this.$router.push('/allmusic/')" type="background">
+                <template #svg>
+                    <i class="bi bi-folder-fill"></i>
+                </template>
+                <template #text>
+                    全部音乐
+                </template>
+            </iconWithText>
+        </iconFlexRow>
+        <dialog_custom v-if="askAddLocalDirs == true" :cancel="()=>{askAddLocalDirs = false}" :finish="()=>{askAddLocalDirs = false;manager.tauri.addMusicDirs(addLocalDirInputValue);manager.tauri.refreshMusicCache(); refreshDirs()}">
+            <h2>
+                请输入一个地址
+            </h2>
+            <p class="tips">示例：C:\Users\gozaoo\Music\</p>
+            <!-- <br> -->
+            <input style="width: 210px" type="text" placeholder="" v-model="addLocalDirInputValue">
+        </dialog_custom>
+        <folder @del="()=>{manager.tauri.removeMusicDirs(item);manager.tauri.refreshMusicCache(); refreshDirs()}" v-for="(item) in localFolders">
+            <template #name>
+                <!-- {{item.split('/')[-1]}} -->
+            </template>
+            <template #path>
+                {{ item }}
+            </template>
+
+        </folder>
+        <p class="tips" v-if="localFolders.length == 0">当前还没有添加的目录，请先添加</p>
+    </div>
     <h2>在线来源</h2>
     <iconWithText type="background">
         <template #icon>
@@ -97,11 +111,12 @@
 </template>
 
 <style scoped>
-.buttomTrack{
+.buttomTrack {
     display: flex;
 
 }
-.buttomTrack>*{
+
+.buttomTrack>* {
     width: fit-content;
 }
 </style>

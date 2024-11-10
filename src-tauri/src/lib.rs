@@ -11,6 +11,8 @@ lazy_static::lazy_static! {
     static ref ARTIST_ID_COUNTER: Mutex<u32> = Mutex::new(0);
     static ref ALBUM_ID_COUNTER: Mutex<u32> = Mutex::new(0);
     static ref MUSIC_CACHE: Mutex<HashMap<PathBuf, Vec<Song>>> = Mutex::new(HashMap::new());
+    static ref MUSIC_DIRS: Mutex<Vec<PathBuf>> = Mutex::new(Vec::new());
+
 
 }
 
@@ -91,16 +93,15 @@ fn scan_music_files(dir: PathBuf) -> Vec<PathBuf> {
             }
         }
     }
-    save_cache_to_disk();
+    // save_cache_to_disk();
     music_files
 }
 
 // 独立的方法，用于添加用户音乐文件夹
 fn add_users_music_dir() {
     if let Some(audio_dir) = dirs::audio_dir() {
-        let mut music_dirs = MUSIC_DIRS.lock().unwrap();
-        music_dirs.push(audio_dir);
-        save_music_dirs_to_disk();
+        let audio_dir_path = audio_dir.to_str().unwrap().to_string();
+        let _ = add_music_dirs(vec![audio_dir_path]);
     }
 }
 
@@ -118,7 +119,6 @@ fn init_application() {
     }
 
     // 重新加载音乐目录，以包含用户音乐文件夹
-    load_music_dirs_from_disk();
 }
 
 // 解析音乐文件并返回Song结构体的函数
@@ -127,7 +127,7 @@ fn parse_music_file(file: PathBuf) -> Result<Song, String> {
     // let tag = AnyTag::new(&file);
     let title = tag.title().unwrap_or("Unknown Title").to_string();
     let artist = tag.artist().unwrap_or("Unknown Artist").to_string();
-    let album = tag.album().unwrap();
+    let album = tag.album_title().unwrap_or("Unknown Album").to_string();
     // 这里简化处理，只取第一个艺术家和专辑，并且没有处理歌词和图片
     let song = Song {
         name: title,
@@ -140,7 +140,7 @@ fn parse_music_file(file: PathBuf) -> Result<Song, String> {
         lyric: String::new(), // 示例中未提供歌词获取逻辑
         al: Album {
             id: next_album_id(),
-            name: album.title.to_string(),
+            name: album,
             pic_url: String::new(), // 示例中未提供图片获取逻辑
         },
         src: file,
@@ -251,35 +251,11 @@ fn remove_music_dirs(dirs_to_remove: Vec<String>) -> Result<(), String> {
         cache.remove(&dir);
     }
     
-    save_music_dirs_to_disk();
-    save_cache_to_disk();
+    // save_music_dirs_to_disk();
+    // save_cache_to_disk();
     Ok(())
 }
 
-#[tauri::command]
-fn add_music_dirs(new_dirs: Vec<String>) -> Result<(), String> {
-    let mut music_dirs = MUSIC_DIRS.lock().unwrap();
-    music_dirs.extend(new_dirs.iter().map(PathBuf::from));
-
-    for dir_str in new_dirs {
-        let dir = PathBuf::from(dir_str);
-        if dir.is_dir() {
-            let songs = scan_music_files(dir.clone());
-            let parsed_songs: Result<Vec<Song>, String> = songs.into_iter().map(parse_music_file).collect();
-            if let Ok(parsed_songs) = parsed_songs {
-                cache_music_list(dir, parsed_songs);
-            }
-        } else {
-            return Err("One or more paths are not valid directories".into());
-        }
-    }
-    save_music_dirs_to_disk();
-    save_cache_to_disk();
-    Ok(())
-}
-lazy_static::lazy_static! {
-    static ref MUSIC_DIRS: Mutex<Vec<PathBuf>> = Mutex::new(Vec::new());
-}
 
 fn save_music_dirs_to_disk() {
     let dirs = MUSIC_DIRS.lock().unwrap();
@@ -297,12 +273,17 @@ fn load_music_dirs_from_disk() {
 
 #[tauri::command]
 fn refresh_music_cache() -> Result<(), String> {
+
     let music_dirs = MUSIC_DIRS.lock().unwrap();
+    
     let mut new_cache = HashMap::new();
+    // println!("music_dirs: {}",music_dirs[0].clone().display());
 
     for dir in &*music_dirs {
         if dir.is_dir() {
             let songs = scan_music_files(dir.clone());
+            // format!("thisDirs: {}", dir.clone().to_str().unwrap().to_string());
+            format!("songs: {}",songs[0].clone().display());
             let parsed_songs: Result<Vec<Song>, String> = songs.into_iter().map(parse_music_file).collect();
             if let Ok(parsed_songs) = parsed_songs {
                 new_cache.insert(dir.clone(), parsed_songs);
@@ -317,15 +298,28 @@ fn refresh_music_cache() -> Result<(), String> {
     let mut cache = MUSIC_CACHE.lock().unwrap();
     *cache = new_cache;
 
-    save_cache_to_disk();
+    // save_cache_to_disk();
     Ok(())
+}
+
+#[tauri::command]
+fn add_music_dirs(new_dirs: Vec<String>) -> Result<(), String> {
+    let mut music_dirs = MUSIC_DIRS.lock().unwrap();
+    music_dirs.extend(new_dirs.iter().map(PathBuf::from));
+    Ok(())
+}
+// 在应用程序的其他部分（例如，在 Tauri 的某个事件处理器中或在初始化时），处理缓存刷新
+fn handle_cache_refresh() {
+    if let Err(e) = refresh_music_cache() {
+        eprintln!("Failed to refresh music cache: {}", e);
+    }
 }
 
 
 // Tauri应用入口点
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-    init_application();
+    // init_application();
 
     tauri::Builder::default()
         .plugin(tauri_plugin_fs::init())
@@ -338,7 +332,11 @@ pub fn run() {
             get_album_cover,
             get_music_file,
             refresh_music_cache // 添加新的命令到这里
-            ])
+            ])        .setup(|app| {
+                // 在应用程序启动时处理缓存刷新
+                handle_cache_refresh();
+                Ok(())
+            })
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

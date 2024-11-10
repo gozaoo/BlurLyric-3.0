@@ -27,7 +27,7 @@ import toggleVue from './components/base/toggle.vue';
 import textspawnVue from './components/base/text-spawn.vue';
 import bodytitleVue from './components/base/bodytitle.vue'
 import iconFlexRow from './components/iconFlexRow.vue'
-
+import dialog from './components/base/dialog.vue';
 // 导入路由配置
 import routes from './router/index.js';
 
@@ -41,6 +41,7 @@ vueApp.component('iconToClick', iconToClickVue)
        .component('bodytitle', bodytitleVue)
        .component('textspawn',textspawnVue)
        .component('iconFlexRow',iconFlexRow)
+       .component('dialog_custom',dialog)
 
 
 // 创建Vue Router实例并配置路由
