@@ -262,8 +262,8 @@
         <div class="relativeBox">
         
             <div ref="cover" style="transform: translateX(17px) translateY(17px); " class="cover">
-                <lazyLoadCoverImage class="blur" :src="currentMusicInfo.al.picUrl"></lazyLoadCoverImage>
-                <lazyLoadCoverImage :src="currentMusicInfo.al.picUrl"></lazyLoadCoverImage>
+                <lazyLoadCoverImage class="blur" :id="currentMusicInfo.al.id"></lazyLoadCoverImage>
+                <lazyLoadCoverImage :id="currentMusicInfo.al.id"></lazyLoadCoverImage>
             </div>
 
             <!-- <div class="cover">
@@ -348,7 +348,7 @@
             </div>
             <div v-show="musicInfoPagePosition!='bottom'" 
             ref="mainContainer" class="mainContainer">
-                <background class="player-background" :imgSrc="currentMusicInfo.al.picUrl" :musicInfoPagePosition="musicInfoPagePosition" />
+                <background class="player-background" :imgSrc="currentMusicInfo.al.id" :musicInfoPagePosition="musicInfoPagePosition" />
 
                 <div  class="controlBar">
                     <div ref="controlTapBar" class="tapBar"></div>

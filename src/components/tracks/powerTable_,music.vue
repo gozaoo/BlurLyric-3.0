@@ -79,7 +79,7 @@
 							})}}
 						</span>
 						<!--图片类型-->
-						<lazy-load-cover-image-vue v-if="item.type=='image'" :src='item.path.apply({
+						<lazy-load-cover-image-vue v-if="item.type=='image'" :id='item.path.apply({
 								line,line_index,item,index
 							})'
 							style="border-radius: 5%;left:0;top:0;height: 100%;width: 100%;position: absolute;">
@@ -185,7 +185,7 @@
 					}, {
 						type: 'image',
 						path:function(){
-							return this.line.al.picUrl;
+							return this.line.al.id;
 						},
 						name: '图像',
 						sizing: 'basis',

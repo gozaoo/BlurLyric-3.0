@@ -9,6 +9,7 @@ import {
     ref,
     onMounted
 } from 'vue'
+import baseMethods from './js/baseMethods'
 
 let templateEmptyMusicTrack = [{
     name: "请选择您的音乐",
@@ -289,48 +290,12 @@ export default {
         async audioManagerConstruct(newSong) {
             const newAudio = document.createElement('audio');
             // const isFilePath = ;
-            function isPossibleLocalPath(str) {
-                // 检查str是否为字符串
-                if (typeof str !== 'string') {
-                    return false;
-                }
 
-                // 检查是否以Windows风格的路径开始（例如C:\或D:\）
-                const isWindowsPath = /^[A-Za-z]:\\/.test(str);
-
-                // 检查是否以Unix/Linux风格的路径开始（例如/)
-                const isUnixPath = /^\//.test(str);
-
-                // 如果是其中之一，则返回true，否则返回false
-                return isWindowsPath || isUnixPath;
-            }
-            if (isPossibleLocalPath(newSong.src)) {
-                // 如果是文件路径，使用manager.tauri.getMusicFile获取二进制信息
+            if (baseMethods.isPossibleLocalPath(newSong.src)) {
+                // 如果是文件路径，使用manager.tauri.getMusicFile获取Base64信息
                 // 假设binaryData已经是Uint8Array类型
                 await manager.tauri.getMusicFile(newSong.id).then(base64_data => {
-                    console.log('读取成功');
-                    // console.log(binaryData);
-
-                    // // 如果binaryData不是Uint8Array，则转换
-                    // if (!(binaryData instanceof Uint8Array)) {
-                    //     binaryData = new Uint8Array(binaryData);
-                    // }
-
-                    // // 创建Blob对象
-                    // const blob = new Blob([binaryData], { type: 'audio/flac' });
-
-                    // // 复用Blob URL，如果已经存在则释放旧的URL
-                    // if (newAudio.src) {
-                    //     URL.revokeObjectURL(newAudio.src);
-                    // }
-                    // const url = URL.createObjectURL(blob);
-
-                    // 设置audio的src为Blob URL
-                    newAudio.src = "data:audio/mpeg;base64,"+base64_data;
-                    // console.timeEnd();
-
-                    // 播放音频
-                    // checkAndPlay();
+                    newAudio.src = `data:audio/mpeg;base64,${base64_data}`;
                 }).catch(error => {
                     console.error('Error fetching music file:', error);
                 });
@@ -534,7 +499,8 @@ export default {
                 return
             }
 
-            this.audioManager.destroyThisManager()
+            if (this.audioManager) this.audioManager.destroyThisManager()
+
             await this.audioManagerConstruct(this.musicTrack[this.musicTrackIndex])
             this.audioManager.play()
         },
@@ -543,7 +509,8 @@ export default {
             if (this.checkMusicIsUsable(this.musicTrackIndex) == false) {
                 return
             }
-            this.audioManager.destroyThisManager()
+            if (this.audioManager) this.audioManager.destroyThisManager()
+
             await this.audioManagerConstruct(this.musicTrack[this.musicTrackIndex])
             this.audioManager.play()
         },

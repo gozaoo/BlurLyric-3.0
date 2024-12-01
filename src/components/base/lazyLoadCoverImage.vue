@@ -2,97 +2,78 @@
   <div class="image-container">
     <!-- 占位组件 -->
     <div class="placeholder">
-		<i class="bi bi-music-note"></i>
-	</div>
+      <i class="bi bi-music-note"></i>
+    </div>
     <!-- 动态绑定的图片元素 -->
     <img
-      v-if="src"
+      v-if="currentSrc"
       :src="currentSrc"
       class="loaded-image"
       :style="{ opacity: imageOpacity }"
     />
-	<img
-	  v-if="src"
-	  :src="src"
-	  @load="handleImageLoad"      ref="image"
-	  @error="handleImageError"
-	  :style="{ opacity: 0,visibility: 'hidden' }"
-	/>
   </div>
 </template>
 
 <script>
+import manager from '../../api/manager';
+
+
+// import { getAlbumCover } from './manager.tauri'; // 假设manager.tauri是导入路径
 
 export default {
   data() {
     return {
       imageOpacity: 0, // 控制图片透明度的数据属性
-	  currentSrc: '',
-	  nextTransilateTime: 0,
-	  timerID: undefined
+      currentSrc: '', // 当前图片的源
     };
   },
   props: {
-    src: {
-      type: String,
+    id: {
+      type: Number,
       default: "", // 默认为空字符串，表示没有图片
     },
   },
   methods: {
+    async loadAlbumCover() {
+      try {
+        if(this.id>=0){
+
+          const base64String = await manager.tauri.getAlbumCover(this.id);
+          this.currentSrc = `data:image/jpeg;base64,${base64String}`; // 假设返回的是JPEG图片
+          this.imageOpacity = 1; // 图片加载成功后，设置透明度为1
+        } 
+      } catch (error) {
+        console.error("Failed to load album cover:", error);
+        this.$emit("imageError", error); // 触发imageError事件，传递错误对象
+      }
+    },
     handleImageLoad(event) {
       // 当图片加载完成时，执行淡入动画
-	  let delay = this.nextTransilateTime-Date.now()
-		if(this.timerID!=undefined){
-			clearTimeout(this.timerID)
-		}
-	  if(delay>=0){
-		this.timerID = setTimeout(()=>{
-			this.currentSrc=this.src
-			this.imageOpacity = 1;
-		},delay)
-	  } else {
-		  	this.currentSrc=this.src
-		  	this.imageOpacity = 1;
-	  }
-	  
-	  
+      this.imageOpacity = 1;
       this.$emit("imageLoaded", event); // 触发imageLoaded事件，传递事件对象
     },
     handleImageError(error) {
       // 当图片加载失败时，可以处理错误
-      // console.error("Image load error:", error);
       this.$emit("imageError", error); // 触发imageError事件，传递错误对象
-    },
-    fadeOutImage() {
-      // 当src变化时，先淡出当前图片
-      this.imageOpacity = 0;
-	  this.nextTransilateTime = Date.now() + 500
     },
   },
   watch: {
-    src: {
-      immediate: false, // 初始时立即执行一次处理函数
-      handler(newSrc, oldSrc) {
-        if (oldSrc !== newSrc) {
-          // 当src发生变化时，先淡出当前图片
-          this.fadeOutImage();
-          // 在下次DOM更新循环结束之后执行，确保DOM已更新
-          this.$nextTick(() => {
-            // 设置图片透明度为0，准备加载新图片
-            this.imageOpacity = 0;
-          });
+    id: {
+      immediate: true, // 当albumId变化时立即执行
+      handler(newAlbumId) {
+        if (newAlbumId) {
+          this.loadAlbumCover(); // 加载专辑封面
         }
       },
     },
   },
   mounted() {
-    // 确保容器占满整个画幅
-    // const container = this.$el.querySelector('.image-container');
-    // container.style.width = '100%';
-    // container.style.height = '100vh'; // 或者根据需要设置为100%
+    // 组件挂载后立即加载专辑封面
+    // this.loadAlbumCover();
   },
 };
 </script>
+
 
 <style scoped>
 .image-container {

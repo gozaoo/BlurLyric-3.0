@@ -2,7 +2,7 @@ use audiotags::Tag;
 use serde_json::{json, Value};
 use std::collections::HashMap;
 use std::fs::{self, DirEntry};
-use base64::{encode};
+// use base64::{encode};
 use std::path::PathBuf;
 use std::io;
 use std::sync::Mutex;
@@ -253,7 +253,7 @@ fn init_application() {
 
 
 #[tauri::command]
-fn get_album_cover(album_id: u32) -> Result<Vec<u8>, String> {
+fn get_album_cover(album_id: u32) -> Result<String, String> {
     let cache = MUSIC_CACHE.lock().unwrap();
     for songs in cache.values() {
         for song in songs {
@@ -262,7 +262,8 @@ fn get_album_cover(album_id: u32) -> Result<Vec<u8>, String> {
                 match Tag::new().read_from_path(&song.src).unwrap().album_cover() {
                     Some(cover) => {
                         // 现在我们可以安全地访问 cover 的 data 字段
-                        return Ok(cover.data.to_vec());
+
+                        return Ok(base64::encode(cover.data));
                     },
                     None => {
                         // 如果没有封面，继续循环
@@ -314,7 +315,7 @@ async fn get_music_file(song_id: u32) -> Result<String, String> {
         match async_fs::read(song_path).await {
             Ok(data) => {
                 println!("Song finished reading, encoding to Base64");
-                Ok(encode(data))
+                Ok(base64::encode(data))
             },
             Err(e) => Err(format!("Failed to read music file: {}", e)),
         }

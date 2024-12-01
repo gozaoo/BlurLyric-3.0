@@ -20,6 +20,21 @@ export default {
         document.execCommand('copy');
         document.body.removeChild(textarea);
     },
+    isPossibleLocalPath(str) {
+        // 检查str是否为字符串
+        if (typeof str !== 'string') {
+            return false;
+        }
+
+        // 检查是否以Windows风格的路径开始（例如C:\或D:\）
+        const isWindowsPath = /^[A-Za-z]:\\/.test(str);
+
+        // 检查是否以Unix/Linux风格的路径开始（例如/)
+        const isUnixPath = /^\//.test(str);
+
+        // 如果是其中之一，则返回true，否则返回false
+        return isWindowsPath || isUnixPath;
+    },
     progressBarReg(progressBarDom, getCurrentProgress, progressUpdate) {
         let info = {
             currentProgress: 0,
