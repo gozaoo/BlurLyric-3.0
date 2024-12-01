@@ -2,15 +2,14 @@ use audiotags::Tag;
 use serde_json::{json, Value};
 use std::collections::HashMap;
 use std::fs::{self, DirEntry};
+use base64::{encode};
 use std::path::PathBuf;
 use std::io;
 use std::sync::Mutex;
 use serde::{Deserialize, Serialize};
 use lazy_static::lazy_static;
 
-use rayon::prelude::*;
 use tokio::fs as async_fs;
-use tokio::io::AsyncReadExt;
 // use ;
 
 // use audiotags::{Tag, Box<dyn AudioTag + Send + Sync>};
@@ -297,7 +296,7 @@ fn load_cache_from_disk() -> Result<(), String> {
 }
 // use std::fs;
 #[tauri::command]
-async fn get_music_file(song_id: u32) -> Result<Vec<u8>, String> {
+async fn get_music_file(song_id: u32) -> Result<String, String> {
     println!("Searching for song with ID: {}", song_id);
 
     // 查找具有匹配 song_id 的歌曲，并立即释放锁
@@ -313,7 +312,10 @@ async fn get_music_file(song_id: u32) -> Result<Vec<u8>, String> {
 
         // 读取歌曲文件内容
         match async_fs::read(song_path).await {
-            Ok(data) => Ok(data),
+            Ok(data) => {
+                println!("Song finished reading, encoding to Base64");
+                Ok(encode(data))
+            },
             Err(e) => Err(format!("Failed to read music file: {}", e)),
         }
     } else {

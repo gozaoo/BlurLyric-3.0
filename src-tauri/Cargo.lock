@@ -182,6 +182,7 @@ name = "blurlyric"
 version = "0.1.0"
 dependencies = [
  "audiotags",
+ "base64 0.22.1",
  "dirs",
  "lazy_static",
  "rayon",

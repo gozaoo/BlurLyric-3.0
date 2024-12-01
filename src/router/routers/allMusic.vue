@@ -14,20 +14,20 @@
             if(this.appState.runOnTauri) {
                 manager.tauri.getMusicList().then((res)=>{
                 this.musicList = [...this.musicList,...res]
-                console.log(this.musicList)
+                // console.log(this.musicList)
                 });
             }
             
         },
-        inject:['appState']
+        inject:['appState','coverMusicTrack']
     }
 </script>
 
 <template>
     <bodytitle text="全部音乐" />
-    <h2>共 {{ musicList.length }} 首 </h2>
+    <h2>共 {{ musicList.length }} 首 </h2> 
     <div class="buttomTrack">
-        <iconWithText type="background" @click="" >
+        <iconWithText @click="coverMusicTrack(this.musicList)" type="background" >
             <template #svg>
                 <i class="bi bi-play-fill"></i>
             </template>
