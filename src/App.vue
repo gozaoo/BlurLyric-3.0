@@ -3,6 +3,7 @@
     import rightBlock from './components/rightBlock.vue'
     import leftBar from './components/leftBar.vue'
     import musicInfoPage from './components/musicInfoPage.vue'
+    import manager from './api/manager'
     import {
         computed,
         ref,
@@ -173,20 +174,35 @@
             cleanUpMusicTrack(){
                 this.musicTrack = templateEmptyMusicTrack
             },
-            pushMusic(singleSong){
+            async pushMusic(singleSong){
                 console.log(this);
                 
-                if(this.checkMusicListIsEmpty())  this.musicTrack.length = 0;
-                // console.log(singleSong);
-                // lo
+                
+                if(this.checkMusicListIsEmpty())  {
+                    this.musicTrack.length = 0
+                    this.musicTrack.push(singleSong)
+
+                    await this.audioManagerConstruct(this.musicTrack[this.musicTrackIndex])
+                    this.audioManager.play()
+                    return;
+                };
+
                 this.musicTrack.push(singleSong)
+
             },
-            pushMusicTrack(musicTrack){
-                if(this.checkMusicListIsEmpty())  this.musicTrack.length = 0;
+            async pushMusicTrack(musicTrack){
+                if(this.checkMusicListIsEmpty())  {
+                    this.musicTrack.length = 0;
+                    this.musicTrack.concat(musicTrack);
+                    await this.audioManagerConstruct(this.musicTrack[this.musicTrackIndex])
+                    this.audioManager.play()
+                    return;
+                }
                 this.musicTrack.concat(musicTrack)
             },
             coverMusicTrack(musicTrack){
-                this.musicTrack = musicTrack
+                this.musicTrack = musicTrack;
+                this.musicTrackIndex = 0;
             },
             regResizeHandle(key,event){
                 this.resizeEvent[key] = event;
@@ -268,9 +284,46 @@
                 this.config = editEvent(this.config)
             },
 
-            audioManagerConstruct(url) {
+            async audioManagerConstruct(newSong) {
                 const newAudio = document.createElement('audio');
-                newAudio.src = url
+                // const isFilePath = ;
+
+                if (newSong.src.startsWith('C:\\') || newSong.src.startsWith('/')) {
+                    // 如果是文件路径，使用manager.tauri.getMusicFile获取二进制信息
+                    // 假设binaryData已经是Uint8Array类型
+                    await manager.tauri.getMusicFile(newSong.id).then(binaryData => {
+                        console.log('读取成功');
+                        // console.log(binaryData);
+
+                        // 如果binaryData不是Uint8Array，则转换
+                        if (!(binaryData instanceof Uint8Array)) {
+                            binaryData = new Uint8Array(binaryData);
+                        }
+
+                        // 创建Blob对象
+                        const blob = new Blob([binaryData], { type: 'audio/flac' });
+
+                        // 复用Blob URL，如果已经存在则释放旧的URL
+                        if (newAudio.src) {
+                            URL.revokeObjectURL(newAudio.src);
+                        }
+                        const url = URL.createObjectURL(blob);
+
+                        // 设置audio的src为Blob URL
+                        newAudio.src = url;
+                        // console.timeEnd();
+
+                        // 播放音频
+                        // checkAndPlay();
+                    }).catch(error => {
+                        console.error('Error fetching music file:', error);
+                    });
+                } else {
+                    // 如果不是文件路径，直接设置src
+                    newAudio.src = newSong.src;
+                    // checkAndPlay();
+                }
+
                 this.setupMediaSession();
                 const {
                     audioState
@@ -456,7 +509,7 @@
 
                 }
             },
-            nextMusic() {
+            async nextMusic() {
                 this.musicTrackIndex = this.getNextMusicIndex();
 
                 if (this.checkMusicIsUsable(this.musicTrackIndex) == false) {
@@ -464,16 +517,16 @@
                 }
 
                 this.audioManager.destroyThisManager()
-                this.audioManagerConstruct(this.musicTrack[this.musicTrackIndex].src)
+                await this.audioManagerConstruct(this.musicTrack[this.musicTrackIndex])
                 this.audioManager.play()
             },
-            prevMusic() {
+            async prevMusic() {
                 this.musicTrackIndex = this.getPrevMusicIndex();
                 if (this.checkMusicIsUsable(this.musicTrackIndex) == false) {
                     return
                 }
                 this.audioManager.destroyThisManager()
-                this.audioManagerConstruct(this.musicTrack[this.musicTrackIndex].src)
+                await this.audioManagerConstruct(this.musicTrack[this.musicTrackIndex])
                 this.audioManager.play()
             },
             checkMusicIsUsable(index) {
@@ -488,7 +541,7 @@
             }
         },
         beforeUnmount() {
-            this.audioManager.destroyThisManager()
+            if(this.audioManager) this.audioManager.destroyThisManager()
         },
         created() {
             // 检测 Tauri API 是否存在
@@ -500,7 +553,7 @@
             })
         },
         mounted() {
-            this.audioManagerConstruct(this.currentMusicInfo.src)
+            // this.audioManagerConstruct(this.currentMusicInfo)
         },
         watch: {}
     }
