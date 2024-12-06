@@ -11,18 +11,15 @@
 
 ### 特别感谢以下项目为我们提供灵感、参考设计和功能代码：
 - [Binaryify/NeteaseCloudMusicApi](https://github.com/Binaryify/NeteaseCloudMusicApi)
-- [tauri](https://tauri.app/)
-- [vue](https://vue3js.cn/)
 - [qier222/YesPlayMusic](https://github.com/qier222/YesPlayMusic)
 - [LyricEase](https://apps.microsoft.com/store/detail/lyricease/9N1MKDF0F4GT?hl=zh-cn&gl=CN)
 - [Apple Music](https://www.apple.com/apple-music/)
 - [Spotify](https://www.spotify.com/)
 
-## 应用内截图一览 
-<span>浏览版本为3.0.0.240405</span>
-<img src='./public/screenshot3.png'>
-<img src='./public/screenshot.png'>
-<img src='./public/screenshot1.png'>
-<img src='./public/screenshot2.png'>
 
-当前项目为个人练手项目，更新慢/bug多请见谅！还请多多提交push帮助项目完成
+
+当前项目为个人新框架新语言练手项目，更新慢/bug多请见谅！
+
+
+## [License](https://github.com/gozaoo/BlurLyric-3.0/blob/v3.0.0-alpha/License)
+ 
