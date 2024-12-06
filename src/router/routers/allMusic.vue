@@ -14,7 +14,6 @@
             if(this.appState.runOnTauri) {
                 manager.tauri.getMusicList().then((res)=>{
                 this.musicList = [...this.musicList,...res]
-                // console.log(this.musicList)
                 });
             }
             

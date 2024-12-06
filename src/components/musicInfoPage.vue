@@ -5,7 +5,7 @@
     import drag from '../js/drag';
     import textSpawn from './base/text-spawn.vue';
     import anime from 'animejs';
-
+    
     import background from './musicInfoPageComponents/background.vue';
     import contain from './musicInfoPageComponents/contain.vue';
     import {
@@ -14,6 +14,7 @@
     export default {
         data() {
             return {
+                // manager,
                 style: {
                     musicDetailRender: {
                         transformX: 0,
@@ -348,7 +349,7 @@
             </div>
             <div v-show="musicInfoPagePosition!='bottom'" 
             ref="mainContainer" class="mainContainer">
-                <background class="player-background" :imgSrc="currentMusicInfo.al.id" :musicInfoPagePosition="musicInfoPagePosition" />
+                <background class="player-background" :coverId="currentMusicInfo.al.id" :musicInfoPagePosition="musicInfoPagePosition" />
 
                 <div  class="controlBar">
                     <div ref="controlTapBar" class="tapBar"></div>

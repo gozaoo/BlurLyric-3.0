@@ -1,5 +1,7 @@
 <script>
+import manager from '../../api/manager';
 
+  manager
     export default{
         data(){
             return{
@@ -10,7 +12,9 @@
                   {},
                   {}
                 ],
-                dynFunctionRunning:false
+                dynFunctionRunning:false,
+                imgSrc: null,
+                objectURL: null
             }
         },
         created(){
@@ -46,10 +50,26 @@
             //     this.dynFunctionRunning =false
             //   }
             // }, 6*1000);
+          },
+          async fetchURL(){
+            if (this.objectURL) {
+                  URL.revokeObjectURL(this.objectURL); // 销毁之前的ObjectURL
+                }
+            const newSrc = await manager.tauri.getAlbumCover(this.coverId);
+            this.objectURL = newSrc; // 更新ObjectURL
+            this.imgSrc = newSrc;
           }
         },
+        mounted(){
+          this.fetchURL()
+        },
+        unmounted(){
+          if (this.objectURL) {
+                  URL.revokeObjectURL(this.objectURL); // 销毁之前的ObjectURL
+                }
+        },
         props: {
-            imgSrc: String,
+          coverId: Number,
             musicInfoPagePosition: String,
             // colorData: Object,
             dynamic: Boolean
@@ -64,6 +84,11 @@
                     }
                 },
                 deep: true
+            },
+            coverId:{
+              handler: function(newid,oldid){
+                this.fetchURL()
+              }
             }
         }
         
@@ -79,7 +104,7 @@
      v-bind:class="['player-background',(dynamic)?'dyn':'']">
       <!-- {{ colorData }} --> 
       <div v-for="n in 4" ref="block" :style="{
-        backgroundImage: 'url(' + this.imgSrc + '?param=128y128'+')',
+        backgroundImage: 'url(' + this.imgSrc + ')',
         ...position[n]
       }">
         

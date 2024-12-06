@@ -6,6 +6,7 @@ export default {
     getMusicList: async () => await invoke("get_music_list"),
     getAlbumCover: async (albumId) => {
         let objectURL
+        if(albumId<0) {return ''};
         await invoke("get_album_cover", { albumId })            
         .then((albumPicData )=>{
             objectURL = URL.createObjectURL( new Blob([albumPicData]));
