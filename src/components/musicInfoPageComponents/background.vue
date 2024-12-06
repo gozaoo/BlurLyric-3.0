@@ -61,7 +61,7 @@ import manager from '../../api/manager';
           }
         },
         mounted(){
-          this.fetchURL()
+          this.fetchURL() 
         },
         unmounted(){
           if (this.objectURL) {
