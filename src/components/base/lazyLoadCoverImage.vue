@@ -38,8 +38,7 @@ export default {
       try {
         if(this.id>=0){
 
-          const base64String = await manager.tauri.getAlbumCover(this.id);
-          this.currentSrc = `data:image/jpeg;base64,${base64String}`; // 假设返回的是JPEG图片
+          this.currentSrc =  await manager.tauri.getAlbumCover(this.id);// 假设返回的是JPEG图片
           this.imageOpacity = 1; // 图片加载成功后，设置透明度为1
         } 
       } catch (error) {

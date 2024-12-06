@@ -201,9 +201,12 @@ export default {
             }
             this.musicTrack.concat(musicTrack)
         },
-        coverMusicTrack(musicTrack) {
+        async coverMusicTrack(musicTrack) {
             this.musicTrack = musicTrack;
             this.musicTrackIndex = 0;
+
+            await this.audioManagerConstruct(this.musicTrack[this.musicTrackIndex])
+            this.audioManager.play()
         },
         regResizeHandle(key, event) {
             this.resizeEvent[key] = event;
@@ -288,15 +291,15 @@ export default {
         },
 
         async audioManagerConstruct(newSong) {
-            const newAudio = document.createElement('audio');
+            let newAudio = document.createElement('audio');
             // const isFilePath = ;
 
             if (baseMethods.isPossibleLocalPath(newSong.src)) {
                 // 如果是文件路径，使用manager.tauri.getMusicFile获取Base64信息
                 // 假设binaryData已经是Uint8Array类型
-                await manager.tauri.getMusicFile(newSong.id).then(base64_data => {
-                    newAudio.src = `data:audio/mpeg;base64,${base64_data}`;
-                }).catch(error => {
+                manager.tauri.getMusicFile(newSong.id).then(url =>
+                    newAudio.src = url
+                ).catch(error => {
                     console.error('Error fetching music file:', error);
                 });
             } else {
@@ -354,11 +357,13 @@ export default {
             let thisConstructIsAvalible = true
             // 检查音频是否可播放并播放
             const checkAndPlay = () => {
-                if(thisConstructIsAvalible == false) return;
+                if (thisConstructIsAvalible == false) return;
                 if (newAudio.readyState >= 4) { // HAVE_ENOUGH_DATA
                     newAudio.play();
                 } else {
                     newAudio.addEventListener('canplay', () => {
+                        if (thisConstructIsAvalible == false) return;
+
                         try {
                             newAudio.play();
                         } catch {
@@ -382,7 +387,6 @@ export default {
             });
 
             const cancelListener = () => {
-                thisConstructIsAvalible= false
                 // 移除所有事件监听
                 newAudio.removeEventListener('loadeddata', () => {
                     loadeddataHandler()
@@ -396,12 +400,17 @@ export default {
                 newAudio.removeEventListener('timeupdate', () => {
                     timeupdateHandler()
                 });
+
             };
 
             let destroyThisManager = () => {
-                // console.log('des');
-
+                console.log("des");
+                thisConstructIsAvalible = false
                 newAudio.pause();
+                URL.revokeObjectURL(newAudio.src)
+                newAudio.src = undefined
+
+                newAudio.remove();
                 cancelListener();
             };
 

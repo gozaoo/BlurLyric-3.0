@@ -22,3 +22,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+src-tauri/src/lib.rs
+/src-tauri/cache
+/src-tauri/music_dirs.json
