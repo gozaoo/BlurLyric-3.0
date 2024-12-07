@@ -7,7 +7,9 @@
     export default {
         data() {
             return {
-                test: false
+                localConfig: {
+
+                }
             }
         },
         components: {
@@ -16,7 +18,31 @@
             linkLine
         },
         methods: {
-
+            refreshConfig(){
+                this.localConfig = this.config;
+            }
+        },
+        inject:['config','editConfig'],
+        created(){
+            this.refreshConfig()
+        },
+        watch:{
+            config:{
+                handler: (newVal)=>{
+                    this.refreshConfig()
+                }
+            },
+            localConfig:{
+                deep:true,
+                handler:function(){
+                    console.log(this.localConfig);
+                    
+                    this.editConfig(()=>{
+                        return this.localConfig
+                    })
+                    
+                }
+            }
         }
     }
 </script>
@@ -24,7 +50,7 @@
 <template>
     <bodytitle text="设置" />
 
-    <h2>显示</h2>
+    <!-- <h2>显示</h2>
     <tracksRow>
         <toggle_lineRow v-model="test">
             <template #icon>
@@ -32,6 +58,17 @@
             </template>
             <template #text>
                 省电模式
+            </template>
+        </toggle_lineRow>
+    </tracksRow>  -->
+    <h2>播放偏好</h2>
+    <tracksRow>
+        <toggle_lineRow v-model="localConfig.audio.smartStreamAudioList">
+            <template #icon>
+                <i class="bi bi-water"></i>
+            </template>
+            <template #text>
+                交叉过渡
             </template>
         </toggle_lineRow>
     </tracksRow>

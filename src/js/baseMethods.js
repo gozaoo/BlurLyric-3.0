@@ -12,6 +12,20 @@ export default {
             }, wait);
         };
     },
+    formatTime_MMSS(seconds) {
+        if (typeof seconds !== 'number' || seconds < 0) {
+            return 'Invalid input';
+        }
+
+        const minutes = Math.floor(seconds / 60);
+        const remainingSeconds = seconds % 60;
+
+        const paddedMinutes = minutes.toString().padStart(2, '0');
+        const paddedSeconds = remainingSeconds.toString().padStart(2, '0');
+
+        return `${paddedMinutes}:${paddedSeconds}`;
+    },
+
     copy(text) {
         const textarea = document.createElement('textarea');
         textarea.value = text;
@@ -61,8 +75,11 @@ export default {
 
         const handleTouchStart = (e) => {
             if (e.touches.length === 1) {
+
+                document.addEventListener('touchmove', handleTouchMove);
+                document.addEventListener('touchend', handleTouchEnd);
                 info.draging = true;
-                info.beforeDragProgress = info.currentProgress;
+                info.beforeDragProgress = getCurrentProgress();
                 const rect = progressBarDom.getBoundingClientRect();
                 info.offsetX = e.touches[0].clientX - rect.left;
                 info.domWidth = rect.width;
@@ -74,8 +91,8 @@ export default {
             if (info.draging && e.touches.length === 1) {
                 const x = e.touches[0].clientX;
                 const rect = progressBarDom.getBoundingClientRect();
-                info.dragProgress = Math.max(0, Math.min(1, (x - rect.left - info.offsetX) / info.domWidth));
-                info.currentProgress = info.dragProgress;
+                info.dragProgress = (x - rect.left - info.offsetX) / info.domWidth;
+                info.currentProgress = info.beforeDragProgress + info.dragProgress;
                 onInfoChange();
             }
         };
@@ -83,14 +100,17 @@ export default {
         const handleTouchEnd = () => {
             if (info.draging) {
                 info.draging = false;
-                info.currentProgress = info.dragProgress;
+                info.currentProgress = info.beforeDragProgress + info.dragProgress;
                 onInfoChange();
             }
         };
 
         const handleMouseDown = (e) => {
             info.draging = true;
-            info.beforeDragProgress = info.currentProgress;
+
+            document.addEventListener('mousemove', handleMouseMove);
+            document.addEventListener('mouseup', handleMouseUp);
+            info.beforeDragProgress = getCurrentProgress();
             const rect = progressBarDom.getBoundingClientRect();
             info.offsetX = e.clientX - rect.left;
             info.domWidth = rect.width;
@@ -101,8 +121,8 @@ export default {
             if (info.draging) {
                 const x = e.clientX;
                 const rect = progressBarDom.getBoundingClientRect();
-                info.dragProgress = Math.max(0, Math.min(1, (x - rect.left - info.offsetX) / info.domWidth));
-                info.currentProgress = info.dragProgress;
+                info.dragProgress = (x - rect.left - info.offsetX) / info.domWidth;
+                info.currentProgress = info.beforeDragProgress + info.dragProgress;
                 onInfoChange();
             }
         };
@@ -110,7 +130,7 @@ export default {
         const handleMouseUp = (e) => {
             if (info.draging) {
                 info.draging = false;
-                info.currentProgress = info.dragProgress;
+                info.currentProgress = info.beforeDragProgress + info.dragProgress;
                 onInfoChange();
             }
         };
@@ -118,6 +138,7 @@ export default {
         const handleMouseEnter = (e) => {
             info.hovering = true;
             info.BeforeHoveringProgress = info.currentProgress;
+            progressBarDom.addEventListener('mouseleave', handleMouseLeave);
             onInfoChange();
         };
 
@@ -128,22 +149,18 @@ export default {
         };
 
         progressBarDom.addEventListener('touchstart', handleTouchStart);
-        progressBarDom.addEventListener('touchmove', handleTouchMove);
-        progressBarDom.addEventListener('touchend', handleTouchEnd);
         progressBarDom.addEventListener('mousedown', handleMouseDown);
-        progressBarDom.addEventListener('mousemove', handleMouseMove);
-        progressBarDom.addEventListener('mouseup', handleMouseUp);
         progressBarDom.addEventListener('mouseenter', handleMouseEnter);
-        progressBarDom.addEventListener('mouseleave', handleMouseLeave);
+
 
         return {
             cancelReg: () => {
                 progressBarDom.removeEventListener('touchstart', handleTouchStart);
-                progressBarDom.removeEventListener('touchmove', handleTouchMove);
-                progressBarDom.removeEventListener('touchend', handleTouchEnd);
+                document.removeEventListener('touchmove', handleTouchMove);
+                document.removeEventListener('touchend', handleTouchEnd);
                 progressBarDom.removeEventListener('mousedown', handleMouseDown);
-                progressBarDom.removeEventListener('mousemove', handleMouseMove);
-                progressBarDom.removeEventListener('mouseup', handleMouseUp);
+                document.removeEventListener('mousemove', handleMouseMove);
+                document.removeEventListener('mouseup', handleMouseUp);
                 progressBarDom.removeEventListener('mouseenter', handleMouseEnter);
                 progressBarDom.removeEventListener('mouseleave', handleMouseLeave);
             }

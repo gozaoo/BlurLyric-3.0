@@ -10,6 +10,7 @@ import {
     onMounted
 } from 'vue'
 import baseMethods from './js/baseMethods'
+import anime from 'animejs/lib/anime.es'
 
 let templateEmptyMusicTrack = [{
     name: "请选择您的音乐",
@@ -73,6 +74,7 @@ export default {
             ],
             title: '主页',
             titleOffsetTop: 0,
+            transitionNextMusicWorking: false,
             config: {
                 language: 'zh_cn',
                 audio: {
@@ -111,7 +113,8 @@ export default {
                 currentTime_round: 0,
                 duration: 0,
                 duration_round: 0,
-                playing: false
+                playing: false,
+                volume: 1
             }),
             trackState: {
                 playMode: 'loopPlaylist',
@@ -176,7 +179,6 @@ export default {
             this.musicTrack = templateEmptyMusicTrack
         },
         async pushMusic(singleSong) {
-            console.log(this);
 
 
             if (this.checkMusicListIsEmpty()) {
@@ -202,6 +204,9 @@ export default {
             this.musicTrack.concat(musicTrack)
         },
         async coverMusicTrack(musicTrack) {
+
+            if (this.audioManager) this.audioManager.destroyThisManager()
+
             this.musicTrack = musicTrack;
             this.musicTrackIndex = 0;
 
@@ -213,7 +218,6 @@ export default {
             return {
                 cancelReg: () => {
                     // this.resizeEvent[key] = undefined
-                    console.log(this.resizeEvent[key])
                     delete this.resizeEvent[key]
                 }
             }
@@ -290,15 +294,20 @@ export default {
             this.config = editEvent(this.config)
         },
 
-        async audioManagerConstruct(newSong) {
+        audioManagerConstruct(newSong) {
+            let timeStamps = Date.now()
+
             let newAudio = document.createElement('audio');
+            
+            newAudio.volume = this.audioState.volume * 1
             // const isFilePath = ;
 
             if (baseMethods.isPossibleLocalPath(newSong.src)) {
                 // 如果是文件路径，使用manager.tauri.getMusicFile获取Base64信息
                 // 假设binaryData已经是Uint8Array类型
-                manager.tauri.getMusicFile(newSong.id).then(url =>
-                    newAudio.src = url
+                manager.tauri.getMusicFile(newSong.id).then(url => {
+                    if (this.audioManager.timeStamps == timeStamps) newAudio.src = url
+                }
                 ).catch(error => {
                     console.error('Error fetching music file:', error);
                 });
@@ -314,7 +323,7 @@ export default {
             } = this;
 
             let updateAudioState = (state, value) => {
-                audioState[state] = value;
+                if (this.audioManager.timeStamps == timeStamps) audioState[state] = value;
             };
 
             let loadeddataHandler = () => {
@@ -337,16 +346,30 @@ export default {
             };
 
             let timeupdateHandler = () => {
+                // if(audio)
                 updateAudioState('currentTime', newAudio.currentTime);
+                let leastTime = newAudio.duration - newAudio.currentTime
+                    if(this.config.audio.smartStreamAudioList == true && leastTime < this.config.audio.audioStreamDuration){
+                        this.transitionNextMusic()
+                    } else if(leastTime == 0) {
+                        let nextMusicIndex = this.getNextMusicIndex();
+                        this.musicTrackIndex = nextMusicIndex;
+                        const nextSong = this.musicTrack[nextMusicIndex];
+                        destroyThisManager()
+
+                        this.audioManagerConstruct(nextSong);
+
+                        this.audioManager.play()
+                    }
             };
 
             let currentEventHandler = () => {
-                if (audioState.playing) {
+                if (audioState.playing == true&&newAudio.duration != NaN) {
                     updateAudioState('currentTime_round', Math.trunc(newAudio.currentTime));
                     updateAudioState('duration_round', Math.trunc(newAudio.duration));
-
+ 
                     // 更新时间的频率由 audioStateHandlerTPS 控制
-                    setTimeout(() => {
+                    if (this.audioManager.timeStamps == timeStamps) setTimeout(() => {
                         timeupdateHandler();
                         currentEventHandler();
                     }, 1000 / this.config.audio.audioStateHandlerTPS);
@@ -354,18 +377,16 @@ export default {
 
             };
 
-            let thisConstructIsAvalible = true
             // 检查音频是否可播放并播放
             const checkAndPlay = () => {
-                if (thisConstructIsAvalible == false) return;
                 if (newAudio.readyState >= 4) { // HAVE_ENOUGH_DATA
-                    newAudio.play();
+                    if (this.audioManager.timeStamps == timeStamps) newAudio.play();
+
                 } else {
                     newAudio.addEventListener('canplay', () => {
-                        if (thisConstructIsAvalible == false) return;
 
                         try {
-                            newAudio.play();
+                            if (this.audioManager.timeStamps == timeStamps) newAudio.play();
                         } catch {
 
                         }
@@ -373,48 +394,30 @@ export default {
                 }
             };
 
-            newAudio.addEventListener('loadeddata', () => {
-                loadeddataHandler()
-            });
-            newAudio.addEventListener('playing', () => {
-                playingHandler()
-            });
-            newAudio.addEventListener('pause', () => {
-                pauseHandler()
-            });
-            newAudio.addEventListener('timeupdate', () => {
-                timeupdateHandler()
-            });
+            newAudio.addEventListener('loadeddata', loadeddataHandler);
+            newAudio.addEventListener('playing', playingHandler);
+            newAudio.addEventListener('pause', pauseHandler);
+            newAudio.addEventListener('timeupdate', timeupdateHandler);
+
 
             const cancelListener = () => {
-                // 移除所有事件监听
-                newAudio.removeEventListener('loadeddata', () => {
-                    loadeddataHandler()
-                });
-                newAudio.removeEventListener('playing', () => {
-                    playingHandler()
-                });
-                newAudio.removeEventListener('pause', () => {
-                    pauseHandler()
-                });
-                newAudio.removeEventListener('timeupdate', () => {
-                    timeupdateHandler()
-                });
-
+                newAudio.removeEventListener('loadeddata', loadeddataHandler);
+                newAudio.removeEventListener('playing', playingHandler);
+                newAudio.removeEventListener('pause', pauseHandler);
+                newAudio.removeEventListener('timeupdate', timeupdateHandler);
             };
 
             let destroyThisManager = () => {
                 console.log("des");
-                thisConstructIsAvalible = false
+                
                 newAudio.pause();
                 URL.revokeObjectURL(newAudio.src)
+                updateAudioState('playing', false);
                 newAudio.src = undefined
-
                 newAudio.remove();
                 cancelListener();
             };
-
-            this.audioManager = {
+            let audioManager = {
                 audioDom: newAudio,
                 cancelListener,
                 destroyThisManager: () => {
@@ -423,8 +426,11 @@ export default {
                 play: checkAndPlay,
                 pause: () => {
                     newAudio.pause()
-                }
-            };
+                },
+                timeStamps
+            }
+            this.audioManager = audioManager;
+            return audioManager;
         },
 
         setupMediaSession() {
@@ -527,7 +533,51 @@ export default {
             if (this.musicTrack[index].id == -2) {
                 return false
             }
-        }
+        },
+        async transitionNextMusic() {
+            if (this.transitionNextMusicWorking == true) return;
+            this.transitionNextMusicWorking = true;
+
+            console.log("working");
+            
+            // debugger
+            let nextMusicIndex = this.getNextMusicIndex();
+            this.musicTrackIndex = nextMusicIndex;
+            const nextSong = this.musicTrack[nextMusicIndex];
+
+            let oldAudioManager = this.audioManager
+            let time = 1000 * (oldAudioManager.audioDom.duration - oldAudioManager.audioDom.currentTime); // 播放剩余时间
+
+            // 切换到新音频
+           this.audioManagerConstruct(nextSong)
+           const newAudio = this.audioManager
+            newAudio.audioDom.volume = 0.5 * this.audioState.volume;
+
+            // 创建音频管理器
+            this.audioManager.play();
+
+            // 处理音频切换时的过渡效果
+            anime({
+                targets: newAudio.audioDom,
+                duration: time,
+                volume: 1 * this.audioState.volume,
+                easing: "linear"
+            });
+
+            anime({
+                targets: oldAudioManager.audioDom,
+                duration: time,
+                volume: 0,
+                easing: 'linear',
+                complete:function(){
+                    oldAudioManager.destroyThisManager()
+                    this.transitionNextMusicWorking = false;
+                }
+            });
+
+            // 更新播放状态
+        },
+
     },
     computed: {
         currentMusicInfo() {

@@ -31,6 +31,7 @@ h2 {
 	--Shadow-value-card-high:0px 5px 17px #0001;
 	--Shadow-value-normal:0px 0px 3px #0005;
 	--Shadow-value-low:0px 0px 5px #0002;
+	--Shadow-value-offsetY-low:0px 2px 7px #0002;
 	--fontColor-content-normal:#000;
 	--fontColor-content-unimportant:#555;
 	--fontColor-content-moreUnimportant:#888;
