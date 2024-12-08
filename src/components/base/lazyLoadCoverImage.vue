@@ -11,13 +11,13 @@
       class="loaded-image"
       :style="{ opacity: imageOpacity }"
     />
-    <img
+    <!-- <img
       v-if="currentSrc"
       :src="currentSrc"
       @load="handleImageLoad"
       @error="handleImageError"
       :style="{ opacity: 0, visibility: 'hidden' }"
-    />
+    /> -->
   </div>
 </template>
 
@@ -63,15 +63,25 @@ export default {
       // 当id变化时，先淡出当前图片
       this.imageOpacity = 0;
       this.nextTransilateTime = Date.now() + 500;
+      setTimeout(() => {
+        this.fetchAlbumCover();
+      }, 500);
     },
     async fetchAlbumCover() {
       // 获取专辑封面并更新currentSrc
       if (this.objectURL) {
         URL.revokeObjectURL(this.objectURL); // 销毁之前的ObjectURL
       }
-      const newSrc = await manager.tauri.getAlbumCover(this.id);
-      this.objectURL = newSrc; // 更新ObjectURL
-      this.currentSrc = newSrc;
+      manager.tauri.getAlbumCover(this.id).then(url=>{
+        this.objectURL = url; // 更新ObjectURL
+        this.currentSrc = url;
+        this.handleImageLoad()
+      }).catch((err)=>{
+        if(err != 'Album cover not found'){ // 找不到专辑图片为正常现象
+          console.log(err);
+        }
+      });
+
     },
   },
   watch: {
@@ -80,7 +90,7 @@ export default {
       handler(newId, oldId) {
         if (newId !== oldId&&newId>=0) {
           this.fadeOutImage();
-          this.fetchAlbumCover();
+          
         }
       },
     },

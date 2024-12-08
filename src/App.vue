@@ -79,7 +79,7 @@ export default {
                 language: 'zh_cn',
                 audio: {
                     smartStreamAudioList: true,
-                    audioStreamDuration: 10, // Unit: second
+                    audioStreamDuration: 7, // Unit: second
                     audioStateHandlerTPS: 20
                 },
                 ui: {

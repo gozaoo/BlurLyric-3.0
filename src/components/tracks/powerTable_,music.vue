@@ -1,7 +1,7 @@
 <template>
 	<div class="table-container">
 		<!--内容标题-->
-		<div class="table-name">
+		<div ref="table_name" class="table-name">
 			<div v-for="(item,index) in currentTable.cellName" class="table-name-cell" :style="{
 					['flex'+((item.sizing)?('-'+item.sizing):'')]: (item.sizingValue)?item.sizingValue:1,
 					...item.spacialStyle
@@ -60,7 +60,7 @@
 		]
 		">
 			<!--内容位置-->
-			<div class="table-row">
+			<div v-if="shouldDisplayIndexRange[1]>=line_index" class="table-row">
 
 				<div :style="{
 					['flex'+((item.sizing)?('-'+item.sizing):'')]: (item.sizingValue)?item.sizingValue:1,
@@ -79,7 +79,7 @@
 							})}}
 						</span>
 						<!--图片类型-->
-						<lazy-load-cover-image-vue v-if="item.type=='image'" :id='item.path.apply({
+						<lazy-load-cover-image-vue v-if="item.type=='image'&&shouldDisplayIndexRange[0]<=line_index" :id='item.path.apply({
 								line,line_index,item,index
 							})'
 							style="border-radius: 5%;left:0;top:0;height: 100%;width: 100%;position: absolute;">
@@ -185,7 +185,7 @@
 					}, {
 						type: 'image',
 						path:function(){
-							return this.line.al.id;
+							return (this.line.al.name != 'Unknown Album')?this.line.al.id:-2;
 						},
 						name: '图像',
 						sizing: 'basis',
@@ -282,7 +282,8 @@
 				lastClick:{
 					index: 0,
 					timeStamp: Date.now()
-				}
+				},
+				shouldDisplayIndexRange: [0,0]
 			}
 		},
 		components: {
@@ -291,6 +292,9 @@
 		},
 		props: {
 			tableData: Object,
+		},
+		mounted(){
+			this.freshShouldDisplay()
 		},
 		methods: {
 			copy: baseMethods.copy,
@@ -306,12 +310,32 @@
 				this.lastClick.index = line_index
 				this.lastClick.timeStamp = newTimestamp
 			},
+			freshShouldDisplay(){
+				const gap = 4;
+				const oneTrackHeight =54; 
+				const firstTop =gap + this.$refs.table_name.offsetTop + this.$refs.table_name.offsetHeight
+				const scrollTop = this.scrollState.scrollTop;
+				const bodyHeight = document.body.offsetHeight;
+
+				// 计算第一个可见行的索引
+				let couldBeSeeFirstIndex = Math.floor((scrollTop - firstTop) / (oneTrackHeight + gap));
+				// 计算最后一个可见行的索引
+				let couldBeSeeFinalIndex = Math.floor((scrollTop - firstTop + bodyHeight) / (oneTrackHeight + gap));
+
+				// 确保索引不会小于0
+				couldBeSeeFirstIndex = couldBeSeeFirstIndex < 0 ? 0 : couldBeSeeFirstIndex;
+				couldBeSeeFinalIndex = couldBeSeeFinalIndex < 0 ? 0 : couldBeSeeFinalIndex;
+
+				this.shouldDisplayIndexRange = [couldBeSeeFirstIndex,couldBeSeeFinalIndex]
+				// console.log(this.shouldDisplayIndexRange);
+			}
 		},
 		watch: {
 			scrollState: {
+				deep: true,
 				handler(newValue, oldValue) {
-					console.log(newValue);
-				}
+					this.freshShouldDisplay()
+				},
 			},
 			tableData: {
 				handler(newValue) {
@@ -325,6 +349,6 @@
 				immediate: true
 			}
 		},
-		inject: ['pushMusic','pushMusicTrack','coverMusicTrack','cleanUpMusicTrack']
+		inject: ['scrollState','pushMusic','pushMusicTrack','coverMusicTrack','cleanUpMusicTrack']
 	}
 </script>

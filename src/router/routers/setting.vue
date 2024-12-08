@@ -9,7 +9,9 @@
             return {
                 localConfig: {
 
-                }
+                },
+                test: false,
+                test_true: true
             }
         },
         components: {
@@ -50,17 +52,27 @@
 <template>
     <bodytitle text="设置" />
 
-    <!-- <h2>显示</h2>
+    <h2>显示</h2>
     <tracksRow>
-        <toggle_lineRow v-model="test">
+        <toggle_lineRow :type="'unavailable'" v-model="test_true">
             <template #icon>
-                <i class="bi bi-battery-full"></i>
+                <i class="bi bi-back"></i>
             </template>
             <template #text>
-                省电模式
+                使用毛玻璃效果 (**当前功能不可用)
             </template>
         </toggle_lineRow>
-    </tracksRow>  -->
+    </tracksRow>    
+    <tracksRow>
+        <toggle_lineRow :type="'unavailable'" v-model="test">
+            <template #icon>
+                <i class="bi bi-film"></i>
+            </template>
+            <template #text>
+                锁定复杂画面计算帧数（24fps）
+            </template>
+        </toggle_lineRow>
+    </tracksRow>
     <h2>播放偏好</h2>
     <tracksRow>
         <toggle_lineRow v-model="localConfig.audio.smartStreamAudioList">
@@ -69,6 +81,38 @@
             </template>
             <template #text>
                 交叉过渡
+            </template>
+        </toggle_lineRow>
+    </tracksRow>
+    <h2>操作偏好</h2>
+    <tracksRow>
+        <toggle_lineRow v-model="test">
+            <template #icon>
+                <i class="bi bi-water"></i>
+            </template>
+            <template #text>
+                双击音乐列表操作
+            </template>
+        </toggle_lineRow>
+    </tracksRow>
+    <h2>基本（敬请期待）</h2>
+    <tracksRow>
+        <toggle_lineRow  :type="'unavailable'" v-model="test">
+            <template #icon>
+                <i class="bi bi-translate"></i>
+            </template>
+            <template #text>
+                语言 | Language (**当前功能不可用)
+            </template>
+        </toggle_lineRow>
+    </tracksRow>
+    <tracksRow>
+        <toggle_lineRow :type="'unavailable'" v-model="test">
+            <template #icon>
+                <i class="bi bi-pci-card-sound"></i>
+            </template>
+            <template #text>
+                音频设备 (**当前功能不可用)
             </template>
         </toggle_lineRow>
     </tracksRow>

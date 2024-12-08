@@ -13,13 +13,13 @@
 </template>
 <style scoped>
     .row {
-        background-color: #0001;
+        background-color: rgba(0, 0, 0, 0.03);
         border-radius: 7px;
         display: flex;
         align-items: center;
         gap: 6px;
         overflow: hidden;
-
+        margin-top: 6px;
     }
 
 </style>
