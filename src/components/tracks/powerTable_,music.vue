@@ -325,8 +325,8 @@
 				// 确保索引不会小于0
 				couldBeSeeFirstIndex = couldBeSeeFirstIndex < 0 ? 0 : couldBeSeeFirstIndex;
 				couldBeSeeFinalIndex = couldBeSeeFinalIndex < 0 ? 0 : couldBeSeeFinalIndex;
-
-				this.shouldDisplayIndexRange = [couldBeSeeFirstIndex,couldBeSeeFinalIndex]
+				if(this.shouldDisplayIndexRange[0]!=couldBeSeeFirstIndex) {this.shouldDisplayIndexRange = [couldBeSeeFirstIndex,couldBeSeeFinalIndex]}
+				
 				// console.log(this.shouldDisplayIndexRange);
 			}
 		},
