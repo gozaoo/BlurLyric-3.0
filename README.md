@@ -1,6 +1,22 @@
 # BlurLyric 3.0
 <p>全新的使用tauri框架的美观多功能播放器！</p>
 
+## 开发/构建办法
+- 1.克隆项目，并配置好rust、nodejs环境
+- 2.在项目根目录使用命令
+```
+npm install
+```
+完成初始化
+```
+npm run tauri dev
+```
+进行开发
+```
+npm run tauri build
+```
+生成可执行文件
+
 ## 特性 (持续更新中)
 - 1.✅ 使用vue、tauri等框架带来的轻量级播放器。
 - 2.❌ 支持本地音乐播放、网易云账号、webdev云盘关联等等。
