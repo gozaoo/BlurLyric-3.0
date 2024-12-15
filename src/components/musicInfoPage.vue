@@ -24,7 +24,8 @@ export default {
             eventListenerRemovers: [],
             dragInfo: null,
             musicInfoPagePosition: 'bottom',
-            cancelCoverBindReg: () => { }
+            cancelCoverBindReg: () => { },
+            changePositionTimeStamps: Date.now()
         }
     },
     computed: {
@@ -46,7 +47,7 @@ export default {
         }
     },
     inject: ['currentMusicInfo', 'audioState', 'audioManager', 'changePlayMode', 'trackState', 'musicTrack',
-        'nextMusic', 'prevMusic', 'getNextMusicIndex', 'getPrevMusicIndex', 'regResizeHandle'
+        'nextMusic', 'prevMusic', 'getNextMusicIndex', 'getPrevMusicIndex', 'regResizeHandle', 'config'
     ],
     mounted() {
         this.onBottomListener();
@@ -55,15 +56,15 @@ export default {
             this.$refs.bar_ProgressBoxContainer
         ]).map((elm) => {
             // console.log(elm);
-            
+
             baseMethods.progressBarReg(elm, () => {
                 return this.audioState.currentTime / this.audioState.duration
             }, (info) => {
                 if (info.draging == true) {
-                    // console.log(info.currentProgress);
-
+                    // console.log(info);
+                    // Number((this.audioState.currentTime / this.audioState.duration).toFixed(3))
+                    this.audioManager.audioDom.currentTime = Math.min(info.currentProgress * this.audioState.duration, this.audioState.duration - this.config.audio.audioStreamDuration - 1)
                     this.progress = info.currentProgress
-                    this.audioManager.audioDom.currentTime = info.currentProgress * this.audioState.duration
                 }
             })
         })
@@ -78,54 +79,75 @@ export default {
     },
     methods: {
         toTop(info) {
-            this.eventListenerRemovers.map((value) => value())
-            this.onTopListener()
-            this.musicInfoPagePosition = "toTop"
+            // 清理现有的监听器
+            this.eventListenerRemovers.forEach((value) => value());
 
+            // 新增顶部的监听器
+            this.onTopListener();
+            this.musicInfoPagePosition = "toTop";
+
+            // 记录当前时间戳，用于判断动画是否完成
+            const timeStamps = Date.now();
+            this.changePositionTimeStamps = timeStamps;
+
+            // 判断是否仍为当前动画的函数
+            const stillIsThisAnimation = () => this.changePositionTimeStamps === timeStamps;
+
+            // 移动页面到顶部
             anime({
                 targets: this.$refs.musicInfoPageRow,
                 easing: 'spring(1, 80, 16,' + Math.abs(info.speedY).toFixed(2) + ')',
-                translateY: -document.body.offsetHeight,
-
-                complete: (anim) => {
-                    anime.set(this.$refs.musicInfoPageRow, {
-                        translateY: '-100%',
-                    })
-                    this.musicInfoPagePosition = "top"
+                translateY: -document.body.offsetHeight + 'px',
+                complete: () => {
+                    this.musicInfoPagePosition = "top"; // 动画结束时更新状态
                 }
-            })
+            });
+
+            // 隐藏控制栏
             anime({
                 targets: this.$refs.musicControlBar,
                 opacity: 0,
                 easing: 'linear',
                 duration: 100
+            });
 
-            })
+            // 移动音乐详情
             anime({
                 targets: this.style.musicDetailRender,
                 transformX: 1,
-                // opacity: 0,
                 easing: 'linear',
                 duration: 100
-            })
+            });
 
-            anime({
-                targets: this.$refs.musicInfoPageRow,
-                background: 'rgba(0,0,0,0.0625)',
-                easings: 'linear',
-                // duration: 100
-            })
+            // 取消模糊效果
+            setTimeout(() => {
+                if (stillIsThisAnimation()) {
+                    anime.set(this.$refs.musicInfoPageRow, {
+                        background: 'rgb(233,233,233)',
+                        backdropFilter: 'blur(0px)'
+                    });
+                }
+            }, 300);
+
+            // 显示主容器
             anime({
                 targets: this.$refs.mainContainer,
                 opacity: 1,
                 easing: 'linear',
                 duration: 100,
-                delay: 300,
-            })
+                delay: 100,
+            });
+
+            // 重新绑定封面图片、主界面位置
+            let position_bind = (speed) => {
+
+                anime.set(this.$refs.musicInfoPageRow, {
+                    translateY: -document.body.offsetHeight + 'px',
+                })
+                cover_position_bind(speed)
+            }
             let cover_position_bind = (speed) => {
                 let positionData = this.$refs.coverImagePlaceHolder.getBoundingClientRect()
-                // console.log({                        translateY:  (this.$refs.coverImagePlaceHolder.offsetTop + 41) + 'px',
-                // translateX: positionData.x + 'px'});
 
                 anime({
                     targets: this.$refs.cover,
@@ -137,45 +159,60 @@ export default {
                 })
             }
             this.$nextTick(() => { cover_position_bind(Math.abs(info.speedY).toFixed(2)) })
-            this.cancelCoverBindReg = this.regResizeHandle('coverMove', () => { cover_position_bind(0) }).cancelReg
+            this.cancelCoverBindReg = this.regResizeHandle('coverMove', () => { position_bind(0) }).cancelReg
 
         },
+
+        // 将音乐信息页面移动到底部
         toBottom(info) {
-            this.musicInfoPagePosition = "toBottom"
+            this.musicInfoPagePosition = "toBottom";
 
-            // this.eventListenerRemovers.push(callBack_drag.destroy)
-            this.cancelCoverBindReg()
-            this.cancelCoverBindReg = () => { }
-            anime.set(this.style.musicDetailRender, {
-                transformX: 0,
-            })
+            // 取消封面图片位置绑定
+            this.cancelCoverBindReg();
+
+            // 清理现有的监听器
+            this.eventListenerRemovers.forEach((value) => value());
+            // 记录当前时间戳，用于判断动画是否完成
+            const timeStamps = Date.now();
+            this.changePositionTimeStamps = timeStamps;
+
+            // 判断是否仍为当前动画的函数
+            const stillIsThisAnimation = () => this.changePositionTimeStamps === timeStamps;
+
+            // 添加模糊效果
             anime.set(this.$refs.musicInfoPageRow, {
-                translateY: (-document.body.offsetHeight) + 'px',
+                background: 'rgba(0, 0, 0, 0.0625)',
+                backdropFilter: 'blur(30px)'
+            });
 
-            })
-            this.eventListenerRemovers.map((value) => value())
+            // 移动页面到底部
             anime({
                 targets: this.$refs.musicInfoPageRow,
                 easing: 'spring(1, 80, 16,' + Math.abs(info.speedY).toFixed(2) + ')',
                 translateY: -88,
                 complete: () => {
-                    this.musicInfoPagePosition = "bottom"
+                    this.musicInfoPagePosition = "bottom";
                 }
-            })
+            });
+
+            // 显示控制栏
             anime({
                 targets: this.$refs.musicControlBar,
                 opacity: 1,
                 easing: 'linear',
                 duration: 100,
                 delay: 300,
-            })
+            });
+
+            // 隐藏主容器
             anime({
                 targets: this.$refs.mainContainer,
                 opacity: 0,
                 easing: 'linear',
                 duration: 100,
-                // delay: 300,
-            })
+            });
+
+            // 缩小封面图片
             anime({
                 targets: this.$refs.cover,
                 width: 54,
@@ -183,10 +220,12 @@ export default {
                 easing: 'spring(1, 80, 15,' + Math.abs(info.speedY).toFixed(2) + ')',
                 translateY: 17,
                 translateX: 17
-            })
-            // regResizeHandle()
-            this.onBottomListener()
+            });
+
+            // 添加底部监听器
+            this.onBottomListener();
         },
+
         onBottomListener() {
             let musicControlBar_animeJsCallBack = null
             let lastTransformX, lastTransformY
@@ -201,12 +240,7 @@ export default {
                     anime.set(this.$refs.musicInfoPageRow, {
                         backdropFilter: 'blur(30px)',
                     })
-                    anime({
-                        targets: this.$refs.musicInfoPageRow,
-                        background: 'rgba(0,0,0,0.1)',
-                        easings: 'linear',
-                        // duration: 100
-                    })
+
                     this.dragInfo = info
                 },
                 (info) => {
@@ -240,12 +274,7 @@ export default {
                         easing: 'spring(1, 80, 14,0)'
                     })
 
-                    anime({
-                        targets: this.$refs.musicInfoPageRow,
-                        background: 'rgba(0,0,0,0.0625)',
-                        easings: 'linear',
-                        // duration: 100
-                    })
+
                     this.dragInfo = null
 
                 })
@@ -375,17 +404,17 @@ export default {
                     </buttom_icon_circleBackground>
                 </div>
             </div>
-            <div   :style="{
-                
-                    'pointer-events': (musicInfoPagePosition == 'top') ? 'auto' : 'none',
-                }" ref="mainContainer" class="mainContainer">
+            <div :style="{
+
+                'pointer-events': (musicInfoPagePosition == 'top') ? 'auto' : 'none',
+            }" ref="mainContainer" class="mainContainer">
                 <background class="player-background" :coverId="currentMusicInfo.al.id"
                     :musicInfoPagePosition="musicInfoPagePosition" />
 
                 <div class="controlBar">
                     <div ref="controlTapBar" class="tapBar"></div>
                 </div>
-                <div   class="musicDetail">
+                <div class="musicDetail">
 
                     <div ref="coverImagePlaceHolder" class="coverImagePlaceHolder">
                     </div>
@@ -414,7 +443,7 @@ export default {
                             <div class="current">
                                 {{ baseMethods.formatTime_MMSS(audioState.currentTime_round) }}
                             </div>
-                            <div class="duration"> 
+                            <div class="duration">
                                 {{ baseMethods.formatTime_MMSS(audioState.duration_round) }}
                             </div>
                         </div>
@@ -483,6 +512,12 @@ export default {
     font-size: 18px;
     font-weight: 900;
     color: #333;
+    width: 100%;
+    word-break: break-all;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
 }
 
 .currentMusic>.artists,
@@ -491,7 +526,12 @@ export default {
     font-size: 14px;
     /* font-weight: 900; */
     color: #676767;
-
+    width: 100%;
+    word-break: break-all;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
 }
 
 .player-background {
@@ -561,7 +601,8 @@ export default {
 }
 
 .mainContainer {
-    user-select: none;opacity: 0;
+    user-select: none;
+    opacity: 0;
     font-size: var(--adaptiveSize);
     color: rgb(255, 255, 255);
 

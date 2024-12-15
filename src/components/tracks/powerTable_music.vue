@@ -283,7 +283,7 @@
 					index: 0,
 					timeStamp: Date.now()
 				},
-				shouldDisplayIndexRange: [0,0]
+				shouldDisplayIndexRange: [-1,12]
 			}
 		},
 		components: {
@@ -292,8 +292,12 @@
 		},
 		props: {
 			tableData: Object,
+			noCover: Boolean
 		},
 		mounted(){
+			if(this.noCover == true){
+				this.currentTable.cellName.splice(1,1)
+			}
 			this.freshShouldDisplay()
 		},
 		methods: {
@@ -320,12 +324,10 @@
 				// 计算第一个可见行的索引
 				let couldBeSeeFirstIndex = Math.floor((scrollTop - firstTop) / (oneTrackHeight + gap));
 				// 计算最后一个可见行的索引
-				let couldBeSeeFinalIndex = Math.floor((scrollTop - firstTop + bodyHeight) / (oneTrackHeight + gap));
-
+				let couldBeSeeFinalIndex = Math.floor((scrollTop - firstTop + bodyHeight) / (oneTrackHeight + gap)) + 4;
 				// 确保索引不会小于0
 				couldBeSeeFirstIndex = couldBeSeeFirstIndex < 0 ? 0 : couldBeSeeFirstIndex;
-				couldBeSeeFinalIndex = couldBeSeeFinalIndex < 0 ? 0 : couldBeSeeFinalIndex;
-				if(this.shouldDisplayIndexRange[0]!=couldBeSeeFirstIndex) {this.shouldDisplayIndexRange = [couldBeSeeFirstIndex,couldBeSeeFinalIndex]}
+				if(this.shouldDisplayIndexRange[0]!=couldBeSeeFirstIndex||this.shouldDisplayIndexRange[1]!=couldBeSeeFinalIndex) {this.shouldDisplayIndexRange = [couldBeSeeFirstIndex,couldBeSeeFinalIndex]}
 				
 				// console.log(this.shouldDisplayIndexRange);
 			}

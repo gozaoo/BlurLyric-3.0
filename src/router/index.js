@@ -16,6 +16,20 @@ const router =[
     },
     {
         path: '/demo/',component:()=>import('./routers/demo.vue')
+    },
+    {
+        path: '/allLocalAlbum/',component:()=>import('./routers/allLocalAlbum.vue')
+    },
+    {
+        path: '/allLocalArtist/',component:()=>import('./routers/allLocalArtist.vue')
+    },
+    {
+        name: 'localArtist',
+        path: '/localArtist/',component:()=>import('./routers/localArtist.vue')
+    },
+    {
+        name: 'localAlbum',
+        path: '/localAlbum/',component:()=>import('./routers/localAlbum.vue')
     }
 ]
 

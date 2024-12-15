@@ -10,7 +10,7 @@ export default {
             intervalId: null,
         }
     },
-    components:{
+    components: {
         flexColumnRow,
         musicCard,
     },
@@ -51,17 +51,36 @@ export default {
     <h1>
         <span style="font-size: .7em;">{{ description }}</span>
     </h1>
-    <iconWithText @click="this.$router.push('/allmusic/')" type="background">
-        <template #svg>
-            <i class="bi bi-folder-fill"></i>
-        </template>
-        <template #text>
-            本地音乐
-        </template>
-    </iconWithText>
+    <iconFlexRow>
+
+        <iconWithText @click="this.$router.push('/allmusic/')" type="background">
+            <template #svg>
+                <i class="bi bi-folder-fill"></i>
+            </template>
+            <template #text>
+                本地音乐
+            </template>
+        </iconWithText>
+        <iconWithText @click="this.$router.push('/allLocalArtist/')" type="background">
+            <template #svg>
+                <i class="bi bi-person-circle"></i>
+            </template>
+            <template #text>
+                所有本地艺人
+            </template>
+        </iconWithText>
+        <iconWithText @click="this.$router.push('/allLocalAlbum/')" type="background">
+            <template #svg>
+                <i class="bi bi-disc-fill"></i>
+            </template>
+            <template #text>
+                所有本地专辑
+            </template>
+        </iconWithText>
+    </iconFlexRow>
+
 
 
 </template>
 
-<style scoped>
-</style>
+<style scoped></style>

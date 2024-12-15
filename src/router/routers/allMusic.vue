@@ -1,6 +1,6 @@
 <script>
     import manager from '../../api/manager'
-    import powerTable_music from '../../components/tracks/powerTable_,music.vue';
+    import powerTable_music from '../../components/tracks/powerTable_music.vue';
     export default{
         data(){
             return {

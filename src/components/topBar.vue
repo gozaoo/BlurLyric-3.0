@@ -63,21 +63,27 @@ export default{
     height: calc(100% + 16px);
     flex: 1;
     display: flex;
-    align-items: center;
+    /* align-items: center; */
   }
   .title{
     font-size: 32px;
-    padding-top: 24px;
+    /* padding-top: 24px; */
     font-weight: 900;
     color: #222;
-    transform: translateY(max(0px,calc(var(--paddingTop) - 15px)));
+    transform: translateY(max(15px,var(--paddingTop)));
     padding-left: 16px;
     transition: 0.25s cubic-bezier(.5,.3,.2,1);
     width: 100%;
+    word-break: break-all;
+    /* overflow: hidden; */
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+
   }
   .blur{
     position: absolute;
-    height: 100px;
+    height: 75px;
     width: 100%;
     left: 52px;
     background-color: #fff8;

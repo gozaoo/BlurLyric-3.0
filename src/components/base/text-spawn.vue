@@ -1,7 +1,7 @@
 <template>
-  <div class="box">
+  <span class="box">
     <a ref="newtext">{{ newText }}</a>
-  </div>
+  </span>
 </template>
 
 <script>
@@ -80,7 +80,7 @@
   .box {
     position: relative;
     width: inherit;
-    display: inline;
+    /* display: inline; */
   }
 
   .oldText {

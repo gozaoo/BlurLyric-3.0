@@ -9,6 +9,6 @@
     .row{
         display: flex;
         gap: 7px;
-        
+        flex-wrap: wrap;
     }
 </style>

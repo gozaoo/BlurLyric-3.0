@@ -19,6 +19,13 @@
             text: String
         },
         watch:{
+            text: {
+                handler(newv){
+                    this.cancelReg();
+                    this.cancelReg = this.regTitle( newv,this.offsetTop,this.hiddenTop).cancelReg
+
+                }
+            }
         },
         methods:{
 
@@ -39,6 +46,7 @@
         font-size: 32px;
         transition: color 0.25s cubic-bezier(.5,.3,.2,1);
         font-weight: 900;
+
     }
     .title.hidden{
         color: #fff0;

@@ -2,7 +2,7 @@
     import contextMenu from '../../components/base/contextMenu.vue';
     import toggle from '../../components/base/toggle.vue'
     import tracksRow from '../../components/tracks/tracksRow.vue'
-    import powerTableVue from '../../components/tracks/powerTable_,music.vue';
+    import powerTableVue from '../../components/tracks/powerTable_music.vue';
     import text_contextMenu from '../../components/text_contextMenu.vue';
     import dialogVue from '../../components/base/dialog.vue'
     export default {

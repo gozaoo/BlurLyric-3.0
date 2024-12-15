@@ -179,17 +179,15 @@ dependencies = [
 
 [[package]]
 name = "blurlyric"
-version = "0.1.0"
+version = "3.0.0"
 dependencies = [
  "audiotags",
- "base64 0.22.1",
  "dirs",
  "lazy_static",
  "serde",
  "serde_json",
  "tauri",
  "tauri-build",
- "tauri-plugin-fs",
  "tauri-plugin-shell",
  "tokio",
 ]
@@ -3395,29 +3393,6 @@ dependencies = [
  "tauri-utils",
  "toml 0.8.2",
  "walkdir",
-]
-
-[[package]]
-name = "tauri-plugin-fs"
-version = "2.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0cdaf6701ee5efc83161cf41004aa5aec4d255c9fb2d2b11fe518fe506acc588"
-dependencies = [
- "anyhow",
- "dunce",
- "glob",
- "percent-encoding",
- "schemars",
- "serde",
- "serde_json",
- "serde_repr",
- "tauri",
- "tauri-plugin",
- "tauri-utils",
- "thiserror 2.0.4",
- "toml 0.8.2",
- "url",
- "uuid",
 ]
 
 [[package]]

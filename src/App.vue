@@ -176,7 +176,7 @@ export default {
             return false
         },
         cleanUpMusicTrack() {
-            this.musicTrack = templateEmptyMusicTrack
+            this.pushMusicTrack(templateEmptyMusicTrack)
         },
         async pushMusic(singleSong) {
 
@@ -301,12 +301,20 @@ export default {
             
             newAudio.volume = this.audioState.volume * 1
             // const isFilePath = ;
-
+            let stillAvalible = true
+            const checkConstructAvalible = ()=>{
+                if (stillAvalible==true){
+                    return true;
+                } else {
+                    destroyThisManager()
+                    return false
+                }
+            }
             if (baseMethods.isPossibleLocalPath(newSong.src)) {
                 // 如果是文件路径，使用manager.tauri.getMusicFile获取Base64信息
                 // 假设binaryData已经是Uint8Array类型
                 manager.tauri.getMusicFile(newSong.id).then(url => {
-                    if (this.audioManager.timeStamps == timeStamps) newAudio.src = url
+                    if (checkConstructAvalible()) newAudio.src = url
                 }
                 ).catch(error => {
                     console.error('Error fetching music file:', error);
@@ -323,7 +331,8 @@ export default {
             } = this;
 
             let updateAudioState = (state, value) => {
-                if (this.audioManager.timeStamps == timeStamps) audioState[state] = value;
+                if(stillAvalible==true)
+                audioState[state] = value;
             };
 
             let loadeddataHandler = () => {
@@ -337,17 +346,21 @@ export default {
             };
 
             let playingHandler = () => {
+                if(checkIsCurrentConstruct()){
                 updateAudioState('playing', true);
-                currentEventHandler();
+                currentEventHandler();}
             };
 
             let pauseHandler = () => {
-                updateAudioState('playing', false);
+                if(checkIsCurrentConstruct()){
+                updateAudioState('playing', false);}
             };
 
             let timeupdateHandler = () => {
                 // if(audio)
-                updateAudioState('currentTime', newAudio.currentTime);
+                if(checkIsCurrentConstruct()&&checkConstructAvalible()) {
+                    updateAudioState('currentTime', newAudio.currentTime);
+                }
                 let leastTime = newAudio.duration - newAudio.currentTime
                     if(this.config.audio.smartStreamAudioList == true && leastTime < this.config.audio.audioStreamDuration){
                         this.transitionNextMusic()
@@ -364,12 +377,12 @@ export default {
             };
 
             let currentEventHandler = () => {
-                if (audioState.playing == true&&newAudio.duration != NaN) {
+                if (checkIsCurrentConstruct()&&checkConstructAvalible()&&audioState.playing == true&&newAudio.duration != NaN) {
                     updateAudioState('currentTime_round', Math.trunc(newAudio.currentTime));
                     updateAudioState('duration_round', Math.trunc(newAudio.duration));
  
                     // 更新时间的频率由 audioStateHandlerTPS 控制
-                    if (this.audioManager.timeStamps == timeStamps) setTimeout(() => {
+                    setTimeout(() => {
                         timeupdateHandler();
                         currentEventHandler();
                     }, 1000 / this.config.audio.audioStateHandlerTPS);
@@ -380,13 +393,13 @@ export default {
             // 检查音频是否可播放并播放
             const checkAndPlay = () => {
                 if (newAudio.readyState >= 4) { // HAVE_ENOUGH_DATA
-                    if (this.audioManager.timeStamps == timeStamps) newAudio.play();
+                    if (checkConstructAvalible()) newAudio.play();
 
                 } else {
                     newAudio.addEventListener('canplay', () => {
 
                         try {
-                            if (this.audioManager.timeStamps == timeStamps) newAudio.play();
+                            if (checkConstructAvalible()) newAudio.play();
                         } catch {
 
                         }
@@ -394,6 +407,13 @@ export default {
                 }
             };
 
+            const checkIsCurrentConstruct = ()=>{
+                if (this.audioManager.timeStamps==timeStamps){
+                    return true;
+                } else {
+                    return false
+                }
+            }
             newAudio.addEventListener('loadeddata', loadeddataHandler);
             newAudio.addEventListener('playing', playingHandler);
             newAudio.addEventListener('pause', pauseHandler);
@@ -408,8 +428,9 @@ export default {
             };
 
             let destroyThisManager = () => {
-                console.log("des");
-                
+                console.log('des');
+                stillAvalible = false
+                // debugger
                 newAudio.pause();
                 URL.revokeObjectURL(newAudio.src)
                 updateAudioState('playing', false);
@@ -439,9 +460,9 @@ export default {
                     title: this.currentMusicInfo.name, // 音频标题
                     artist: this.currentMusicInfo.ar.map(artist => artist.name).join('/'), // 艺术家
                     album: this.currentMusicInfo.al.name, // 专辑名称
-                    artwork: [{
-                        src: this.currentMusicInfo.al.picUrl
-                    }] // 专辑封面图片
+                    // artwork: [{
+                    //     src: this.currentMusicInfo.al.picUrl
+                    // }] // 专辑封面图片
                 });
 
                 navigator.mediaSession.metadata = metadata;
@@ -569,9 +590,10 @@ export default {
                 duration: time,
                 volume: 0,
                 easing: 'linear',
-                complete:function(){
+                complete:()=>{
                     oldAudioManager.destroyThisManager()
                     this.transitionNextMusicWorking = false;
+
                 }
             });
 
@@ -581,6 +603,7 @@ export default {
     },
     computed: {
         currentMusicInfo() {
+            
             return this.musicTrack[this.musicTrackIndex];
         }
     },

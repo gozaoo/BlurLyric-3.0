@@ -74,12 +74,13 @@ export default {
         };
 
         const handleTouchStart = (e) => {
+            
             if (e.touches.length === 1) {
+                info.beforeDragProgress = getCurrentProgress();
 
                 document.addEventListener('touchmove', handleTouchMove);
                 document.addEventListener('touchend', handleTouchEnd);
                 info.draging = true;
-                info.beforeDragProgress = getCurrentProgress();
                 const rect = progressBarDom.getBoundingClientRect();
                 info.offsetX = e.touches[0].clientX - rect.left;
                 info.domWidth = rect.width;
@@ -106,11 +107,12 @@ export default {
         };
 
         const handleMouseDown = (e) => {
+            info.beforeDragProgress = getCurrentProgress();
+
             info.draging = true;
 
             document.addEventListener('mousemove', handleMouseMove);
             document.addEventListener('mouseup', handleMouseUp);
-            info.beforeDragProgress = getCurrentProgress();
             const rect = progressBarDom.getBoundingClientRect();
             info.offsetX = e.clientX - rect.left;
             info.domWidth = rect.width;

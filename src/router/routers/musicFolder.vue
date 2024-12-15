@@ -78,7 +78,22 @@ export default {
                 <template #text>
                     全部音乐
                 </template>
-            </iconWithText>
+            </iconWithText>        <iconWithText @click="this.$router.push('/allLocalArtist/')" type="background">
+            <template #svg>
+                <i class="bi bi-person-circle"></i>
+            </template>
+            <template #text>
+                所有本地艺人
+            </template>
+        </iconWithText>
+        <iconWithText @click="this.$router.push('/allLocalAlbum/')" type="background">
+            <template #svg>
+                <i class="bi bi-disc-fill"></i>
+            </template>
+            <template #text>
+                所有本地专辑
+            </template>
+        </iconWithText>
         </iconFlexRow>
         <dialog_custom v-if="askAddLocalDirs == true" :cancel="()=>{askAddLocalDirs = false}" :finish="()=>{askAddLocalDirs = false;manager.tauri.addMusicDirs(addLocalDirInputValue);manager.tauri.refreshMusicCache(); refreshDirs()}">
             <h2>

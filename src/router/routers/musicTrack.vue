@@ -1,6 +1,6 @@
 <script>
     import manager from '../../api/manager'
-    import powerTable_music from '../../components/tracks/powerTable_,music.vue';
+    import powerTable_music from '../../components/tracks/powerTable_music.vue';
     export default{
         data(){
             return {
@@ -18,7 +18,7 @@
             // }
             
         },
-        inject:['musicTrack','musicTrackIndex']
+        inject:['musicTrack','musicTrackIndex','cleanUpMusicTrack']
     }
 </script>
 
@@ -26,14 +26,14 @@
     <bodytitle text="当前播放列表" />
 
     <div class="buttomTrack">
-        <!-- <iconWithText type="background" @click="" >
+        <iconWithText type="background" @click="cleanUpMusicTrack()" >
             <template #svg>
                 <i class="bi bi-play-fill"></i>
             </template>
             <template #text>
-                播放全部
+                重置列表
             </template>
-        </iconWithText> -->
+        </iconWithText>
     </div>
     <br>
     <powerTable_music :tableData="{
