@@ -15,7 +15,6 @@
             if(this.appState.runOnTauri) {
                 manager.tauri.getAlbums().then((res)=>{
                 this.albumList = [...this.albumList,...res]
-
                 });
 
                 

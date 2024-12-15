@@ -47,6 +47,8 @@ export default {
                     manager.tauri.getAlbumsSongsById(id).then((al_songs) => {
 
                         this.al_songs = al_songs
+                        console.log(al_songs);
+
                     })
                     break;
                 case 'online':
@@ -60,6 +62,8 @@ export default {
                     manager.tauri.getAlbumsSongsById(id).then((al_songs) => {
 
                         this.al_songs = al_songs
+                        console.log(al_songs);
+
                     })
                     break;
             }

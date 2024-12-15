@@ -12,6 +12,12 @@ export default {
             }, wait);
         };
     },
+    sortByTrackNumber(myarray) {
+        myarray.sort(function(a, b) {
+            // 假设track_number是一个数字，如果不是，可能需要根据实际情况调整比较逻辑
+            return a.track_number - b.track_number;
+        });
+    },    
     formatTime_MMSS(seconds) {
         if (typeof seconds !== 'number' || seconds < 0) {
             return 'Invalid input';
