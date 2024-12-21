@@ -4,6 +4,7 @@ import rightBlock from './components/rightBlock.vue'
 import leftBar from './components/leftBar.vue'
 import musicInfoPage from './components/musicInfoPage.vue'
 import manager from './api/manager'
+import messageDisplay from './components/messageDisplay.vue'
 import {
     computed,
     ref,
@@ -57,6 +58,7 @@ export default {
         leftBar,
         rightBlock,
         musicInfoPage,
+        messageDisplay
     },
     data() {
         return {
@@ -133,6 +135,8 @@ export default {
                 }]
             },
             resizeEvent: {},
+
+            messageList: []
         }
     },
     provide() {
@@ -166,6 +170,12 @@ export default {
             appState: computed(() => this.appState),
             source: computed(() => this.source),
             regResizeHandle: this.regResizeHandle,
+
+            messageList: computed(() => this.messageList),
+            regMessage: this.regMessage,
+            getAllMessages: this.getAllMessages,
+            destoryMessage: this.destoryMessage,
+
         };
     },
     methods: {
@@ -187,11 +197,19 @@ export default {
 
                 await this.audioManagerConstruct(this.musicTrack[this.musicTrackIndex])
                 this.audioManager.play()
+                this.regMessage({
+                    type: 'Message',
+                    content: '已添加音乐《'+singleSong.name+'》至列表末 '
+                })
                 return;
             };
 
             this.musicTrack.push(singleSong)
 
+            this.regMessage({
+                type: 'Message',
+                content: '已添加音乐《'+singleSong.name+'》至列表末 '
+            })
         },
         async pushMusicTrack(musicTrack) {
             if (this.checkMusicListIsEmpty()) {
@@ -363,6 +381,8 @@ export default {
                 if (checkIsCurrentConstruct() && checkConstructAvalible()) {
                     updateAudioState('currentTime', newAudio.currentTime);
                 }
+                // 开始处理播放结束事件
+                if (this.trackState.playMode == 'stopAfterSingle') return;
                 let leastTime = newAudio.duration - newAudio.currentTime
                 if (this.config.audio.smartStreamAudioList == true && leastTime < this.config.audio.audioStreamDuration) {
                     this.transitionNextMusic()
@@ -504,36 +524,54 @@ export default {
             if (nextIndex == allPlayModes.length) nextIndex = 0;
 
             this.trackState.playMode = allPlayModes[nextIndex]
+            let modeName = {
+                'loopPlaylist': "列表循环", 'loopSingle': '单曲循环', 'stopAfterSingle': '播完本曲暂停', 'randomPlay': '随机播放', 'smartRecommend': '智能推荐（暂时不可用）'
+            }
+
+            this.regMessage({
+                type: 'Message',
+                content: '播放模式已经调为 ' + modeName[this.trackState.playMode]
+            })
 
         },
         getNextMusicIndex() {
             switch (this.trackState.playMode) {
-                case 'loopPlaylist':
+                case 'loopPlaylist': {
                     let nextIndex = this.musicTrackIndex + 1;
                     if (nextIndex >= this.musicTrack.length) nextIndex = 0;
                     return nextIndex;
+                }
 
-                case 'loopSingle':
+                case 'loopSingle': {
                     return this.musicTrackIndex; // 重复播放当前歌曲
+                }
+                case 'stopAfterSingle': {
+                    let nextIndex = this.musicTrackIndex + 1;
+                    if (nextIndex >= this.musicTrack.length) nextIndex = 0;
+                    return nextIndex;
+                }
 
-                case 'stopAfterSingle':
-                    return this.musicTrackIndex;
-
-                case 'randomPlay':
+                case 'randomPlay': {
                     let randomIndex = this.musicTrackIndex;
-                    while (randomIndex === this.musicTrackIndex) {
-                        randomIndex = Math.floor(Math.random() * this.musicTrack.length);
+                    if (this.musicTrack.length > 1) {
+                        while (randomIndex === this.musicTrackIndex) {
+                            randomIndex = Math.floor(Math.random() * this.musicTrack.length);
+                        }
                     }
-                    return randomIndex;
 
-                case 'smartRecommend':
+                    return randomIndex;
+                }
+
+                case 'smartRecommend': {
                     // 暂时按照下一首处理
                     let nextIndexForSmart = this.musicTrackIndex + 1;
                     if (nextIndexForSmart >= this.musicTrack.length) nextIndexForSmart = 0;
                     return nextIndexForSmart;
+                }
 
-                default:
+                default: {
                     return 0;
+                }
             }
         },
         getPrevMusicIndex() {
@@ -619,7 +657,30 @@ export default {
 
             // 更新播放状态
         },
-
+        async getAllMessages() {
+            return this.messageList;
+        },
+        async regMessage(message) {
+            let timeStamp = Date.now()
+            message["timeStamp"] = timeStamp
+            /**
+             * 对于 message
+             * {
+             *      type: String // Message或Alert
+             *      timeStamp: Number // 作为时间标识符
+             *      content: String // 作为内容
+             *      leastTime: Number // Message或Alert的持续时间，选填
+             * }
+             */
+            this.messageList.push(message);
+            setTimeout(() => {
+                this.messageList = this.messageList.filter(_message => _message.timeStamp != timeStamp);
+            }, message.leastTime || 7 * 1000);
+            return this.messageList.length - 1
+        },
+        // async destoryMessage(index) {
+        //     this.messageList.splice(index, 1);
+        // }
     },
     computed: {
         currentMusicInfo() {
@@ -647,6 +708,7 @@ export default {
 </script>
 
 <template>
+    <messageDisplay />
     <topBar :titleOffsetTop="titleOffsetTop" :leftBarState="leftBarState">
         <template #title>
             <textspawn :text="this.title" />
