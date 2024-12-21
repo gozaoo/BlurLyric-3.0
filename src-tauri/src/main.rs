@@ -4,3 +4,4 @@
 fn main() {
     blurlyric_lib::run()
 }
+ 

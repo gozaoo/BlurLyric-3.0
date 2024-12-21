@@ -298,12 +298,12 @@ export default {
             let timeStamps = Date.now()
 
             let newAudio = document.createElement('audio');
-            
+
             newAudio.volume = this.audioState.volume * 1
             // const isFilePath = ;
             let stillAvalible = true
-            const checkConstructAvalible = ()=>{
-                if (stillAvalible==true){
+            const checkConstructAvalible = () => {
+                if (stillAvalible == true) {
                     return true;
                 } else {
                     destroyThisManager()
@@ -331,8 +331,8 @@ export default {
             } = this;
 
             let updateAudioState = (state, value) => {
-                if(stillAvalible==true)
-                audioState[state] = value;
+                if (stillAvalible == true)
+                    audioState[state] = value;
             };
 
             let loadeddataHandler = () => {
@@ -346,41 +346,43 @@ export default {
             };
 
             let playingHandler = () => {
-                if(checkIsCurrentConstruct()){
-                updateAudioState('playing', true);
-                currentEventHandler();}
+                if (checkIsCurrentConstruct()) {
+                    updateAudioState('playing', true);
+                    currentEventHandler();
+                }
             };
 
             let pauseHandler = () => {
-                if(checkIsCurrentConstruct()){
-                updateAudioState('playing', false);}
+                if (checkIsCurrentConstruct()) {
+                    updateAudioState('playing', false);
+                }
             };
 
             let timeupdateHandler = () => {
                 // if(audio)
-                if(checkIsCurrentConstruct()&&checkConstructAvalible()) {
+                if (checkIsCurrentConstruct() && checkConstructAvalible()) {
                     updateAudioState('currentTime', newAudio.currentTime);
                 }
                 let leastTime = newAudio.duration - newAudio.currentTime
-                    if(this.config.audio.smartStreamAudioList == true && leastTime < this.config.audio.audioStreamDuration){
-                        this.transitionNextMusic()
-                    } else if(leastTime == 0) {
-                        let nextMusicIndex = this.getNextMusicIndex();
-                        this.musicTrackIndex = nextMusicIndex;
-                        const nextSong = this.musicTrack[nextMusicIndex];
-                        destroyThisManager()
+                if (this.config.audio.smartStreamAudioList == true && leastTime < this.config.audio.audioStreamDuration) {
+                    this.transitionNextMusic()
+                } else if (leastTime == 0) {
+                    let nextMusicIndex = this.getNextMusicIndex();
+                    this.musicTrackIndex = nextMusicIndex;
+                    const nextSong = this.musicTrack[nextMusicIndex];
+                    destroyThisManager()
 
-                        this.audioManagerConstruct(nextSong);
+                    this.audioManagerConstruct(nextSong);
 
-                        this.audioManager.play()
-                    }
+                    this.audioManager.play()
+                }
             };
 
             let currentEventHandler = () => {
-                if (checkIsCurrentConstruct()&&checkConstructAvalible()&&audioState.playing == true&&newAudio.duration != NaN) {
+                if (checkIsCurrentConstruct() && checkConstructAvalible() && audioState.playing == true && newAudio.duration != NaN) {
                     updateAudioState('currentTime_round', Math.trunc(newAudio.currentTime));
                     updateAudioState('duration_round', Math.trunc(newAudio.duration));
- 
+
                     // 更新时间的频率由 audioStateHandlerTPS 控制
                     setTimeout(() => {
                         timeupdateHandler();
@@ -407,8 +409,8 @@ export default {
                 }
             };
 
-            const checkIsCurrentConstruct = ()=>{
-                if (this.audioManager.timeStamps==timeStamps){
+            const checkIsCurrentConstruct = () => {
+                if (this.audioManager.timeStamps == timeStamps) {
                     return true;
                 } else {
                     return false
@@ -507,13 +509,31 @@ export default {
         getNextMusicIndex() {
             switch (this.trackState.playMode) {
                 case 'loopPlaylist':
-                    let nextIndex = this.musicTrackIndex + 1
-                    if (nextIndex >= this.musicTrack.length) nextIndex = 0
-                    return nextIndex
+                    let nextIndex = this.musicTrackIndex + 1;
+                    if (nextIndex >= this.musicTrack.length) nextIndex = 0;
+                    return nextIndex;
+
+                case 'loopSingle':
+                    return this.musicTrackIndex; // 重复播放当前歌曲
+
+                case 'stopAfterSingle':
+                    return this.musicTrackIndex;
+
+                case 'randomPlay':
+                    let randomIndex = this.musicTrackIndex;
+                    while (randomIndex === this.musicTrackIndex) {
+                        randomIndex = Math.floor(Math.random() * this.musicTrack.length);
+                    }
+                    return randomIndex;
+
+                case 'smartRecommend':
+                    // 暂时按照下一首处理
+                    let nextIndexForSmart = this.musicTrackIndex + 1;
+                    if (nextIndexForSmart >= this.musicTrack.length) nextIndexForSmart = 0;
+                    return nextIndexForSmart;
 
                 default:
-                    return 0
-
+                    return 0;
             }
         },
         getPrevMusicIndex() {
@@ -560,7 +580,7 @@ export default {
             this.transitionNextMusicWorking = true;
 
             console.log("working");
-            
+
             // debugger
             let nextMusicIndex = this.getNextMusicIndex();
             this.musicTrackIndex = nextMusicIndex;
@@ -570,8 +590,8 @@ export default {
             let time = 1000 * (oldAudioManager.audioDom.duration - oldAudioManager.audioDom.currentTime); // 播放剩余时间
 
             // 切换到新音频
-           this.audioManagerConstruct(nextSong)
-           const newAudio = this.audioManager
+            this.audioManagerConstruct(nextSong)
+            const newAudio = this.audioManager
             newAudio.audioDom.volume = 0.5 * this.audioState.volume;
 
             // 创建音频管理器
@@ -590,7 +610,7 @@ export default {
                 duration: time,
                 volume: 0,
                 easing: 'linear',
-                complete:()=>{
+                complete: () => {
                     oldAudioManager.destroyThisManager()
                     this.transitionNextMusicWorking = false;
 
@@ -603,7 +623,7 @@ export default {
     },
     computed: {
         currentMusicInfo() {
-            
+
             return this.musicTrack[this.musicTrackIndex];
         }
     },

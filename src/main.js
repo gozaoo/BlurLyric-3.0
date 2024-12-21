@@ -31,7 +31,7 @@ import dialog from './components/base/dialog.vue';
 // 导入路由配置
 import routes from './router/index.js';
 import LazyLoadCoverImage from './components/base/lazyLoadCoverImage.vue';
-
+import suspendingBox from './components/base/suspendingBox.vue'
 // 创建Vue应用实例
 let vueApp = createApp(App);
  
@@ -43,7 +43,7 @@ vueApp.component('iconToClick', iconToClickVue)
        .component('textspawn',textspawnVue)
        .component('iconFlexRow',iconFlexRow)
        .component('dialog_custom',dialog)
-
+      .component('suspendingBox',suspendingBox)
        .component('LazyLoadCoverImage',LazyLoadCoverImage)
 
 

@@ -28,10 +28,10 @@ h2 {
 
     --color-button-active: rgb(0,144,220);
     --color-toggle-actived: rgb(0,122,204);
-	--Shadow-value-card-high:0px 5px 17px #0001;
-	--Shadow-value-normal:0px 0px 3px #0005;
-	--Shadow-value-low:0px 0px 5px #0002;
-	--Shadow-value-offsetY-low:0px 2px 7px #0002;
+	--Shadow-value-card-high:0px 0.3125em 1.0625em #0001;
+	--Shadow-value-normal:0px 0px 0.1875em #0005;
+	--Shadow-value-low:0px 0px 0.3125em #0002;
+	--Shadow-value-offsetY-low:0px 0.125em 0.4375em #0002;
 	--fontColor-content-normal:#000;
 	--fontColor-content-unimportant:#555;
 	--fontColor-content-moreUnimportant:#888;

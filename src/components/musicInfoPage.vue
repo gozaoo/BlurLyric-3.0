@@ -20,17 +20,43 @@ export default {
                     transformX: 0,
                 }
             },
-            // progress: 0,
-            eventListenerRemovers: [],
+
+            // UI大小调节
+            UIScale_userSet: 1,
+            /**
+             * 
+             */
+            UIScale_autoSet: 1, 
+
+
+            
+            // 提供下方缓存保存
             dragInfo: null,
+
+            // 组件位置状态
+            /**
+             * bottom: 在底部
+             * top: 在顶部
+             * toBottom: 从顶部动画至底部中
+             * toTop：从底部动画至顶部中
+             */
             musicInfoPagePosition: 'bottom',
+
+            // 缓存监听器注销器
+            eventListenerRemovers: [],
             cancelCoverBindReg: () => { },
-            changePositionTimeStamps: Date.now()
+
+            // 用于标识当前处于哪个时刻激活的动画
+            // 理论值：Number: Date.now()
+            changePositionTimeStamps: 0
         }
     },
     computed: {
         progress: function () {
             return Number((this.audioState.currentTime / this.audioState.duration).toFixed(3))
+        },
+        UIScale: function(){
+            return ((this.UIScale_userSet != 1)?this.UIScale_userSet:this.UIScale_autoSet)+ 'rem'
         }
     },
     components: {
@@ -50,7 +76,11 @@ export default {
         'nextMusic', 'prevMusic', 'getNextMusicIndex', 'getPrevMusicIndex', 'regResizeHandle', 'config'
     ],
     mounted() {
+
+        // 注册底部栏拖动
         this.onBottomListener();
+
+        // 注册进度条拖动
         ([
             this.$refs.progressBoxContainer,
             this.$refs.bar_ProgressBoxContainer
@@ -319,17 +349,13 @@ export default {
                 <lazyLoadCoverImage :id="currentMusicInfo.al.id"></lazyLoadCoverImage>
             </div>
 
-            <!-- <div class="cover">
-                    <lazyLoadCoverImage class="blur" :src="currentMusicInfo.al.picUrl"></lazyLoadCoverImage>
-                    <lazyLoadCoverImage :src="currentMusicInfo.al.picUrl"></lazyLoadCoverImage>
-                </div> -->
+
             <div ref="bar_ProgressBoxContainer" :style="{
                 '--progress': progress
             }" class="bar_ProgressBoxContainer">
                 <div class="insert"></div>
             </div>
             <div ref="musicControlBar" class="musicControlBar">
-
                 <div class="cover placeholder">
                 </div>
                 <div ref="barDetail" class="detail">
@@ -405,7 +431,7 @@ export default {
                 </div>
             </div>
             <div :style="{
-
+                'fontSize': UIScale,
                 'pointer-events': (musicInfoPagePosition == 'top') ? 'auto' : 'none',
             }" ref="mainContainer" class="mainContainer">
                 <background class="player-background" :coverId="currentMusicInfo.al.id"
@@ -493,11 +519,11 @@ export default {
 .musicInfo>.name {
     font-weight: 900;
     color: #fffd;
-    font-size: 21px;
+    font-size: 1.3125em;
 }
 
 .musicInfo>.artists {
-    font-size: 14px;
+    font-size: 0.875em;
     color: #fff9
 }
 
@@ -539,6 +565,7 @@ export default {
     left: 0;
     top: 0;
     width: 100%;
+    z-index: 0;
     height: 100%
 }
 
@@ -612,9 +639,12 @@ export default {
     margin: 0.6em auto;
     height: .8em;
     cursor: n-resize;
+    z-index: 1;
+    /* display: a; */
+/* position: absolute; */
     width: 5em;
     border-radius: 1em;
-    background-color: #0002
+    background-color: #fff2;
 }
 
 .controlBar {
@@ -623,7 +653,7 @@ export default {
 
 .mainContainer {
     font-size: 1rem;
-    z-index: 0;
+    z-index: 1;
 }
 
 .musicInfoPageRow {
@@ -701,7 +731,7 @@ export default {
 }
 
 .cover>.blur {
-    filter: blur(12px);
+    filter: blur(0.75em);
     position: absolute;
     transform-origin: 50% 100%;
     transform: scale(0.85);
@@ -795,18 +825,18 @@ export default {
 }
 
 .progressBoxContainer {
-    height: 30px;
+    height: 1.875em;
     display: flex;
     flex-direction: column;
     justify-content: center;
-    margin-bottom: 2px;
+    margin-bottom: 0.125em;
 }
 
 .progressBoxContainer:hover .progressBox {
     background-color: #fff5;
     width: 104%;
-    height: 18px;
-    border-radius: 9px;
+    height: 1.125em;
+    border-radius: 0.5625em;
     margin: 0 -2%;
 }
 
@@ -820,8 +850,8 @@ export default {
     margin: 0 0%;
     width: 100%;
     /* width: 98%; */
-    height: 14px;
-    border-radius: 7px;
+    height: 0.875em;
+    border-radius: 0.4375em;
     box-shadow: var(--Shadow-value-offsetY-low);
     background-color: #fff3;
     cursor: pointer;
@@ -839,7 +869,7 @@ export default {
 .infoPage_ProgressContainer>.progressInfo {
     display: flex;
     justify-content: space-between;
-    font-size: 9px;
+    font-size: 0.5625em;
     color: #fff9
 }
 </style>
