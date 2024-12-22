@@ -7,6 +7,8 @@ import textSpawn from './base/text-spawn.vue';
 import anime from 'animejs';
 import background from './musicInfoPageComponents/background.vue';
 import contain from './musicInfoPageComponents/contain.vue';
+import button_block from './musicInfoPageComponents/button_block.vue'
+import button_circle from './musicInfoPageComponents/button_circle.vue'
 import {
     computed,
 } from 'vue'
@@ -26,10 +28,10 @@ export default {
             /**
              * 
              */
-            UIScale_autoSet: 1, 
+            UIScale_autoSet: 1,
 
+            maxColumnWidth: "min(50vh, 40vw)",
 
-            
             // 提供下方缓存保存
             dragInfo: null,
 
@@ -55,9 +57,7 @@ export default {
         progress: function () {
             return Number((this.audioState.currentTime / this.audioState.duration).toFixed(3))
         },
-        UIScale: function(){
-            return ((this.UIScale_userSet != 1)?this.UIScale_userSet:this.UIScale_autoSet)+ 'rem'
-        }
+
     },
     components: {
         lazyLoadCoverImage,
@@ -65,7 +65,10 @@ export default {
         playModeSvg,
         textSpawn,
         background,
-        contain
+        contain,
+
+        button_block,
+        button_circle
     },
     provide() {
         return {
@@ -73,7 +76,7 @@ export default {
         }
     },
     inject: ['currentMusicInfo', 'audioState', 'audioManager', 'changePlayMode', 'trackState', 'musicTrack',
-        'nextMusic', 'prevMusic', 'getNextMusicIndex', 'getPrevMusicIndex', 'regResizeHandle', 'config'
+        'nextMusic', 'prevMusic', 'getNextMusicIndex', 'getPrevMusicIndex', 'regResizeHandle', 'config', 'scrollState'
     ],
     mounted() {
 
@@ -160,13 +163,17 @@ export default {
             }, 300);
 
             // 显示主容器
-            anime({
-                targets: this.$refs.mainContainer,
-                opacity: 1,
-                easing: 'linear',
-                duration: 100,
-                delay: 100,
-            });
+            setTimeout(() => {
+                if (stillIsThisAnimation()) {
+                    anime({
+                        targets: this.$refs.mainContainer,
+                        opacity: 1,
+                        easing: 'linear',
+                        duration: 100,
+                    });
+                }
+            }, 100);
+
 
             // 重新绑定封面图片、主界面位置
             let position_bind = (speed) => {
@@ -333,6 +340,33 @@ export default {
                 })
             // controlTapBar
             this.eventListenerRemovers.push(callBack_drag.destroy)
+        },
+        adjustedMaxColumnWidth() {
+            let isMobilePortrait = window.innerWidth <= 480;
+            let isTabletPortrait = window.innerWidth > 480 && window.innerWidth <= 768;
+            let isDesktop = window.innerWidth > 768;
+            if (isMobilePortrait) {
+                return '76vw'; // 手机竖屏适配值
+            } else if (isTabletPortrait) {
+                return '56vw'; // 平板竖屏适配值
+            } else if (isDesktop) {
+                return this.maxColumnWidth; // 横屏适配最佳值
+            }
+        },
+        UIScale() {
+            let isMobile = window.innerWidth <= 768;
+            let isTablet = window.innerWidth > 768 && window.innerWidth <= 1024;
+            let isDesktop = window.innerWidth > 1024;
+
+            if (isMobile) {
+                return (this.UIScale_userSet != 1 ? this.UIScale_userSet : this.UIScale_autoSet) + 'rem';
+            } else if (isTablet) {
+                // Adjust the scale for tablets
+                return (this.UIScale_userSet != 1 ? this.UIScale_userSet : this.UIScale_autoSet) + 'rem';
+            } else if (isDesktop) {
+                // Adjust the scale for desktops
+                return (this.UIScale_userSet != 1 ? this.UIScale_userSet : this.UIScale_autoSet) + 'rem';
+            }
         }
     }
 }
@@ -440,7 +474,10 @@ export default {
                 <div class="controlBar">
                     <div ref="controlTapBar" class="tapBar"></div>
                 </div>
-                <div class="musicDetail">
+                <!--绑定最大栏宽度-->
+                <div :style="{
+                    '--maxColumnWidth': adjustedMaxColumnWidth()
+                }" class="musicDetail">
 
                     <div ref="coverImagePlaceHolder" class="coverImagePlaceHolder">
                     </div>
@@ -475,40 +512,74 @@ export default {
                         </div>
                     </div>
                     <div class="musicDetailButton">
-                        <buttom_icon_circleBackground @click="changePlayMode">
-                            <template #icon>
-                                <playModeSvg style="transform: scale(.7) translateY(1%);transform-origin: 50% 50%;">
-                                </playModeSvg>
-                            </template>
-                        </buttom_icon_circleBackground>
+                        <button_circle @click="changePlayMode">
+                            <playModeSvg style="transform: scale(.7) translateY(1%);transform-origin: 50% 50%;">
+                            </playModeSvg>
+                        </button_circle>
 
-                        <buttom_icon_circleBackground @click="prevMusic()">
-                            <template #icon>
-                                <i class="bi bi-skip-start-fill"></i>
-                            </template>
-                        </buttom_icon_circleBackground>
-                        <buttom_icon_circleBackground
+
+                        <button_circle @click="prevMusic()">
+                            <i class="bi bi-skip-start-fill"></i>
+                        </button_circle>
+                        <button_circle
                             @click="(audioState.playing == true) ? audioManager.pause() : audioManager.play()"
                             class="playButtom">
-                            <template #icon>
-                                <div style="transform: scale(1.5);transform-origin: 50% 50%;">
-                                    <i v-if="audioState.playing == true" class="bi bi-pause-fill"></i>
-                                    <i v-if="audioState.playing == false" class="bi bi-play-fill"></i>
+                            <div style="transform: scale(1.5);transform-origin: 50% 50%;">
+                                <i v-if="audioState.playing == true" class="bi bi-pause-fill"></i>
+                                <i v-if="audioState.playing == false" class="bi bi-play-fill"></i>
+                            </div>
+                        </button_circle>
+                        <button_circle @click="nextMusic()">
+                            <i class="bi bi-skip-end-fill"></i>
+                        </button_circle>
+                        <button_circle>
+                            <i style="transform: scale(.7) translateY(1%);transform-origin: 50% 50%;"
+                                class="bi bi-volume-up bi"></i>
+                        </button_circle>
+                    </div>
+                    <div class="musicDetailButton">
+                        <suspendingBox :theme="'light'" :direction="'top'" :hoverOnly="true">
+                            <template #placeholder>
+                                <button_block>
+                                    <i class="bi bi-music-note-list"></i>
+                                </button_block>
+                            </template>
+                            <template #suspendContent>
+                                <div>
+                                    展示音乐列表
                                 </div>
                             </template>
-                        </buttom_icon_circleBackground>
-                        <buttom_icon_circleBackground @click="nextMusic()">
-                            <template #icon>
-                                <i class="bi bi-skip-end-fill"></i>
+                        </suspendingBox>
+                        <suspendingBox :theme="'light'" :direction="'top'" :hoverOnly="true">
+                            <template #placeholder>
+
+                                <button_block :actived="true">
+                                    <i class="bi bi-vinyl"></i>
+                                </button_block>
                             </template>
-                        </buttom_icon_circleBackground>
-                        <buttom_icon_circleBackground>
-                            <template #icon>
-                                <i style="transform: scale(.7) translateY(1%);transform-origin: 50% 50%;"
-                                    class="bi-volume-up bi"></i>
-                                <!-- <playModeSvg  style="transform: scale(.7) translateY(1%);transform-origin: 50% 50%;"></playModeSvg> -->
+                            <template #suspendContent>
+                                <div>
+                                    仅显示专辑信息
+                                </div>
                             </template>
-                        </buttom_icon_circleBackground>
+                        </suspendingBox>
+                        <suspendingBox :theme="'light'" :direction="'top'" :hoverOnly="true">
+                            <template #placeholder>
+
+                                <button_block>
+                                    <i class="bi bi-text-left"></i>
+                                </button_block>
+                            </template>
+                            <template #suspendContent>
+                                <div>
+                                    展示歌词
+                                </div>
+                            </template>
+                        </suspendingBox>
+
+
+
+
                     </div>
                 </div>
             </div>
@@ -518,7 +589,7 @@ export default {
 <style scoped>
 .musicInfo>.name {
     font-weight: 900;
-    color: #fffd;
+    color: #fffe;
     font-size: 1.3125em;
 }
 
@@ -580,7 +651,7 @@ export default {
     max-height: calc(100% - 48px);
     left: 50%;
     transform: translateX(-50%);
-    width: min(50vh, 40vw);
+    width: var(--maxColumnWidth);
 }
 
 .musicDetailButton {
@@ -606,9 +677,11 @@ export default {
     border-radius: 1%;
     overflow: hidden;
     image-rendering: auto;
-    width: min(50vh, 40vw);
+    /* 绑定maxColumnWidth值 */
+    width: var(--maxColumnWidth);
+    height: var(--maxColumnWidth);
+
     aspect-ratio: 1/1;
-    height: min(50vh, 40vw);
     cursor: pointer;
 }
 
@@ -641,7 +714,7 @@ export default {
     cursor: n-resize;
     z-index: 1;
     /* display: a; */
-/* position: absolute; */
+    /* position: absolute; */
     width: 5em;
     border-radius: 1em;
     background-color: #fff2;
@@ -810,8 +883,13 @@ export default {
 
 .playButtom {
     font-size: 28px;
-    height: 30px;
+    /* height: 30px; */
     padding: 0.4em;
+}
+
+.musicDetailButton .playButtom {
+    font-size: 1.75em;
+    /* padding: 0.5em; */
 }
 
 @media screen and (max-width: 560px) {

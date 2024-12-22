@@ -96,11 +96,12 @@ export default {
                         style.top = `${originY}px`;
                         style.left = `${originX}px`;
                     } else if (isHorizontal == true) {
-                        style[reverse[dir]] = `${placeholderRect[dirToVal[dir]] + 5}px`;
+                        style[reverse[dir]] = `${(placeholderRect[dirToVal[dir]] + 5) * (( dir === 'left')?-1:1)}px`;
                         style.top = `${ placeholderRect.height / 2 - floatingBoxRect.height / 2}px`;
                     } else if (isVertical == true) {
-                        style.top = `${placeholderRect[dirToVal[dir]]} + 5}px`;
-                        style.left = `${placeholderRect.left + placeholderRect.width / 2 - floatingBoxRect.width / 2}px`;
+                        debugger
+                        style.top = `${(placeholderRect[dirToVal[dir]] + 5) * (( dir === 'top')?-1:1)}px`;
+                        style.left = `${placeholderRect.width / 2 - floatingBoxRect.width / 2}px`;
                     }
 
                     // 检查悬浮盒子是否在视口内，并调整位置
@@ -154,7 +155,7 @@ export default {
             if (props.hoverOnly && props.visibility) {
                 timeoutId = setTimeout(() => {
                     isVisible.value = true;
-                }, 500);
+                }, 300);
             }
         };
 
@@ -197,12 +198,13 @@ export default {
 }
 .floating-box {
     position: absolute;
-    min-width: 100px !important;
+    min-width: max-content !important;
     /* 悬浮盒子的默认样式 */
     opacity: 0;
+    font-size: 0.8em;
     padding: .4em .7em;
     border-radius: 0.64em;
-    transition: 0.3s;
+    transition: left 0s, top 0s, 0.3s;
     box-shadow: var(--Shadow-value-normal);
 }
 
