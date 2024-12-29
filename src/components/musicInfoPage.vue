@@ -29,7 +29,8 @@ export default {
              * 
              */
             UIScale_autoSet: 1,
-
+            UIMode: 'desktop',
+            UIMode_enum: ['mobile', 'tablet', 'desktop'],
             maxColumnWidth: "min(50vh, 40vw)",
 
             // 提供下方缓存保存
@@ -97,7 +98,7 @@ export default {
                     // console.log(info);
                     // Number((this.audioState.currentTime / this.audioState.duration).toFixed(3))
                     this.audioManager.audioDom.currentTime = Math.min(info.currentProgress * this.audioState.duration, this.audioState.duration - this.config.audio.audioStreamDuration - 1)
-                    this.progress = info.currentProgress
+                    // this.progress = info.currentProgress
                 }
             })
         })
@@ -346,10 +347,15 @@ export default {
             let isTabletPortrait = window.innerWidth > 480 && window.innerWidth <= 768;
             let isDesktop = window.innerWidth > 768;
             if (isMobilePortrait) {
+                this.UIMode = 'mobile';
                 return '76vw'; // 手机竖屏适配值
             } else if (isTabletPortrait) {
-                return '56vw'; // 平板竖屏适配值
+                this.UIMode = 'tablet';
+                return 'min(76vw,48vh)'; // 手机竖屏适配值
+
             } else if (isDesktop) {
+                this.UIMode = 'desktop';
+
                 return this.maxColumnWidth; // 横屏适配最佳值
             }
         },
@@ -376,7 +382,7 @@ export default {
         transform: translateY(-88px);background:rgba(0,0,0,0.0625);
         " class="global_backgroundblur_light musicInfoPageRow">
 
-        <div class="relativeBox">
+        <div :class="['relativeBox',`mode-${UIMode}`]">
 
             <div ref="cover" style="transform: translateX(17px) translateY(17px); " class="cover">
                 <lazyLoadCoverImage class="blur" :id="currentMusicInfo.al.id"></lazyLoadCoverImage>
@@ -513,7 +519,7 @@ export default {
                     </div>
                     <div class="musicDetailButton">
                         <button_circle @click="changePlayMode">
-                            <playModeSvg style="transform: scale(.7) translateY(1%);transform-origin: 50% 50%;">
+                            <playModeSvg style="transform: scale(.75) translateY(1%);transform-origin: 50% 50%;">
                             </playModeSvg>
                         </button_circle>
 
@@ -533,7 +539,7 @@ export default {
                             <i class="bi bi-skip-end-fill"></i>
                         </button_circle>
                         <button_circle>
-                            <i style="transform: scale(.7) translateY(1%);transform-origin: 50% 50%;"
+                            <i style="transform: scale(.75) translateY(1%);transform-origin: 50% 50%;"
                                 class="bi bi-volume-up bi"></i>
                         </button_circle>
                     </div>
@@ -640,6 +646,15 @@ export default {
     height: 100%
 }
 
+
+.mode-tablet .musicDetail,.mode-mobile .musicDetail {
+    justify-content: flex-end;
+}
+
+.mode-tablet .coverImagePlaceHolder,.mode-mobile .coverImagePlaceHolder {
+    margin: auto auto;
+}
+
 .musicDetail {
     position: absolute;
     height: 100%;
@@ -647,8 +662,9 @@ export default {
     flex-direction: column;
     justify-content: space-evenly;
     box-sizing: border-box;
-    padding-bottom: 40px;
+    padding-bottom: 2.5em;
     max-height: calc(100% - 48px);
+    gap: 1.4em;
     left: 50%;
     transform: translateX(-50%);
     width: var(--maxColumnWidth);
@@ -678,7 +694,7 @@ export default {
     overflow: hidden;
     image-rendering: auto;
     /* 绑定maxColumnWidth值 */
-    width: var(--maxColumnWidth);
+    /* width: var(--maxColumnWidth); */
     height: var(--maxColumnWidth);
 
     aspect-ratio: 1/1;

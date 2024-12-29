@@ -206,7 +206,7 @@ fn parse_music_file(file: PathBuf) -> Result<Song, String> {
     let song_data = match tag_result {
         Ok(tag) => {
             // 如果成功读取标签，则使用标签中的信息
-
+            
             let track_number = tag.track_number().unwrap_or_else(|| 0);
             let title = tag
                 .title()
@@ -225,6 +225,8 @@ fn parse_music_file(file: PathBuf) -> Result<Song, String> {
                 .album_title()
                 .map(|s| s.to_string())
                 .unwrap_or_else(|| "Unknown Album".to_string());
+            
+            // let lyrics = 
             let album = get_or_create_album(album_name);
             (title, artists, album,track_number)
         }
@@ -234,7 +236,8 @@ fn parse_music_file(file: PathBuf) -> Result<Song, String> {
                 file_name.clone(),
                 vec![get_or_create_artist("Unknown Artist".to_string())],
                 get_or_create_album("Unknown Album".to_string()),
-                0
+                0,
+                // "No lyrics found".to_string()
             )
         }
     };

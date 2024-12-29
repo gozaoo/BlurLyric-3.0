@@ -283,7 +283,7 @@
 					index: 0,
 					timeStamp: Date.now()
 				},
-				shouldDisplayIndexRange: [-1,12]
+				shouldDisplayIndexRange: [-1,0]
 			}
 		},
 		components: {
@@ -324,7 +324,7 @@
 				// 计算第一个可见行的索引
 				let couldBeSeeFirstIndex = Math.floor((scrollTop - firstTop) / (oneTrackHeight + gap));
 				// 计算最后一个可见行的索引
-				let couldBeSeeFinalIndex = Math.floor((scrollTop - firstTop + bodyHeight) / (oneTrackHeight + gap)) + 4;
+				let couldBeSeeFinalIndex = Math.floor((scrollTop - firstTop + bodyHeight) / (oneTrackHeight + gap)) + 2;
 				// 确保索引不会小于0
 				couldBeSeeFirstIndex = couldBeSeeFirstIndex < 0 ? 0 : couldBeSeeFirstIndex;
 				if(this.shouldDisplayIndexRange[0]!=couldBeSeeFirstIndex||this.shouldDisplayIndexRange[1]!=couldBeSeeFinalIndex) {this.shouldDisplayIndexRange = [couldBeSeeFirstIndex,couldBeSeeFinalIndex]}

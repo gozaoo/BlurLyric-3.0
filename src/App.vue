@@ -199,7 +199,7 @@ export default {
                 this.audioManager.play()
                 this.regMessage({
                     type: 'Message',
-                    content: '已添加音乐《'+singleSong.name+'》至列表末 '
+                    content: '已添加音乐《' + singleSong.name + '》至列表末 '
                 })
                 return;
             };
@@ -208,7 +208,7 @@ export default {
 
             this.regMessage({
                 type: 'Message',
-                content: '已添加音乐《'+singleSong.name+'》至列表末 '
+                content: '已添加音乐《' + singleSong.name + '》至列表末 '
             })
         },
         async pushMusicTrack(musicTrack) {
@@ -328,11 +328,15 @@ export default {
                     return false
                 }
             }
+            const destroyObjectURLMethod = () => {
+
+            }
             if (baseMethods.isPossibleLocalPath(newSong.src)) {
                 // 如果是文件路径，使用manager.tauri.getMusicFile获取Base64信息
                 // 假设binaryData已经是Uint8Array类型
-                manager.tauri.getMusicFile(newSong.id).then(url => {
-                    if (checkConstructAvalible()) newAudio.src = url
+                manager.tauri.getMusicFile(newSong.id).then(result => {
+                    if (checkConstructAvalible()) { newAudio.src = result.objectURL; destroyObjectURLMethod = result.destroyObjectURL }
+
                 }
                 ).catch(error => {
                     console.error('Error fetching music file:', error);
@@ -452,14 +456,20 @@ export default {
             let destroyThisManager = () => {
                 console.log('des');
                 stillAvalible = false
-                // debugger
                 newAudio.pause();
-                URL.revokeObjectURL(newAudio.src)
+
+                // 如果是文件路径，销毁ObjectURL
+                baseMethods.isPossibleLocalPath(newSong.src) ? destroyObjectURLMethod() : '';
+
+                // 重置音频状态
                 updateAudioState('playing', false);
+
+                // 移除监听器
                 newAudio.src = undefined
                 newAudio.remove();
                 cancelListener();
             };
+            // 创建音频管理器
             let audioManager = {
                 audioDom: newAudio,
                 cancelListener,

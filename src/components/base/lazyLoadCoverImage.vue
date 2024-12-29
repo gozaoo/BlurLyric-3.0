@@ -30,7 +30,8 @@ export default {
       currentSrc: '', // 存储当前的ObjectURL
       nextTransilateTime: 0,
       timerID: undefined,
-      objectURL: null, // 存储ObjectURL，以便于后续销毁
+      objectURL: null, // 存储ObjectURL，以便于后续销毁,
+      destroyObjectURL: ()=>{},
     };
   },
   props: {
@@ -69,15 +70,16 @@ export default {
     },
     async fetchAlbumCover() {
       // 获取专辑封面并更新currentSrc
-      if (this.objectURL) {
-        URL.revokeObjectURL(this.objectURL); // 销毁之前的ObjectURL
-      }
-      manager.tauri.getAlbumCover(this.id).then(url=>{
-        this.objectURL = url; // 更新ObjectURL
-        this.currentSrc = url;
-        this.handleImageLoad()
-      }).catch((err)=>{
-        if(err != 'Album cover not found'){ // 找不到专辑图片为正常现象
+        this.destroyObjectURL()
+      await manager.tauri.getAlbumCover(this.id).then(result => {
+        this.objectURL = result.objectURL; // 更新ObjectURL
+        this.currentSrc = result.objectURL;
+        // console.log(this);
+
+        this.destroyObjectURL = result.destroyObjectURL;
+        this.handleImageLoad();
+      }).catch((err) => {
+        if (err != 'Album cover not found') { // 找不到专辑图片为正常现象
           console.log(err);
         }
       });
@@ -88,9 +90,9 @@ export default {
     id: {
       immediate: true, // 初始时立即执行一次处理函数
       handler(newId, oldId) {
-        if (newId !== oldId&&newId>=0) {
+        if (newId !== oldId && newId >= 0) {
           this.fadeOutImage();
-          
+
         }
       },
     },
@@ -98,14 +100,15 @@ export default {
   unmounted() {
     // 组件注销前，销毁ObjectURL
     if (this.objectURL) {
-      URL.revokeObjectURL(this.objectURL);
+      // manager.tauri.destroyObjectURL(this.id);
+      this.destroyObjectURL();
     }
   },
   mounted() {
-    if (this.id>=0) {
-          this.fadeOutImage();
-          this.fetchAlbumCover();
-        }
+    if (this.id >= 0) {
+      this.fadeOutImage();
+      this.fetchAlbumCover();
+    }
     // 确保容器占满整个画幅
     // const container = this.$el.querySelector('.image-container');
     // container.style.width = '100%';

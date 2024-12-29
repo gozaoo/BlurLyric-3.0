@@ -91,7 +91,7 @@ export default {
 
                     const isHorizontal = dir === 'left' || dir === 'right';
                     const isVertical = dir === 'top' || dir === 'bottom';
-                    console.log(floatingBoxRect);
+                    // console.log(floatingBoxRect);
                     if (dir === 'center') {
                         style.top = `${originY}px`;
                         style.left = `${originX}px`;
@@ -99,7 +99,7 @@ export default {
                         style[reverse[dir]] = `${(placeholderRect[dirToVal[dir]] + 5) * (( dir === 'left')?-1:1)}px`;
                         style.top = `${ placeholderRect.height / 2 - floatingBoxRect.height / 2}px`;
                     } else if (isVertical == true) {
-                        debugger
+                        // debugger
                         style.top = `${(placeholderRect[dirToVal[dir]] + 5) * (( dir === 'top')?-1:1)}px`;
                         style.left = `${placeholderRect.width / 2 - floatingBoxRect.width / 2}px`;
                     }
@@ -204,7 +204,7 @@ export default {
     font-size: 0.8em;
     padding: .4em .7em;
     border-radius: 0.64em;
-    transition: left 0s, top 0s, 0.3s;
+    transition: left 0s, top 0s,right 0s,bottom 0s, 0.3s;
     box-shadow: var(--Shadow-value-normal);
 }
 
