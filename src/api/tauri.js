@@ -144,19 +144,18 @@ export default {
     
     // 获取所有艺术家
     getArtists: async () => await invoke("get_all_my_artists"),
-    
-    // 通过ID获取专辑
-    getAlbumById: async (albumId) => await invoke("get_album_by_id", { albumId: Number(albumId) }),
-    
-    // 通过ID获取艺术家
-    getArtistById: async (artistId) => await invoke("get_artist_by_id", { artistId: Number(artistId) }),
-    
-    // 通过专辑ID获取歌曲
-    getAlbumsSongsById: async (albumId) => await invoke("get_albums_songs_by_id", { albumId: Number(albumId) }),
-    
-    // 通过艺术家ID获取歌曲
-    getArtistsSongsById: async (artistId) => await invoke("get_artists_songs_by_id", { artistId: Number(artistId) }),
+// 通过ID获取专辑
+getAlbumById: async (albumId) => await invoke("get_album_by_id", { albumId: Number(albumId) }),
 
-    // 销毁对象URL
-    destroyObjectURL: destroyObjectURL
-};
+// 通过ID获取艺术家
+getArtistById: async (artistId) => await invoke("get_artist_by_id", { artistId: Number(artistId) }),
+
+// 通过专辑ID获取歌曲
+getAlbumsSongsById: async (albumId) => await invoke("get_albums_songs_by_id", { albumId: Number(albumId) }),
+
+// 通过艺术家ID获取歌曲
+getArtistsSongsById: async (artistId) => await invoke("get_artists_songs_by_id", { artistId: Number(artistId) }),
+
+// 销毁对象URL
+destroyObjectURL: destroyObjectURL
+}

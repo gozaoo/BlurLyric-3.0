@@ -735,7 +735,7 @@ pub fn run() {
             get_artist_by_id,
             get_albums_songs_by_id,
             get_artists_songs_by_id,
-            get_low_quality_album_cover
+            close_app
         ])
         .setup(|app| {
             // 在应用程序启动时处理缓存刷新
@@ -746,4 +746,10 @@ pub fn run() {
         })
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
+}
+// 新增的关闭应用的方法
+#[tauri::command]
+fn close_app(window: tauri::Window) {
+    // 关闭当前窗口
+    window.close().unwrap();
 }
