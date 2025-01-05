@@ -1,7 +1,13 @@
 <script>
+<<<<<<< Updated upstream
 import manager from "../../api/manager";
 import powerTable_Music from "../../components/tracks/powerTable_music.vue";
 import baseMethods from "../../js/baseMethods";
+=======
+import manager from '../../api/manager';
+import powerTable_Music from '../../components/tracks/powerTable_music.vue';
+import baseMethods from '../../js/baseMethods';
+>>>>>>> Stashed changes
 // import powerTable_Music from '../../components/tracks/powerTable_,music.vue';
 export default {
     data() {
@@ -51,10 +57,39 @@ export default {
                 console.log(al_songs);
                 baseMethods.sortByTrackNumber(this.al_songs)
 
+<<<<<<< Updated upstream
             });
         },
     },
 };
+=======
+                        this.al_songs = al_songs
+                        baseMethods.sortByTrackNumber(al_songs)
+
+                    })
+                    break;
+                case 'online':
+
+                    break;
+                default:
+                    manager.tauri.getAlbumById(id).then((al) => {
+                        
+                        this.al = al
+                    })
+                    manager.tauri.getAlbumsSongsById(id).then((al_songs) => {
+
+                        this.al_songs = al_songs
+                        baseMethods.sortByTrackNumber(al_songs)
+
+
+                    })
+                    break;
+            }
+
+        }
+    }
+}
+>>>>>>> Stashed changes
 </script>
 
 <template>

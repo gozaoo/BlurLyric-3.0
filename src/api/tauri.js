@@ -114,6 +114,7 @@ export default {
     refreshMusicCache: async () => await invoke("refresh_music_cache"),
     getAlbums: async () => await invoke("get_all_my_albums"),
     getArtists: async () => await invoke("get_all_my_artists"),
+<<<<<<< Updated upstream
     getAlbumById: async (albumId) => await invoke("get_album_by_id", {
         albumId: Number(albumId)
     }),
@@ -128,3 +129,11 @@ export default {
     }),
     destroyObjectURL: destroyObjectURL
 };
+=======
+    getAlbumById: async (albumId) => await invoke("get_album_by_id", { albumId: Number(albumId) }),
+    getArtistById: async (artistId) => await invoke("get_artist_by_id", { artistId: Number(artistId) }),
+    getAlbumsSongsById: async (albumId) => await invoke("get_albums_songs_by_id", { albumId: Number(albumId) }),
+    closeApp: invoke("close_app"),
+    getArtistsSongsById: async (artistId) => await invoke("get_artists_songs_by_id", { artistId: Number(artistId) })
+}
+>>>>>>> Stashed changes

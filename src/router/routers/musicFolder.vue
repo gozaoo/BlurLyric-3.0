@@ -1,6 +1,7 @@
 <script>
 import folder from '../../components/tracks/folder.vue';
 import dialog from '../../components/base/dialog.vue';
+import dialog_vue from '../../components/base/dialog.vue';
 import powerTable from '../../components/tracks/powerTable.vue';
 import manager from '../../api/manager';
 export default {
@@ -14,6 +15,7 @@ export default {
     },
     components: {
         dialog,
+        dialog_vue,
         powerTable,
         folder
     },
@@ -96,6 +98,7 @@ export default {
         </iconWithText>
         </iconFlexRow>
         <dialog_custom v-if="askAddLocalDirs == true" :cancel="()=>{askAddLocalDirs = false}" :finish="()=>{askAddLocalDirs = false;manager.tauri.addMusicDirs(addLocalDirInputValue);manager.tauri.refreshMusicCache(); refreshDirs()}">
+        <dialog_vue v-if="askAddLocalDirs == true" :cancel="()=>{askAddLocalDirs = false}" :finish="()=>{askAddLocalDirs = false;manager.tauri.addMusicDirs(addLocalDirInputValue);manager.tauri.refreshMusicCache(); refreshDirs()}">
             <h2>
                 请输入一个地址
             </h2>
@@ -103,6 +106,7 @@ export default {
             <!-- <br> -->
             <input style="width: 210px" type="text" placeholder="" v-model="addLocalDirInputValue">
         </dialog_custom>
+        </dialog_vue>
         <folder @del="()=>{manager.tauri.removeMusicDirs(item);manager.tauri.refreshMusicCache(); refreshDirs()}" v-for="(item) in localFolders">
             <template #name>
                 <!-- {{item.split('/')[-1]}} -->
