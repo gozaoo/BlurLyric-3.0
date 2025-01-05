@@ -116,7 +116,7 @@ export default {
 .player-background {
   animation: spawnplayerbackground 0.3s linear;
   filter: blur(8vmin) saturate(200%) contrast(40%) brightness(90%);
-  transition: background .4s;
+  /* transition: background .4s; */
   margin: -10vh 0 0 -10vw;
 
 }
@@ -143,20 +143,20 @@ export default {
   /* background-size: cover; */
   /* will-change: filter,background; */
   will-change: background;
-  transition: background .4s;
+  /* transition: background .4s; */
 }
 
 
 .player-background>div {
   --animationName: background1;
-  transition: background .4s, background-position 6s ease-in-out;
+  /* transition: background .4s, background-position 6s ease-in-out; */
   background-position: var(--random-x) var(--random-y);
   /* transform: rotate(calc(calc(var(--random-x) / 100% ) * 180deg)); */
 
 }
 
 .player-background.dyn>div {
-  transition: background .4s, background-position 6s ease-in-out;
+  /* transition: background .4s, background-position 6s ease-in-out; */
 
 }
 

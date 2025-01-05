@@ -5,12 +5,7 @@
       <i class="bi bi-music-note"></i>
     </div>
     <!-- 动态绑定的图片元素 -->
-    <img
-      v-if="currentSrc"
-      :src="currentSrc"
-      class="loaded-image"
-      :style="{ opacity: imageOpacity }"
-    />
+    <img v-if="currentSrc" :src="currentSrc" class="loaded-image" :style="{ opacity: imageOpacity }" />
     <!-- <img
       v-if="currentSrc"
       :src="currentSrc"
@@ -31,14 +26,19 @@ export default {
       nextTransilateTime: 0,
       timerID: undefined,
       objectURL: null, // 存储ObjectURL，以便于后续销毁,
-      destroyObjectURL: ()=>{},
+      destroyObjectURL: () => { },
     };
   },
+  inject: ['regMessage'],
   props: {
     id: {
       type: [String, Number], // id可以是字符串或数字
       default: "", // 默认为空字符串，表示没有id
     },
+    maxResolution: {
+      type: [Number, String], // id可以是字符串或数字
+      default: manager.tauri.enum_resolutions.normal,
+    }
   },
   methods: {
     handleImageLoad(event) {
@@ -70,13 +70,23 @@ export default {
     },
     async fetchAlbumCover() {
       // 获取专辑封面并更新currentSrc
-        this.destroyObjectURL()
-      await manager.tauri.getAlbumCover(this.id).then(result => {
+      this.destroyObjectURL()
+      let result_message;
+      if (this.maxResolution != 0) {
+        //当不是获得原图时
+        result_message = this.regMessage({
+          type: "LongMessage",
+          content: "正在进行缩略图优化...",
+        })
+      }
+      await manager.tauri.getAlbumCover(this.id, this.maxResolution).then(result => {
         this.objectURL = result.objectURL; // 更新ObjectURL
         this.currentSrc = result.objectURL;
         // console.log(this);
 
         this.destroyObjectURL = result.destroyObjectURL;
+        (result_message!=null&& result_message!=undefined)?result_message.destoryMessage():'';
+
         this.handleImageLoad();
       }).catch((err) => {
         if (err != 'Album cover not found') { // 找不到专辑图片为正常现象
@@ -120,17 +130,19 @@ export default {
 <style scoped>
 .image-container {
   position: relative;
-  overflow: hidden;	box-shadow: var(--Shadow-value-normal);
-  }
+  overflow: hidden;
+  box-shadow: var(--Shadow-value-normal);
+}
+
 .placeholder {
-	height: 100%;
-	width: 100%;
-	background-color: #00000007;
-	color:var(--fontColor-content-moreUnimportant);
-	display: flex;
-	font-size: 1.3em;
-	align-items: center;
-	justify-content: center;
+  height: 100%;
+  width: 100%;
+  background-color: #00000007;
+  color: var(--fontColor-content-moreUnimportant);
+  display: flex;
+  font-size: 1.3em;
+  align-items: center;
+  justify-content: center;
 }
 
 .loaded-image {
@@ -139,7 +151,9 @@ export default {
   left: 0;
   width: 100%;
   height: auto;
-  object-fit: cover; /* 保持图片的比例，不拉伸 */
-  transition: opacity .5s; /* 淡入淡出动画 */
+  object-fit: cover;
+  /* 保持图片的比例，不拉伸 */
+  transition: opacity .5s;
+  /* 淡入淡出动画 */
 }
 </style>

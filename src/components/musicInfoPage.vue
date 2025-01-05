@@ -286,7 +286,6 @@ export default {
                     if (info.offsetDirectionX != 'none') {
                         this.style.musicDetailRender.transformX = info.offsetX + lastTransformX
                     }
-                    // console.log(info.speedY);
 
                     if (info.offsetY < -100 || info.speedY < -1.5) {
                         if (navigator.vibrate) navigator.vibrate(50);
@@ -296,7 +295,6 @@ export default {
 
                 },
                 (info) => {
-                    // console.log('2');
 
                     if (info.offsetX < -100 || info.speedX < -1) {
                         if (navigator.vibrate) navigator.vibrate(50);
@@ -386,7 +384,7 @@ export default {
 
             <div ref="cover" style="transform: translateX(17px) translateY(17px); " class="cover">
                 <lazyLoadCoverImage class="blur" :id="currentMusicInfo.al.id"></lazyLoadCoverImage>
-                <lazyLoadCoverImage :id="currentMusicInfo.al.id"></lazyLoadCoverImage>
+                <lazyLoadCoverImage :maxResolution="0" :id="currentMusicInfo.al.id"></lazyLoadCoverImage>
             </div>
 
 

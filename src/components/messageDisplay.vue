@@ -1,17 +1,22 @@
 <!-- MessageDisplay.vue -->
 <template>
     <div class="messageListBox">
-        <div class="global_backgroundblur_light" v-for="message in messageList" :key="message.id">
-            <div v-if="message.type == 'Alert'">
+        <div :class="['global_backgroundblur_light',message.type,message.state]" v-for="message in messageList" :key="message.id">
+            <div class="Alert" v-if="message.type == 'Alert'">
                 <!-- 显示 Alert 类型的消息 -->
                 <span>{{ message.content }}</span>
             </div>
-            <div v-else-if="message.type == 'Message'">
+            <div :class="['LongMessage',message.state]"  v-if="message.type == 'LongMessage'">
+                <!-- 显示 Message 类型的消息 -->
+                <span>{{ message.content }}</span>
+            </div>
+            <div class="Message" v-else-if="message.type == 'Message'">
                 <!-- 显示 Message 类型的消息 -->
                 <span>{{ message.content }}</span>
             </div>
 
         </div>
+
     </div>
 
 </template>
@@ -39,7 +44,8 @@ export default {
     justify-content: flex-end;
     gap: 8px;
 }
-.messageListBox>*{
+
+.messageListBox>* {
     /* background: #; */
     font-size: .8rem;
     padding: 9px 14px;
@@ -51,21 +57,31 @@ export default {
     position: relative;
     opacity: 0;
     box-sizing: content-box;
+    transition: 0.26s;
+}
+
+.messageListBox> .LongMessage.display{
+    opacity: 1;
+}
+.message {
     overflow: hidden;
     animation: in 6.5s ease-in-out;
-    /* outline:  var(--color-input-outline-normal) solid  2px; */
 }
+
 @keyframes in {
-    0%{
+    0% {
         opacity: 0;
-    }   
-    4%{
+    }
+
+    4% {
         opacity: 1;
     }
-    96%{
+
+    96% {
         opacity: 1;
     }
-    100%{
+
+    100% {
         opacity: 0;
     }
 }

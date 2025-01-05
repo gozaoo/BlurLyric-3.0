@@ -48,7 +48,6 @@ export default {
             });
             manager.tauri.getAlbumsSongsById(id).then((al_songs) => {
                 this.al_songs = al_songs;
-                console.log(al_songs);
                 baseMethods.sortByTrackNumber(this.al_songs)
 
             });

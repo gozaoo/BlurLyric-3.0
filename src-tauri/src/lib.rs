@@ -1,15 +1,14 @@
 use audiotags::Tag;
+use image::{imageops::FilterType, DynamicImage, GenericImageView};
 use lazy_static::lazy_static;
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value as serde_json_value};
-
 use std::collections::HashMap;
 use std::fs::{self, DirEntry};
-use std::io;
+use std::io::Cursor;
 use std::path::PathBuf;
 use std::sync::Mutex;
 use tokio::fs as async_fs;
-
 lazy_static! {
     // ID 计数器
     static ref SONG_ID_COUNTER: Mutex<u32> = Mutex::new(0);
@@ -65,7 +64,7 @@ struct Song {
     lyric: String,
     al: Album,
     src: PathBuf,
-    track_number:u16
+    track_number: u16,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -74,12 +73,138 @@ struct Artist {
     name: String,
     alias: Vec<String>,
 }
+// 生成缓存图片路径
+fn get_cache_image_path(cache_dir: &PathBuf, album_id: u32, max_resolution: u32) -> PathBuf {
+    let mut path = cache_dir.clone();
+    let binding = ALBUM_CACHE.lock().unwrap();
+    let album = binding.values().find(|album| album.id == album_id).unwrap();
+    path.push(sanitize_filename(format!(
+        "album_{}_{}.jpg",
+        album.name, max_resolution
+    )));
+    path
+}
 
+// 获取缓存目录
+fn get_cache_dir() -> Result<PathBuf, String> {
+    let path = dirs::cache_dir().ok_or("Cannot get cache directory")?;
+    let mut path = path;
+    path.push("com.blurlyric.app");
+    if !path.exists() {
+        fs::create_dir_all(&path).map_err(|e| e.to_string())?;
+    }
+    Ok(path)
+}
+// 从缓存读取图片
+fn read_image_from_cache(path: &PathBuf) -> Result<tauri::ipc::Response, String> {
+    fs::read(path)
+        .map(|data| tauri::ipc::Response::new(data))
+        .map_err(|e| e.to_string())
+}
+// 从专辑获取封面数据
+fn get_album_cover_data(album_id: u32) -> Result<Vec<u8>, String> {
+    let cache = MUSIC_CACHE.lock().unwrap();
+    for songs in cache.values() {
+        for song in songs {
+            if song.al.id == album_id {
+                match Tag::new()
+                    .read_from_path(&song.src)
+                    .map_err(|e| e.to_string())?
+                    .album_cover()
+                {
+                    Some(cover) => return Ok(cover.data.to_vec()),
+                    None => continue,
+                }
+            }
+        }
+    }
+    Err("Album cover not found".to_string())
+}
+fn resize_image(image: DynamicImage, max_resolution: u32) -> DynamicImage {
+    let (width, height) = image.dimensions();
+    let scale = f32::max(width as f32, height as f32) / max_resolution as f32;
+    if scale > 1.0 {
+        let new_width = (width as f32 / scale) as u32;
+        let new_height = (height as f32 / scale) as u32;
+        image.resize(new_width, new_height, FilterType::Nearest)
+    } else {
+        image
+    }
+}
 impl Artist {
     fn get_songs(&self) -> Vec<Song> {
         let map = ARTIST_SONGS_MAP.lock().unwrap();
         map.get(&self.id).unwrap_or(&vec![]).clone()
     }
+}
+
+const MAX_FILENAME_LENGTH: usize = 50;
+
+fn sanitize_filename(name: String) -> String {
+    let sanitized: String = name
+        .chars()
+        .map(|c| {
+            if c.is_alphanumeric() || c == '_' || c == '-' || c == '.' {
+                c.to_string()
+            } else {
+                "_".to_string()
+            }
+        })
+        .collect();
+    if sanitized.len() > MAX_FILENAME_LENGTH {
+        let mut truncated = sanitized
+            .chars()
+            .take(MAX_FILENAME_LENGTH)
+            .collect::<String>();
+        while truncated.ends_with('.') || truncated.ends_with('_') {
+            if truncated.len() > 0 {
+                truncated.pop();
+            } else {
+                break;
+            }
+        }
+        truncated
+    } else {
+        sanitized
+    }
+}
+
+#[tauri::command]
+async fn get_low_quality_album_cover(
+    album_id: u32,
+    max_resolution: u32,
+) -> Result<tauri::ipc::Response, String> {
+    let start = std::time::Instant::now();
+
+    let cache_dir = get_cache_dir().map_err(|e| e.to_string())?;
+    let cache_path = get_cache_image_path(&cache_dir, album_id, max_resolution);
+    if cache_path.exists() {
+        return read_image_from_cache(&cache_path);
+    }
+
+    let cover_data = get_album_cover_data(album_id).map_err(|e| e.to_string())?;
+    let duration = start.elapsed();
+    println!("读取封面数据耗时: {:?}", duration);
+
+    let start = std::time::Instant::now();
+    let image = image::load_from_memory(&cover_data).map_err(|e| e.to_string())?;
+    let resized_image = tokio::task::spawn_blocking(move || resize_image(image, max_resolution))
+        .await
+        .map_err(|e| format!("JoinError: {:?}", e))?;
+    let duration = start.elapsed();
+    println!("图片处理耗时: {:?}", duration);
+
+    let mut buffer = Vec::new();
+    {
+        let mut cursor = Cursor::new(&mut buffer);
+        resized_image
+            .write_to(&mut Cursor::new(&mut buffer), image::ImageFormat::WebP)
+            .map_err(|e| e.to_string())?;
+    }
+
+    fs::write(&cache_path, &buffer).map_err(|e| e.to_string())?;
+
+    Ok(tauri::ipc::Response::new(buffer))
 }
 #[derive(Debug, Serialize, Deserialize, Clone)]
 struct Album {
@@ -167,6 +292,7 @@ fn scan_music_files(dir: &PathBuf) -> Vec<PathBuf> {
                 if entry.file_type().map(|ft| ft.is_dir()).unwrap_or(false) {
                     scan_music_files(&entry.path())
                 } else if is_music_file(&entry) {
+                    println!("Found music file: {}", entry.path().display());
                     vec![entry.path()]
                 } else {
                     vec![]
@@ -206,7 +332,7 @@ fn parse_music_file(file: PathBuf) -> Result<Song, String> {
     let song_data = match tag_result {
         Ok(tag) => {
             // 如果成功读取标签，则使用标签中的信息
-            
+
             let track_number = tag.track_number().unwrap_or_else(|| 0);
             let title = tag
                 .title()
@@ -225,10 +351,10 @@ fn parse_music_file(file: PathBuf) -> Result<Song, String> {
                 .album_title()
                 .map(|s| s.to_string())
                 .unwrap_or_else(|| "Unknown Album".to_string());
-            
-            // let lyrics = 
+
+            // let lyrics =
             let album = get_or_create_album(album_name);
-            (title, artists, album,track_number)
+            (title, artists, album, track_number)
         }
         Err(_) => {
             // 如果读取标签失败，则使用默认值
@@ -249,7 +375,7 @@ fn parse_music_file(file: PathBuf) -> Result<Song, String> {
         lyric: String::new(),
         al: song_data.2,
         src: file,
-        track_number: song_data.3
+        track_number: song_data.3,
     };
     {
         let mut artist_songs_map = ARTIST_SONGS_MAP.lock().unwrap();
@@ -293,6 +419,8 @@ fn refresh_music_cache() -> Result<(), String> {
     let mut new_cache = HashMap::new();
 
     for dir in &*music_dirs {
+        println!("Scanning music files in: {}", dir.display());
+
         if dir.is_dir() {
             let songs = scan_music_files(dir);
             let parsed_songs: Result<Vec<Song>, String> =
@@ -307,6 +435,18 @@ fn refresh_music_cache() -> Result<(), String> {
                 }
             }
         } else {
+            match remove_music_dirs(vec![dir.display().to_string()]) {
+                Ok(_) => {
+                    eprintln!(
+                        "Path is not a directory, removed from music dirs: {}",
+                        dir.display()
+                    );
+                }
+                Err(e) => {
+                    eprintln!("Failed to remove path from music dirs: {}", e);
+                }
+            }
+
             return Err(format!("Path is not a directory: {}", dir.display()));
         }
     }
@@ -368,13 +508,14 @@ fn add_users_music_dir() {
 // 程序启动时调用的方法
 fn init_application() {
     // 加载音乐缓存
+    println!("initing application.");
 
     // 加载音乐目录
     if let Err(e) = load_music_dirs_from_disk() {
         eprintln!("Failed to load music directories from disk: {}", e);
     }
-    eprintln!("test");
 
+    println!("checking config.");
     // 检查音乐目录是否为空
     {
         let mut music_dirs = MUSIC_DIRS.lock().unwrap();
@@ -390,10 +531,12 @@ fn init_application() {
         }
     }
 
+    println!("scanning music dirs.");
     // 刷新音乐缓存
     if let Err(e) = refresh_music_cache() {
         eprintln!("Failed to refresh music cache: {}", e);
     }
+    println!("init application finished.");
 }
 
 #[tauri::command]
@@ -503,42 +646,60 @@ fn remove_music_dirs(dirs_to_remove: Vec<String>) -> Result<(), String> {
     Ok(())
 }
 
+// 保存音乐目录到磁盘
 fn save_music_dirs_to_disk() -> Result<(), String> {
     let dirs_clone = {
-        println!("Locking MUSIC_DIRS");
         let dirs = MUSIC_DIRS.lock().unwrap();
-        println!("Locked MUSIC_DIRS and cloned the contents.");
         dirs.clone()
     };
-    let file = std::fs::File::create("music_dirs.json").map_err(|e| e.to_string())?;
-    serde_json::to_writer(file, &dirs_clone).map_err(|e| e.to_string())
+    let cache_dir = get_cache_dir().map_err(|e| e.to_string())?;
+    println!("Cache directory: {:?}", cache_dir);
+    if !cache_dir.exists() {
+        if let Err(e) = fs::create_dir_all(&cache_dir) {
+            return Err(format!("Failed to create cache directory: {}", e));
+        }
+    }
+    let file_path = cache_dir.join("MUSIC_DIRS.json");
+    println!("File path: {:?}", file_path);
+    let file = match fs::File::create(&file_path) {
+        Ok(f) => f,
+        Err(e) => return Err(format!("Failed to create file: {}", e)),
+    };
+    if let Err(e) = serde_json::to_writer(&file, &dirs_clone) {
+        return Err(format!("Failed to write to file: {}", e));
+    }
+    Ok(())
 }
 
 // 从磁盘加载音乐目录
 fn load_music_dirs_from_disk() -> Result<(), String> {
-    let file_path = "music_dirs.json";
-    let mut file = match fs::File::open(file_path) {
-        Ok(file) => file,
-        Err(_) => {
-            // 如果文件不存在或无法打开，则创建新文件
-            let audio_dir = dirs::audio_dir().ok_or("No default audio directory found")?;
-            let mut file = fs::File::create(file_path).map_err(|e| e.to_string())?;
-            let dirs = vec![audio_dir];
-            serde_json::to_writer(&mut file, &dirs).map_err(|e| e.to_string())?;
-            return Ok(()); // 文件已创建并写入，返回成功
+    let cache_dir = get_cache_dir().map_err(|e| e.to_string())?;
+    println!("Cache directory: {:?}", cache_dir);
+    if !cache_dir.exists() {
+        if let Err(e) = fs::create_dir_all(&cache_dir) {
+            return Err(format!("Failed to create cache directory: {}", e));
         }
-    };
-
-    // 如果文件存在，读取内容
-    let mut contents = String::new();
-    io::Read::read_to_string(&mut file, &mut contents).map_err(|e| e.to_string())?;
-    let dirs: Vec<PathBuf> = serde_json::from_str(&contents).map_err(|e| e.to_string())?;
-    // 锁定互斥锁，更新内容，然后立即释放锁
-    let mut music_dirs = MUSIC_DIRS.lock().unwrap();
-    *music_dirs = dirs;
+    }
+    let file_path = cache_dir.join("MUSIC_DIRS.json");
+    println!("File path: {:?}", file_path);
+    if !file_path.exists() {
+        let audio_dir = dirs::audio_dir().ok_or("No default audio directory found")?;
+        let dirs = vec![audio_dir];
+        let file = match fs::File::create(&file_path) {
+            Ok(f) => f,
+            Err(e) => return Err(format!("Failed to create file: {}", e)),
+        };
+        if let Err(e) = serde_json::to_writer(&file, &dirs) {
+            return Err(format!("Failed to write to file: {}", e));
+        }
+    } else {
+        let file = fs::File::open(&file_path).map_err(|e| e.to_string())?;
+        let dirs: Vec<PathBuf> = serde_json::from_reader(file).map_err(|e| e.to_string())?;
+        let mut music_dirs = MUSIC_DIRS.lock().unwrap();
+        *music_dirs = dirs;
+    }
     Ok(())
 }
-
 #[tauri::command]
 fn add_music_dirs(new_dirs: Vec<String>) -> Result<(), String> {
     {
@@ -573,7 +734,8 @@ pub fn run() {
             get_album_by_id,
             get_artist_by_id,
             get_albums_songs_by_id,
-            get_artists_songs_by_id
+            get_artists_songs_by_id,
+            get_low_quality_album_cover
         ])
         .setup(|app| {
             // 在应用程序启动时处理缓存刷新

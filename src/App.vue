@@ -454,7 +454,6 @@ export default {
             };
 
             let destroyThisManager = () => {
-                console.log('des');
                 stillAvalible = false
                 newAudio.pause();
 
@@ -627,7 +626,6 @@ export default {
             if (this.transitionNextMusicWorking == true) return;
             this.transitionNextMusicWorking = true;
 
-            console.log("working");
 
             // debugger
             let nextMusicIndex = this.getNextMusicIndex();
@@ -670,23 +668,78 @@ export default {
         async getAllMessages() {
             return this.messageList;
         },
-        async regMessage(message) {
+        regMessage(message) {
             let timeStamp = Date.now()
             message["timeStamp"] = timeStamp
             /**
              * 对于 message
              * {
-             *      type: String // Message或Alert
+             *      type: String // Message或Alert或LongMessage
              *      timeStamp: Number // 作为时间标识符
              *      content: String // 作为内容
+             *      state: String // 作为类型，选填
              *      leastTime: Number // Message或Alert的持续时间，选填
+             *      repeatTimes: Number // LongMessage的重复次数，选填
              * }
              */
+            let currentIndex = this.messageList.length;
+            if(message.type == 'LongMessage'){
+                // 检查是否有重合的
+                let longMessageIndex = this.messageList.findIndex(_message => _message.content == message.content)
+                // 如果有重合的，增加重复次数
+                if(longMessageIndex != -1){
+                    this.messageList[longMessageIndex].repeatTimes ++;
+                    return {
+                        destoryMessage: () => {
+                            if (this.messageList[longMessageIndex].repeatTimes > 1) {
+                                this.messageList[longMessageIndex].repeatTimes --;
+                                return;
+                            }
+                            this.messageList[longMessageIndex].state = 'hidden';
+                            
+                            setTimeout(() => {
+                                if (this.messageList[longMessageIndex].repeatTimes == 1) {
+                                    this.messageList = this.messageList.filter(_message => _message.content != message.content);
+                                    return;
+                                }
+                                
+                            }, 260);
+                        }
+                    }
+                }
+            }
             this.messageList.push(message);
-            setTimeout(() => {
-                this.messageList = this.messageList.filter(_message => _message.timeStamp != timeStamp);
-            }, message.leastTime || 7 * 1000);
-            return this.messageList.length - 1
+            switch (message.type) {
+                case 'Message':
+                    break;
+                case 'Alert':
+                    break;
+                case 'LongMessage':
+                    this.messageList[currentIndex]['repeatTimes'] = 1;
+                    this.messageList[currentIndex]['state'] = 'display';
+                    return {
+                        destoryMessage: () => {
+                            if (this.messageList[currentIndex].repeatTimes > 1) {
+                                this.messageList[currentIndex].repeatTimes --;
+                                return;
+                            }
+                            this.messageList[currentIndex].state = 'hidden';
+                            setTimeout(() => {
+                                if (this.messageList[currentIndex].repeatTimes == 1) {
+                                    this.messageList = this.messageList.filter(_message => _message.content != message.content);
+                                    return;
+                                }
+                            }, 260);
+                        }
+                    }
+                    break;
+                default:
+                    setTimeout(() => {
+                        this.messageList = this.messageList.filter(_message => _message.timeStamp != timeStamp);
+                    }, message.leastTime || 7 * 1000);
+                    return this.messageList.length - 1
+                    break;
+            }
         },
         // async destoryMessage(index) {
         //     this.messageList.splice(index, 1);
