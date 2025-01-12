@@ -736,12 +736,14 @@ pub fn run() {
             get_albums_songs_by_id,
             get_artists_songs_by_id,
             close_app
+            close_app,
+            get_low_quality_album_cover
         ])
         .setup(|app| {
             // 在应用程序启动时处理缓存刷新
-            if let Err(e) = handle_cache_refresh() {
                 eprintln!("Failed to refresh music cache during setup: {}", e);
-            }
+            init_application();
+
             Ok(())
         })
         .run(tauri::generate_context!())

@@ -1,5 +1,7 @@
 <script>
     import manager from '../../api/manager'
+import girdRowAlbum from "../../components/gridRowAlbum.vue"
+import album from '../../components/album_lazyLoad.vue'
     // import powerTable_music from '../../components/tracks/powerTable_,music.vue';
     export default{
         data(){
@@ -10,7 +12,7 @@
                 manager
             }
         },
-        // components:{powerTable_music},
+        components:{girdRowAlbum,album},
         created(){
             if(this.appState.runOnTauri) {
                 manager.tauri.getAlbums().then((res)=>{
@@ -39,7 +41,16 @@
         </iconWithText>
     </iconFlexRow> -->
     <br>
-    <iconFlexRow>
+    <girdRowAlbum>
+        <album @click="this.$router.push({
+            path: '/localAlbum/',
+            query: {
+                id: item.id,
+                type: 'local'
+            }
+        })"  v-for="(item) in albumList" :album="item"></album>
+    </girdRowAlbum>
+    <!-- <iconFlexRow>
         <iconWithText  @click="this.$router.push({
             path: '/localAlbum/',
             query: {
@@ -54,7 +65,7 @@
                 {{ item.name}}
             </template>
         </iconWithText>
-    </iconFlexRow>
+    </iconFlexRow> -->
     <!-- <powerTable_music :tableData="{
         cellArray:this.musicList
     }" /> -->

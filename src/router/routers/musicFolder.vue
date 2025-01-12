@@ -97,7 +97,6 @@ export default {
             </template>
         </iconWithText>
         </iconFlexRow>
-        <dialog_custom v-if="askAddLocalDirs == true" :cancel="()=>{askAddLocalDirs = false}" :finish="()=>{askAddLocalDirs = false;manager.tauri.addMusicDirs(addLocalDirInputValue);manager.tauri.refreshMusicCache(); refreshDirs()}">
         <dialog_vue v-if="askAddLocalDirs == true" :cancel="()=>{askAddLocalDirs = false}" :finish="()=>{askAddLocalDirs = false;manager.tauri.addMusicDirs(addLocalDirInputValue);manager.tauri.refreshMusicCache(); refreshDirs()}">
             <h2>
                 请输入一个地址
@@ -105,7 +104,6 @@ export default {
             <p class="tips">示例：C:\Users\gozaoo\Music\</p>
             <!-- <br> -->
             <input style="width: 210px" type="text" placeholder="" v-model="addLocalDirInputValue">
-        </dialog_custom>
         </dialog_vue>
         <folder @del="()=>{manager.tauri.removeMusicDirs(item);manager.tauri.refreshMusicCache(); refreshDirs()}" v-for="(item) in localFolders">
             <template #name>

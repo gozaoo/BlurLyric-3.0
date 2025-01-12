@@ -158,4 +158,4 @@ getArtistsSongsById: async (artistId) => await invoke("get_artists_songs_by_id",
 
 // 销毁对象URL
 destroyObjectURL: destroyObjectURL
-}
+}}

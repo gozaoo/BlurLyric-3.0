@@ -8,6 +8,7 @@ import manager from '../../api/manager';
 import powerTable_Music from '../../components/tracks/powerTable_music.vue';
 import baseMethods from '../../js/baseMethods';
 >>>>>>> Stashed changes
+import album from "../../components/album.vue"
 // import powerTable_Music from '../../components/tracks/powerTable_,music.vue';
 export default {
     data() {
@@ -23,6 +24,7 @@ export default {
         };
     },
     components: { powerTable_Music },
+    components: { powerTable_Music,album },
     watch: {
         // 监听$route对象中的params属性
         $route: {
@@ -62,32 +64,6 @@ export default {
     },
 };
 =======
-                        this.al_songs = al_songs
-                        baseMethods.sortByTrackNumber(al_songs)
-
-                    })
-                    break;
-                case 'online':
-
-                    break;
-                default:
-                    manager.tauri.getAlbumById(id).then((al) => {
-                        
-                        this.al = al
-                    })
-                    manager.tauri.getAlbumsSongsById(id).then((al_songs) => {
-
-                        this.al_songs = al_songs
-                        baseMethods.sortByTrackNumber(al_songs)
-
-
-                    })
-                    break;
-            }
-
-        }
-    }
-}
 >>>>>>> Stashed changes
 </script>
 

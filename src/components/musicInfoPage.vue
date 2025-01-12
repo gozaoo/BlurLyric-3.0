@@ -613,6 +613,7 @@ export default {
     font-size: 18px;
     font-weight: 900;
     color: #333;
+    color: #000c;
     width: 100%;
     word-break: break-all;
     overflow: hidden;
@@ -627,6 +628,7 @@ export default {
     font-size: 14px;
     /* font-weight: 900; */
     color: #676767;
+    color: #000000AD;
     width: 100%;
     word-break: break-all;
     overflow: hidden;
@@ -869,6 +871,7 @@ export default {
     font-size: 18px;
     font-weight: 900;
     color: #333;
+    color: #000c;
 }
 
 .currentMusic>.artists,
@@ -877,12 +880,14 @@ export default {
     font-size: 14px;
     /* font-weight: 900; */
     color: #676767;
+    color: #000000AD;
 
 }
 
 .control {
     display: flex;
     color: #333;
+    color: #000c;
     align-items: center;
     gap: 6px;
     flex: 0 1 0;
