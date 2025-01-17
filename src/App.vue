@@ -596,7 +596,6 @@ export default {
             }
         },
         async nextMusic() {
-            this.musicTrackIndex = this.getNextMusicIndex();
             let nextIndex = this.getNextMusicIndex();
 
             if (this.checkMusicIsUsable(this.musicTrackIndex) == false) {
@@ -613,20 +612,14 @@ export default {
                 await this.audioManagerConstruct(this.musicTrack[this.musicTrackIndex])
                 this.audioManager.play()
 
-            if (this.audioManager) this.audioManager.destroyThisManager()
-
-            await this.audioManagerConstruct(this.musicTrack[this.musicTrackIndex])
-            this.audioManager.play()
             }
         },
         async prevMusic() {
-            this.musicTrackIndex = this.getPrevMusicIndex();
             let nextIndex = this.getPrevMusicIndex()
 
             if (this.checkMusicIsUsable(this.musicTrackIndex) == false) {
                 return
             }
-            if (this.audioManager) this.audioManager.destroyThisManager()
             if (this.config.audio.smartStreamAudioList == true ) {
                 this.transitionNextMusic({
                     leastTime: 1000,
@@ -638,8 +631,6 @@ export default {
                 await this.audioManagerConstruct(this.musicTrack[this.musicTrackIndex])
                 this.audioManager.play()
 
-            await this.audioManagerConstruct(this.musicTrack[this.musicTrackIndex])
-            this.audioManager.play()
             }
         },
         checkMusicIsUsable(index) {
@@ -647,7 +638,6 @@ export default {
                 return false
             }
         },
-        async transitionNextMusic() {
         async transitionNextMusic(options = {
             nextIndex : this.getNextMusicIndex()
 
@@ -657,13 +647,11 @@ export default {
 
 
             // debugger
-            let nextMusicIndex = this.getNextMusicIndex();
             let nextMusicIndex = options.nextIndex;
             this.musicTrackIndex = nextMusicIndex;
             const nextSong = this.musicTrack[nextMusicIndex];
 
             let oldAudioManager = this.audioManager
-            let time = 1000 * (oldAudioManager.audioDom.duration - oldAudioManager.audioDom.currentTime); // 播放剩余时间
             let time = options.leastTime || 1000 * (oldAudioManager.audioDom.duration - oldAudioManager.audioDom.currentTime); // 播放剩余时间
 
             // 切换到新音频

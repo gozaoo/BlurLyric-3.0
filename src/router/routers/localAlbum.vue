@@ -1,13 +1,7 @@
 <script>
-<<<<<<< Updated upstream
 import manager from "../../api/manager";
 import powerTable_Music from "../../components/tracks/powerTable_music.vue";
 import baseMethods from "../../js/baseMethods";
-=======
-import manager from '../../api/manager';
-import powerTable_Music from '../../components/tracks/powerTable_music.vue';
-import baseMethods from '../../js/baseMethods';
->>>>>>> Stashed changes
 import album from "../../components/album.vue"
 // import powerTable_Music from '../../components/tracks/powerTable_,music.vue';
 export default {
@@ -23,7 +17,6 @@ export default {
             al_songs: [],
         };
     },
-    components: { powerTable_Music },
     components: { powerTable_Music,album },
     watch: {
         // 监听$route对象中的params属性
@@ -58,13 +51,10 @@ export default {
                 this.al_songs = al_songs;
                 baseMethods.sortByTrackNumber(this.al_songs)
 
-<<<<<<< Updated upstream
             });
         },
     },
 };
-=======
->>>>>>> Stashed changes
 </script>
 
 <template>

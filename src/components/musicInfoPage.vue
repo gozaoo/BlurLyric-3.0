@@ -612,7 +612,6 @@ export default {
 .currentMusic>.name {
     font-size: 18px;
     font-weight: 900;
-    color: #333;
     color: #000c;
     width: 100%;
     word-break: break-all;
@@ -627,7 +626,6 @@ export default {
 .next>.name {
     font-size: 14px;
     /* font-weight: 900; */
-    color: #676767;
     color: #000000AD;
     width: 100%;
     word-break: break-all;
@@ -870,7 +868,6 @@ export default {
 .currentMusic>.name {
     font-size: 18px;
     font-weight: 900;
-    color: #333;
     color: #000c;
 }
 
@@ -879,14 +876,12 @@ export default {
 .next>.name {
     font-size: 14px;
     /* font-weight: 900; */
-    color: #676767;
     color: #000000AD;
 
 }
 
 .control {
     display: flex;
-    color: #333;
     color: #000c;
     align-items: center;
     gap: 6px;

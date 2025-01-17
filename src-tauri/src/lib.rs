@@ -717,7 +717,7 @@ fn handle_cache_refresh() -> Result<(), String> {
 // Tauri应用入口点
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-    init_application();
+    // init_application();
 
     tauri::Builder::default()
         .plugin(tauri_plugin_shell::init())
@@ -735,13 +735,11 @@ pub fn run() {
             get_artist_by_id,
             get_albums_songs_by_id,
             get_artists_songs_by_id,
-            close_app
             close_app,
             get_low_quality_album_cover
+            // init_application
         ])
         .setup(|app| {
-            // 在应用程序启动时处理缓存刷新
-                eprintln!("Failed to refresh music cache during setup: {}", e);
             init_application();
 
             Ok(())
