@@ -749,8 +749,6 @@ pub fn run() {
             get_users_music_dir
         ])
         .setup(|app| {
-            // init_application();
-
             Ok(())
         })
         .run(tauri::generate_context!())
