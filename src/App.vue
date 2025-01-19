@@ -5,6 +5,7 @@ import leftBar from './components/leftBar.vue'
 import musicInfoPage from './components/musicInfoPage.vue'
 import manager from './api/manager'
 import messageDisplay from './components/messageDisplay.vue'
+import oobe from './components/oobe.vue'
 import {
     computed,
     ref,
@@ -58,7 +59,8 @@ export default {
         leftBar,
         rightBlock,
         musicInfoPage,
-        messageDisplay
+        messageDisplay,
+        oobe
     },
     data() {
         return {
@@ -790,6 +792,7 @@ export default {
 </script>
 
 <template>
+    <oobe />
     <messageDisplay />
     <topBar :titleOffsetTop="titleOffsetTop" :leftBarState="leftBarState">
         <template #title>

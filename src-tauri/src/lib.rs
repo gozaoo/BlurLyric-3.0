@@ -7,6 +7,8 @@ use std::collections::HashMap;
 use std::fs::{self, DirEntry};
 use std::io::Cursor;
 use std::path::PathBuf;
+// use arrayfire::{self, Dim4, Image as AfImage, interpolate, DataType};
+// use arrayfire::device::{set_device, DeviceType};
 use std::sync::Mutex;
 use tokio::fs as async_fs;
 lazy_static! {
@@ -126,7 +128,7 @@ fn resize_image(image: DynamicImage, max_resolution: u32) -> DynamicImage {
     if scale > 1.0 {
         let new_width = (width as f32 / scale) as u32;
         let new_height = (height as f32 / scale) as u32;
-        image.resize(new_width, new_height, FilterType::Nearest)
+        image.resize(new_width, new_height, FilterType::Lanczos3)
     } else {
         image
     }
@@ -498,14 +500,19 @@ fn next_album_id() -> u32 {
 }
 
 // 独立的方法，用于添加用户音乐文件夹
+#[tauri::command]
 fn add_users_music_dir() {
     if let Some(audio_dir) = dirs::audio_dir() {
         let audio_dir_path = audio_dir.to_str().unwrap().to_string();
         let _ = add_music_dirs(vec![audio_dir_path]);
     }
 }
-
+#[tauri::command]
+fn get_users_music_dir() -> String {
+    dirs::audio_dir().map(|dir| dir.to_str().unwrap().to_string()).unwrap_or_default()
+}
 // 程序启动时调用的方法
+#[tauri::command]
 fn init_application() {
     // 加载音乐缓存
     println!("initing application.");
@@ -517,19 +524,19 @@ fn init_application() {
 
     println!("checking config.");
     // 检查音乐目录是否为空
-    {
-        let mut music_dirs = MUSIC_DIRS.lock().unwrap();
-        if music_dirs.is_empty() {
-            if let Some(audio_dir) = dirs::audio_dir() {
-                music_dirs.push(audio_dir);
-                if let Err(e) = save_music_dirs_to_disk() {
-                    eprintln!("Failed to save updated music directories to disk: {}", e);
-                }
-            } else {
-                eprintln!("No default audio directory found.");
-            }
-        }
-    }
+    // {
+    //     let mut music_dirs = MUSIC_DIRS.lock().unwrap();
+    //     if music_dirs.is_empty() {
+    //         if let Some(audio_dir) = dirs::audio_dir() {
+    //             music_dirs.push(audio_dir);
+    //             if let Err(e) = save_music_dirs_to_disk() {
+    //                 eprintln!("Failed to save updated music directories to disk: {}", e);
+    //             }
+    //         } else {
+    //             eprintln!("No default audio directory found.");
+    //         }
+    //     }
+    // }
 
     println!("scanning music dirs.");
     // 刷新音乐缓存
@@ -736,11 +743,13 @@ pub fn run() {
             get_albums_songs_by_id,
             get_artists_songs_by_id,
             close_app,
-            get_low_quality_album_cover
-            // init_application
+            get_low_quality_album_cover,
+            init_application,
+            add_users_music_dir,
+            get_users_music_dir
         ])
         .setup(|app| {
-            init_application();
+            // init_application();
 
             Ok(())
         })

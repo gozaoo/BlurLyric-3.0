@@ -43,7 +43,10 @@ h2 {
 p.tips{
   font-size: 12px;color:#0006;
 }
-input{
+/**
+  输入框
+*/
+input[type="text"]{
   padding: 11px;
   border-radius: 11px;
   border: none;
@@ -51,9 +54,25 @@ input{
   /* outline: 0; */
   outline:  var(--color-input-outline-normal) solid  2px;
 }
-input:focus{
+input[type="text"]:focus{
   box-shadow: var(--Shadow-value-card-high);
   outline:  var(--color-button-active) solid  2px;
+}
+select{
+
+  margin-left: .7em;
+  padding: 7px;
+  border-radius: 9px;
+  border: none;
+  background-color: rgba(0, 0, 0, 0.03);
+  outline: var(--color-input-outline-normal) solid  2px;
+}
+option{
+  padding: 11px;
+  border-radius: 11px;
+  border: none;
+  background-color: rgba(0, 0, 0, 0.03);
+  outline: var(--color-input-outline-normal) solid  2px;
 }
 body{
   background-color: var(--mainBlockBackground);

@@ -1,46 +1,73 @@
 <script>
-    import manager from '../../api/manager'
+import manager from '../../api/manager'
 import girdRowAlbum from "../../components/gridRowAlbum.vue"
 import album from '../../components/album_lazyLoad.vue'
-    // import powerTable_music from '../../components/tracks/powerTable_,music.vue';
-    export default{
-        data(){
-            return {
-                albumList: [
+import conditioner from '../../components/tracks/conditioner.vue'
+// import powerTable_music from '../../components/tracks/powerTable_,music.vue';
+export default {
+    data() {
+        return {
+            albumList: [
 
-                ],
-                manager
-            }
-        },
-        components:{girdRowAlbum,album},
-        created(){
-            if(this.appState.runOnTauri) {
-                manager.tauri.getAlbums().then((res)=>{
-                this.albumList = [...this.albumList,...res]
-                });
+            ],
+            arraySortCondition: {
+				// 定义condition对象
+				filterFunction: (item) => {
+					const content = "";
+					return (
+						item.name.includes(content)
+					);
+				},
+				getKey: (item) => new String(item.track_number),
+				sortOrder: 'asc', // 可选参数，'asc'或'desc'
+			},
+            getKeyMethods: [
+                {
+                    id: 1,
+                    name: '专辑名',
+                    method: (item) => item.name
+                },
+                // {
+                //     id: 2,
+                //     name: '歌手',
+                //     method: (item) => item.artist.map(artist => artist.name).join(' ')
+                // },
 
-                
-            }
-            
-        },
-        inject:['appState','coverMusicTrack']
-    }
+            ],
+            manager
+        }
+    },
+    components: { girdRowAlbum, album, conditioner },
+    created() {
+        if (this.appState.runOnTauri) {
+            manager.tauri.getAlbums().then((res) => {
+                this.albumList = [...this.albumList, ...res]
+            });
+
+
+        }
+
+    },
+    inject: ['appState', 'coverMusicTrack']
+}
 </script>
 
 <template>
     <bodytitle text="全部专辑" />
-    <h2>共 {{ albumList.length }} 张 </h2> 
+    <h2>共 {{ albumList.length }} 张 </h2>
     <!-- <iconFlexRow>
         <iconWithText @click="manager.tauri.refreshMusicCache()" type="background" >
             <template #svg>
                 <i class="bi bi-play-fill"></i>
             </template>
-            <template #text>
+<template #text>
                 刷新
             </template>
-        </iconWithText>
-    </iconFlexRow> -->
-    <br>
+</iconWithText>
+</iconFlexRow> -->
+    <!-- <br> -->
+    <conditioner :condition="arraySortCondition" :getKeyMethods="getKeyMethods" @conditionChange="arraySortCondition = $event; console.log(arraySortCondition);
+    ; currentTable.cellArray = baseMethods.filterAndSort(tableData.cellArray, $event);"></conditioner>
     <girdRowAlbum>
         <album @click="this.$router.push({
             path: '/localAlbum/',
@@ -48,7 +75,7 @@ import album from '../../components/album_lazyLoad.vue'
                 id: item.id,
                 type: 'local'
             }
-        })"  v-for="(item) in albumList" :album="item"></album>
+        })" v-for="(item) in albumList" :album="item"></album>
     </girdRowAlbum>
     <!-- <iconFlexRow>
         <iconWithText  @click="this.$router.push({
@@ -72,11 +99,12 @@ import album from '../../components/album_lazyLoad.vue'
 </template>
 
 <style scoped>
-.buttomTrack{
+.buttomTrack {
     display: flex;
 
 }
-.buttomTrack>*{
+
+.buttomTrack>* {
     width: fit-content;
 }
 </style>

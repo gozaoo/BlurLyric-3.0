@@ -88,6 +88,9 @@ const enum_resolutions = {
 // 导出API函数
 export default {
     // 获取音乐列表
+    initApplication: ()=>{
+        return invoke('init_application') 
+    },
     getMusicList: async () => await invoke("get_music_list"),
     
     enum_resolutions,
@@ -157,5 +160,13 @@ getAlbumsSongsById: async (albumId) => await invoke("get_albums_songs_by_id", { 
 getArtistsSongsById: async (artistId) => await invoke("get_artists_songs_by_id", { artistId: Number(artistId) }),
 
 // 销毁对象URL
-destroyObjectURL: destroyObjectURL
+destroyObjectURL: destroyObjectURL,
+
+/**
+ * Adds a user's music directory.
+ * @param {string} dir - The directory to add.
+ * @returns {Promise<any>} - A promise that resolves when the directory is added.
+ */
+addUsersMusicDir: async (dir) => await invoke("add_users_music_dir", { dir }),
+getUsersMusicDir: async () => await invoke("get_users_music_dir"),
 }
