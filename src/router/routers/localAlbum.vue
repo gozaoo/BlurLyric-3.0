@@ -64,14 +64,7 @@ export default {
     </div>
     <bodytitle :text="'专辑 \n' + al.name" />
     <h2>共 {{ al_songs.length }} 首</h2>
-    <div class="buttomTrack">
-        <iconWithText @click="coverMusicTrack(this.al_songs)" type="background">
-            <template #svg>
-                <i class="bi bi-play-fill"></i>
-            </template>
-            <template #text> 播放全部 </template>
-        </iconWithText>
-    </div>
+
     <br />
     <powerTable_Music :noCover="true" :tableData="{
         cellArray: this.al_songs,

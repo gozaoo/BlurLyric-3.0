@@ -1,6 +1,14 @@
 <template>
-	<conditioner :condition="arraySortCondition" @conditionChange="arraySortCondition = $event;console.log(arraySortCondition);
-	;currentTable.cellArray = baseMethods.filterAndSort(tableData.cellArray, $event);"/>
+	<div class="buttomTrack">
+		<iconWithText @click="coverMusicTrack(this.currentTable.cellArray)" type="background">
+			<template #svg>
+				<i class="bi bi-play-fill"></i>
+			</template>
+			<template #text> 播放全部 </template>
+		</iconWithText>
+	</div><br>
+	<conditioner :condition="arraySortCondition" @conditionChange="arraySortCondition = $event; console.log(arraySortCondition);
+	;currentTable.cellArray = baseMethods.filterAndSort(tableData.cellArray, $event);" />
 	<div class="table-container">
 		<!--内容标题-->
 		<div ref="table_name" class="table-name">
@@ -81,8 +89,8 @@
 							}) }}
 						</span>
 						<!--图片类型-->
-						<lazy-load-cover-image-vue v-if="item.type == 'image' && shouldDisplayIndexRange[0] <= line_index"
-							:id='item.path.apply({
+						<lazy-load-cover-image-vue
+							v-if="item.type == 'image' && shouldDisplayIndexRange[0] <= line_index" :id='item.path.apply({
 								line, line_index, item, index
 							})' style="border-radius: 5%;left:0;top:0;height: 100%;width: 100%;position: absolute;">
 						</lazy-load-cover-image-vue>
@@ -295,10 +303,13 @@ export default {
 					src: null
 				}]
 			},
-			lastClick: {
+			lastClick: [{
 				index: 0,
 				timeStamp: Date.now()
-			},
+			}, {
+				index: 0,
+				timeStamp: Date.now()
+			}],
 			shouldDisplayIndexRange: [-1, 0]
 		}
 	},
@@ -323,13 +334,35 @@ export default {
 			let newTimestamp = Date.now();
 			// console.log("pushed",this.currentTable.cellArray[line_index]);
 
-			if (this.lastClick.index == line_index && newTimestamp - this.lastClick.timeStamp < 300) {
-				this.pushMusic(this.currentTable.cellArray[line_index]);
-				// console.log("pushed",this.currentTable.cellArray[line_index]);
+			if (this.lastClick[0].index == line_index && newTimestamp - this.lastClick[0].timeStamp < 300) {
+				// 触发切歌事件
+				let hasBeenActived = false;
 
+				// 如果连续按了三次，则覆盖当前播放列表
+				if (
+					(2 * (newTimestamp) - this.lastClick[0].timeStamp - this.lastClick[1].timeStamp < 600) && // 确保是三次快速点击
+					this.lastClick[0].index == line_index && // 确保是同一首歌
+					this.lastClick[1].index == line_index
+				) {
+					coverMusicTrack(this.currentTable.cellArray, line_index)
+					hasBeenActived = true;
+
+				}
+
+				// 当前歌单是当前播放歌单，则切到当前index
+				if (hasBeenActived == false&&Object.is(this.musicTrack, this.currentTable.cellArray)) {
+					this.nextMusic(line_index)
+				} else if(hasBeenActived == false) {
+					// 否则将选中曲目插入播放列表
+					this.pushMusic(this.currentTable.cellArray[line_index]);
+				}
 			}
-			this.lastClick.index = line_index
-			this.lastClick.timeStamp = newTimestamp
+			this.lastClick[1].index = this.lastClick[0].index
+			this.lastClick[1].timeStamp = this.lastClick[0].timeStamp
+
+			this.lastClick[0].index = line_index
+			this.lastClick[0].timeStamp = newTimestamp
+
 		},
 		freshShouldDisplay() {
 			const gap = 4;
@@ -377,6 +410,6 @@ export default {
 		// 	immediate: true
 		// }
 	},
-	inject: ['scrollState', 'pushMusic', 'pushMusicTrack', 'coverMusicTrack', 'cleanUpMusicTrack']
+	inject: ['nextMusic', 'musicTrack', 'scrollState', 'pushMusic', 'pushMusicTrack', 'coverMusicTrack', 'cleanUpMusicTrack']
 }
 </script>

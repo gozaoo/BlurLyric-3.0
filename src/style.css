@@ -32,6 +32,8 @@ h2 {
 	--Shadow-value-normal:0px 0px 0.1875em #0005;
 	--Shadow-value-low:0px 0px 0.3125em #0002;
 	--Shadow-value-offsetY-low:0px 0.125em 0.4375em #0002;
+  /** 18px = 1em */
+  --Shadow-value-offsetY-high:rgba(255, 255, 255, 0.1) 0px 1px 1px 0px inset, rgba(50, 50, 93, 0.25) 0px 50px 100px -20px, rgba(0, 0, 0, 0.1) 0px 30px 60px -30px;
 	--fontColor-content-normal:#000;
 	--fontColor-content-unimportant:#555;
 	--fontColor-content-moreUnimportant:#888;

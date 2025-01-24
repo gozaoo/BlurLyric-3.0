@@ -129,7 +129,24 @@ export default {
                 screenType: null, // ['landscape','portrai,'mini']
             },
             source: {
-                local: [],
+                local: {
+                    musicList: {
+                        lastUpdateTimestamp: 0,
+                        data: []
+                    },
+                    folders: {
+                        lastUpdateTimestamp: 0,
+                        data: []
+                    },
+                    albums: {
+                        lastUpdateTimestamp: 0,
+                        data: []
+                    },
+                    artists: {
+                        lastUpdateTimestamp: 0,
+                        data: []
+                    },
+                },
                 online: [{
                     name: 'API1',
                     type: 'NeteaseCloudMusicApi',
@@ -223,12 +240,12 @@ export default {
             }
             this.musicTrack.concat(musicTrack)
         },
-        async coverMusicTrack(musicTrack) {
+        async coverMusicTrack(musicTrack, musicTrackIndex = 0) {
 
             if (this.audioManager) this.audioManager.destroyThisManager()
 
             this.musicTrack = musicTrack;
-            this.musicTrackIndex = 0;
+            this.musicTrackIndex = musicTrackIndex;
 
             await this.audioManagerConstruct(this.musicTrack[this.musicTrackIndex])
             this.audioManager.play()
@@ -597,8 +614,8 @@ export default {
 
             }
         },
-        async nextMusic() {
-            let nextIndex = this.getNextMusicIndex();
+        async nextMusic(index) {
+            let nextIndex = index || this.getNextMusicIndex();
 
             if (this.checkMusicIsUsable(this.musicTrackIndex) == false) {
                 return

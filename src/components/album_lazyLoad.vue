@@ -43,7 +43,10 @@ export default {
         }
     },
     mounted(){
-        this.updateShow()
+        requestAnimationFrame(()=>{
+            this.updateShow()
+        })
+        // this.updateShow()
     },
     inject: ['scrollState'],
     watch: {
