@@ -121,11 +121,11 @@ export default {
             this.musicInfoPagePosition = "toTop";
 
             // 记录当前时间戳，用于判断动画是否完成
-            const timeStamps = Date.now();
+            let timeStamps = Date.now();
             this.changePositionTimeStamps = timeStamps;
 
             // 判断是否仍为当前动画的函数
-            const stillIsThisAnimation = () => this.changePositionTimeStamps === timeStamps;
+            const stillIsThisAnimation = () => this.changePositionTimeStamps == timeStamps;
 
             // 移动页面到顶部
             anime({
@@ -155,7 +155,7 @@ export default {
 
             // 取消模糊效果
             setTimeout(() => {
-                if (stillIsThisAnimation()) {
+                if (stillIsThisAnimation()== true) {
                     anime.set(this.$refs.musicInfoPageRow, {
                         background: 'rgb(233,233,233)',
                         backdropFilter: 'blur(0px)'
@@ -165,7 +165,7 @@ export default {
 
             // 显示主容器
             setTimeout(() => {
-                if (stillIsThisAnimation()) {
+                if (stillIsThisAnimation() == true) {
                     anime({
                         targets: this.$refs.mainContainer,
                         opacity: 1,

@@ -1,6 +1,9 @@
 <script>
 import flexColumnRow from '../../components/flexColumnRow.vue';
 import musicCard from '../../components/musicCard.vue';
+import album from '../../components/album.vue'
+import girdRowAlbum from "../../components/gridRowAlbum.vue"
+import manager from '../../api/manager';
 
 export default {
     data() {
@@ -8,15 +11,28 @@ export default {
             title: 'Loading...',
             description: '',
             intervalId: null,
+            randomAlbum: [],
         }
     },
     components: {
         flexColumnRow,
         musicCard,
+        girdRowAlbum, album
+
     },
     created() {
         this.updateTitleAndDescription(); // 初始化标题和描述
         this.intervalId = setInterval(this.updateTitleAndDescription, 5 * 60 * 1000); // 每5分钟更新一次标题和描述
+    },
+    async mounted() {
+        console.log(this.source);
+        // 从本地数据this.source.local.albums.data中，不打乱原数组地随机选择4张专辑
+        this.randomAlbum = this.source.local.albums.data.sort(() => Math.random() - 0.5).slice(0, 4);
+        // 监听专辑数据缓存更新事件，当专辑数据缓存更新时，重新随机选择4张专辑
+        manager.tauri.onCacheUpdate('albums', () => {
+            this.randomAlbum = this.source.local.albums.data.sort(() => Math.random() - 0.5).slice(0, 4);
+        });
+        
     },
     methods: {
         updateTitleAndDescription() {
@@ -42,7 +58,8 @@ export default {
     },
     beforeUnmount() {
         clearInterval(this.intervalId);
-    }
+    },
+    inject: ['source'],
 }
 </script>
 
@@ -51,7 +68,7 @@ export default {
     <h1>
         <span style="font-size: .7em;">{{ description }}</span>
     </h1>
-    <iconFlexRow>
+    <!-- <iconFlexRow>
 
         <iconWithText @click="this.$router.push('/allmusic/')" type="background">
             <template #svg>
@@ -78,9 +95,20 @@ export default {
             </template>
         </iconWithText>
     </iconFlexRow>
+    <h1>
+        <span style="font-size: .7em;">听听专辑</span>
+       
+    </h1> -->
 
-
-
+    <girdRowAlbum >
+        <album @click="this.$router.push({
+            path: '/localAlbum/',
+            query: {
+                id: item.id,
+                type: 'local'
+            }
+        })" v-for="(item) in randomAlbum" :noTitle="true" :album="item"></album>
+    </girdRowAlbum>
 </template>
 
 <style scoped></style>

@@ -3,6 +3,9 @@ const router =[
         path: '/', component: ()=>import('./routers/home.vue')
     },
     {
+        path: '/search/', component: ()=>import('./routers/search.vue')
+    },
+    {
         path: '/allmusic/', component: ()=>import('./routers/allMusic.vue')
     },
     {

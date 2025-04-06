@@ -1,7 +1,6 @@
 <script>
 import manager from '../../api/manager';
 
-manager
 export default {
   data() {
     return {

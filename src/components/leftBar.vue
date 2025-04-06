@@ -43,7 +43,7 @@ watch(
   user-select: none;
   display: flex;
   flex-direction: column;
-  padding: 50px 7px 0 7px;
+  padding: 50px 7px 95px 7px;
   margin-top: -50px;
   z-index: 1;
   background-color: #eee;

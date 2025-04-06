@@ -36,7 +36,8 @@
         user-select: none;
         cursor: pointer;
         overflow: hidden;
-        min-height: 36px;
+  transition: all 0.15s ease-in-out;
+  min-height: 36px;
     }
     .buttom:hover{
         background-color: #00000008;

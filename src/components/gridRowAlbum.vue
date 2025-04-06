@@ -14,6 +14,7 @@
   .grid-container {
     display: grid;
     gap: 36px 48px;
-    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    /* width: ; */
+    grid-template-columns: repeat(auto-fit, minmax(130px,1fr));
   }
   </style>

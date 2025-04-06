@@ -3,8 +3,15 @@ import manager from '../../api/manager'
 import girdRowAlbum from "../../components/gridRowAlbum.vue"
 import album from '../../components/album_lazyLoad.vue'
 import conditioner from '../../components/tracks/conditioner.vue'
+import baseMethods from '../../js/baseMethods'
 // import powerTable_music from '../../components/tracks/powerTable_,music.vue';
 export default {
+    methods: {
+        handleConditionChange(event) {
+            this.arraySortCondition = event;
+            this.albumList = baseMethods.filterAndSort([...this.albumList], event);
+        }
+    },
     data() {
         return {
             albumList: [
@@ -66,8 +73,7 @@ export default {
 </iconWithText>
 </iconFlexRow> -->
     <!-- <br> -->
-    <conditioner :condition="arraySortCondition" :getKeyMethods="getKeyMethods" @conditionChange="arraySortCondition = $event; console.log(arraySortCondition);
-    ; currentTable.cellArray = baseMethods.filterAndSort(tableData.cellArray, $event);"></conditioner>
+    <conditioner class="conditioner" :condition="arraySortCondition" :getKeyMethods="getKeyMethods" @conditionChange="handleConditionChange"></conditioner>
     <girdRowAlbum>
         <album @click="this.$router.push({
             path: '/localAlbum/',

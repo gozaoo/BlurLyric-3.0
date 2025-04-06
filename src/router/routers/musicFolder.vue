@@ -42,13 +42,9 @@ export default {
         },
     },
     methods: {
-        async refreshDirs() {
-            let result = await manager.tauri.getAllMusicDirs()
-            this.localFolders = result;
-        }
+
     },
     async created() {
-        this.refreshDirs()
     },
     inject: ['appState', 'source']
 }
@@ -61,13 +57,13 @@ export default {
         <h2>管理本地文件夹</h2>
         <iconFlexRow>
 
-            <iconWithText @click="manager.tauri.refreshMusicCache(); refreshDirs()" type="background">
+            <iconWithText @click="manager.tauri.refreshMusicCache();" type="background">
                 <template #icon>
                     <i class="bi bi-arrow-clockwise"></i>
                 </template>
                 <template #text>刷新</template>
             </iconWithText>
-            <iconWithText @click="askAddLocalDirs= true" type="background">
+            <iconWithText @click="askAddLocalDirs = true" type="background">
                 <template #icon>
                     <i class="bi bi-plus-circle-dotted"></i>
                 </template>
@@ -80,24 +76,26 @@ export default {
                 <template #text>
                     全部音乐
                 </template>
-            </iconWithText>        <iconWithText @click="this.$router.push('/allLocalArtist/')" type="background">
-            <template #svg>
-                <i class="bi bi-person-circle"></i>
-            </template>
-            <template #text>
-                所有本地艺人
-            </template>
-        </iconWithText>
-        <iconWithText @click="this.$router.push('/allLocalAlbum/')" type="background">
-            <template #svg>
-                <i class="bi bi-disc-fill"></i>
-            </template>
-            <template #text>
-                所有本地专辑
-            </template>
-        </iconWithText>
+            </iconWithText>
+            <iconWithText @click="this.$router.push('/allLocalArtist/')" type="background">
+                <template #svg>
+                    <i class="bi bi-person-circle"></i>
+                </template>
+                <template #text>
+                    所有本地艺人
+                </template>
+            </iconWithText>
+            <iconWithText @click="this.$router.push('/allLocalAlbum/')" type="background">
+                <template #svg>
+                    <i class="bi bi-disc-fill"></i>
+                </template>
+                <template #text>
+                    所有本地专辑
+                </template>
+            </iconWithText>
         </iconFlexRow>
-        <dialog_vue v-if="askAddLocalDirs == true" :cancel="()=>{askAddLocalDirs = false}" :finish="()=>{askAddLocalDirs = false;manager.tauri.addMusicDirs(addLocalDirInputValue);manager.tauri.refreshMusicCache(); refreshDirs()}">
+        <dialog_vue v-if="askAddLocalDirs == true" :cancel="() => { askAddLocalDirs = false }"
+            :finish="() => { askAddLocalDirs = false; manager.tauri.addMusicDirs(addLocalDirInputValue); manager.tauri.refreshMusicCache(); }">
             <h2>
                 请输入一个地址
             </h2>
@@ -105,7 +103,8 @@ export default {
             <!-- <br> -->
             <input style="width: 210px" type="text" placeholder="" v-model="addLocalDirInputValue">
         </dialog_vue>
-        <folder @del="()=>{manager.tauri.removeMusicDirs(item);manager.tauri.refreshMusicCache(); refreshDirs()}" v-for="(item) in localFolders">
+        <folder @del="() => { manager.tauri.removeMusicDirs(item); manager.tauri.refreshMusicCache();  }"
+            v-for="(item) in source.local.folders.data">
             <template #name>
                 <!-- {{item.split('/')[-1]}} -->
             </template>
@@ -114,7 +113,7 @@ export default {
             </template>
 
         </folder>
-        <p class="tips" v-if="localFolders.length == 0">当前还没有添加的目录，请先添加</p>
+        <p class="tips" v-if="source.local.folders.data.length == 0">当前还没有添加的目录，请先添加</p>
     </div>
     <h2>在线来源</h2>
     <iconWithText type="background">

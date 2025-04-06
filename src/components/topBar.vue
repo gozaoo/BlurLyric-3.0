@@ -29,9 +29,7 @@ export default{
     </iconToClick>
     <div  data-tauri-drag-region class="drag" >
       <div class="blur"></div>
-      <div :style="{
-        '--paddingTop':titleOffsetTop+'px'
-      }" data-tauri-drag-region class="title">
+      <div data-tauri-drag-region class="title">
         <slot name="title" />
         <slot name="appname"/>
       </div> 
@@ -46,7 +44,6 @@ export default{
   .topbar{
     height: 34px;
     display: flex;
-    align-items: center;
     gap: 7px;
     width: 100%;
     margin: -8px 0 0 -8px;
@@ -70,7 +67,6 @@ export default{
     /* padding-top: 24px; */
     font-weight: 900;
     color: #222;
-    transform: translateY(max(15px,var(--paddingTop)));
     padding-left: 16px;
     transition: 0.25s cubic-bezier(.5,.3,.2,1);
     width: 100%;
@@ -90,6 +86,7 @@ export default{
     backdrop-filter: blur(12px);
     transition: 0.25s cubic-bezier(.5,.3,.2,1);
     z-index: -1;
+    margin-top: -7px;
     mask-image: linear-gradient(180deg,#000f 0%,#000f 76%,transparent 100%);
   }
   .wide .blur{

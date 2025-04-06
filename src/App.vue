@@ -76,7 +76,11 @@ export default {
             titles: [
 
             ],
-            title: '主页',
+            title: {
+                type: 'text',
+                text: '主页',
+                components: []
+            },
             titleOffsetTop: 0,
             transitionNextMusicWorking: false,
             config: {
@@ -172,6 +176,10 @@ export default {
             checkMusicListIsEmpty: this.checkMusicListIsEmpty,
             musicTrack: computed(() => this.musicTrack),
             musicTrackIndex: computed(() => this.musicTrackIndex),
+            source: computed(() => ({
+                local: this.source.local,
+                online: this.source.online
+            })),
 
             audioManager: computed(() => this.audioManager),
             audioState: computed(() => this.audioState),
@@ -278,14 +286,18 @@ export default {
         },
         /**
          * 处理标题和主内容框滚动事件
-         * @param text String
+         * @param detail Object
          * @param offsetTop Number
          * @param minHiddenTop Number
          */
-        regTitle(text, offsetTop, minHiddenTop) {
+        regTitle(detail = {
+            type: 'text',
+            text: '主页',
+            components: []
+        }, offsetTop, minHiddenTop) {
             let currentIndex = this.title.length;
             this.titles.push({
-                text,
+                detail,
                 offsetTop,
                 minHiddenTop
             });
@@ -322,7 +334,7 @@ export default {
             }
 
             if (activeTitle) {
-                this.title = activeTitle.text;
+                this.title = activeTitle;
                 this.titleOffsetTop = titleOffsetTop;
             }
         },
@@ -347,7 +359,7 @@ export default {
                     return false
                 }
             }
-            const destroyObjectURLMethod = () => {
+            let destroyObjectURLMethod = () => {
 
             }
             if (baseMethods.isPossibleLocalPath(newSong.src)) {
@@ -620,7 +632,7 @@ export default {
             if (this.checkMusicIsUsable(this.musicTrackIndex) == false) {
                 return
             }
-            if (this.config.audio.smartStreamAudioList == true ) {
+            if (this.config.audio.smartStreamAudioList == true) {
                 this.transitionNextMusic({
                     leastTime: 1000,
                     nextIndex: nextIndex
@@ -639,7 +651,7 @@ export default {
             if (this.checkMusicIsUsable(this.musicTrackIndex) == false) {
                 return
             }
-            if (this.config.audio.smartStreamAudioList == true ) {
+            if (this.config.audio.smartStreamAudioList == true) {
                 this.transitionNextMusic({
                     leastTime: 1000,
                     nextIndex: nextIndex
@@ -658,7 +670,7 @@ export default {
             }
         },
         async transitionNextMusic(options = {
-            nextIndex : this.getNextMusicIndex()
+            nextIndex: this.getNextMusicIndex()
 
         }) {
             if (this.transitionNextMusicWorking == true) return;
@@ -721,26 +733,26 @@ export default {
              * }
              */
             let currentIndex = this.messageList.length;
-            if(message.type == 'LongMessage'){
+            if (message.type == 'LongMessage') {
                 // 检查是否有重合的
                 let longMessageIndex = this.messageList.findIndex(_message => _message.content == message.content)
                 // 如果有重合的，增加重复次数
-                if(longMessageIndex != -1){
-                    this.messageList[longMessageIndex].repeatTimes ++;
+                if (longMessageIndex != -1) {
+                    this.messageList[longMessageIndex].repeatTimes++;
                     return {
                         destoryMessage: () => {
                             if (this.messageList[longMessageIndex].repeatTimes > 1) {
-                                this.messageList[longMessageIndex].repeatTimes --;
+                                this.messageList[longMessageIndex].repeatTimes--;
                                 return;
                             }
                             this.messageList[longMessageIndex].state = 'hidden';
-                            
+
                             setTimeout(() => {
                                 if (this.messageList[longMessageIndex].repeatTimes == 1) {
                                     this.messageList = this.messageList.filter(_message => _message.content != message.content);
                                     return;
                                 }
-                                
+
                             }, 260);
                         }
                     }
@@ -758,7 +770,7 @@ export default {
                     return {
                         destoryMessage: () => {
                             if (this.messageList[currentIndex].repeatTimes > 1) {
-                                this.messageList[currentIndex].repeatTimes --;
+                                this.messageList[currentIndex].repeatTimes--;
                                 return;
                             }
                             this.messageList[currentIndex].state = 'hidden';
@@ -802,7 +814,56 @@ export default {
         })
     },
     mounted() {
-        // this.audioManagerConstruct(this.currentMusicInfo)
+        // 当tauri API存在时，初始化本地资源
+        if (this.appState.runOnTauri) {
+            // 初始化加载数据
+            const loadInitialData = async () => {
+                try {
+                    // 调用initApplication初始化应用，它会执行一次refreshMusicCache
+                    await manager.tauri.initApplication();
+                    // 加载数据到前端缓存
+                    await manager.tauri.getMusicList();
+                    await manager.tauri.getAllMusicDirs();
+                    await manager.tauri.getAlbums();
+                    await manager.tauri.getArtists();
+                } catch (error) {
+                    console.error('初始化数据加载失败:', error);
+                }
+            };
+
+            // 建立缓存响应式绑定
+            this.source.local = {
+                get musicList() {
+                    return manager.tauri.appLocalCache.musicList;
+                },
+                get folders() {
+                    return manager.tauri.appLocalCache.folders;
+                },
+                get albums() {
+                    return manager.tauri.appLocalCache.albums;
+                },
+                get artists() {
+                    return manager.tauri.appLocalCache.artists;
+                }
+            };
+
+            // 启动自动更新监听
+            const createUpdateListener = (type) => {
+                return (newData) => {
+                    console.log(`Cache updated for ${type}:`, newData);
+                    this.source.local[type].data = newData;
+                    this.source.local[type].lastUpdateTimestamp = Date.now();
+                };
+            };
+
+            // 注册缓存更新回调
+            manager.tauri.onCacheUpdate('musicList', createUpdateListener('musicList'));
+            manager.tauri.onCacheUpdate('folders', createUpdateListener('folders'));
+            manager.tauri.onCacheUpdate('albums', createUpdateListener('albums'));
+            manager.tauri.onCacheUpdate('artists', createUpdateListener('artists'));
+
+            loadInitialData();
+        }
     },
     watch: {}
 }
@@ -831,16 +892,27 @@ export default {
                     </template>
                 </iconWithText>
 
-                <!--音乐目录-->
-                <iconWithText style="width: 100%;" @click="this.$router.push('/musicFolder/')"
+                <iconWithText style="width: 100%;" @click="this.$router.push('/')"
                     :type="(leftBarState == 'short') ? 'hidden' : null">
                     <template #svg>
-                        <i class="bi bi-folder-fill"></i>
+                        <i class="bi bi-collection-fill"></i>
                     </template>
                     <template #text>
-                        音乐来源
+                        我的收藏
                     </template>
                 </iconWithText>
+                
+                <iconWithText style="width: 100%;" @click="this.$router.push('/search/')"
+                    :type="(leftBarState == 'short') ? 'hidden' : null">
+                    <template #svg>
+                        <i class="bi bi-search"></i>
+                    </template>
+                    <template #text>
+                        搜索
+                    </template>
+                </iconWithText>
+                <!--placeholder-->
+                <div style="margin-top: auto;"></div>
 
 
                 <iconWithText style="width: 100%;" @click="this.$router.push('/musicTrack/')"

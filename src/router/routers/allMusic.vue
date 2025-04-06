@@ -25,17 +25,6 @@
 <template>
     <bodytitle text="全部音乐" />
     <h2>共 {{ musicList.length }} 首 </h2> 
-    <div class="buttomTrack">
-        <iconWithText @click="coverMusicTrack(this.musicList)" type="background" >
-            <template #svg>
-                <i class="bi bi-play-fill"></i>
-            </template>
-            <template #text>
-                播放全部
-            </template>
-        </iconWithText>
-    </div>
-    <br>
     <powerTable_music :tableData="{
         cellArray:this.musicList
     }" />

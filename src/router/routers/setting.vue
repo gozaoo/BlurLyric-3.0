@@ -1,57 +1,68 @@
 <script>
-    import FlexColumnRow from '../../components/flexColumnRow.vue';
-    import toggle_lineRow from '../../components/tracks/toggle-line.vue'
-    import linkLine from '../../components/tracks/link-line.vue';
-    import tracksRow from '../../components/tracks/tracksRow.vue'
+import FlexColumnRow from '../../components/flexColumnRow.vue';
+import toggle_lineRow from '../../components/tracks/toggle-line.vue'
+import linkLine from '../../components/tracks/link-line.vue';
+import tracksRow from '../../components/tracks/tracksRow.vue'
 
-    export default {
-        data() {
-            return {
-                localConfig: {
+export default {
+    data() {
+        return {
+            localConfig: {
 
-                },
-                test: false,
-                test_true: true
-            }
-        },
-        components: {
-            toggle_lineRow,
-            tracksRow,
-            linkLine
-        },
-        methods: {
-            refreshConfig(){
-                this.localConfig = this.config;
-            }
-        },
-        inject:['config','editConfig'],
-        created(){
-            this.refreshConfig()
-        },
-        watch:{
-            config:{
-                handler: (newVal)=>{
-                    this.refreshConfig()
-                }
             },
-            localConfig:{
-                deep:true,
-                handler:function(){
-                    console.log(this.localConfig);
-                    
-                    this.editConfig(()=>{
-                        return this.localConfig
-                    })
-                    
-                }
+            test: false,
+            test_true: true
+        }
+    },
+    components: {
+        toggle_lineRow,
+        tracksRow,
+        linkLine
+    },
+    methods: {
+        refreshConfig() {
+            this.localConfig = this.config;
+        }
+    },
+    inject: ['config', 'editConfig'],
+    created() {
+        this.refreshConfig()
+    },
+    watch: {
+        config: {
+            handler: (newVal) => {
+                this.refreshConfig()
+            }
+        },
+        localConfig: {
+            deep: true,
+            handler: function () {
+                console.log(this.localConfig);
+
+                this.editConfig(() => {
+                    return this.localConfig
+                })
+
             }
         }
     }
+}
 </script>
 
 <template>
     <bodytitle text="设置" />
+    <h2>来源管理</h2>
+    <tracksRow>
 
+        <linkLine @click="this.$router.push('/musicFolder/')">
+            <template #icon>
+                <i class="bi bi-folder-fill"></i>
+            </template>
+            <template #text>
+                音乐来源
+            </template>
+        </linkLine>
+    </tracksRow>
     <h2>显示</h2>
     <tracksRow>
         <toggle_lineRow :type="'unavailable'" v-model="test_true">
@@ -62,7 +73,7 @@
                 使用毛玻璃效果 (**当前功能不可用)
             </template>
         </toggle_lineRow>
-    </tracksRow>    
+    </tracksRow>
     <tracksRow>
         <toggle_lineRow :type="'unavailable'" v-model="test">
             <template #icon>
@@ -97,7 +108,7 @@
     </tracksRow>
     <h2>基本（敬请期待）</h2>
     <tracksRow>
-        <toggle_lineRow  :type="'unavailable'" v-model="test">
+        <toggle_lineRow :type="'unavailable'" v-model="test">
             <template #icon>
                 <i class="bi bi-translate"></i>
             </template>
@@ -134,12 +145,12 @@
 </template>
 
 <style scoped>
-    .buttomTrack {
-        display: flex;
+.buttomTrack {
+    display: flex;
 
-    }
+}
 
-    .buttomTrack>* {
-        width: fit-content;
-    }
+.buttomTrack>* {
+    width: fit-content;
+}
 </style>

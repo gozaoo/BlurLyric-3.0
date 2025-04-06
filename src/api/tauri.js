@@ -5,31 +5,42 @@ import app from '../main.js';
 const objectURLCache = new Map();
 const objectURLCounter = new Map();
 const requestCache = new Map();
-
+// 应用本地数据缓存结构
+const onCacheUpdateListeners = new Map();
+const appLocalDataCache = {
+    musicList: {
+        lastUpdateTimestamp: 0,
+        data: []
+    },
+    folders: {
+        lastUpdateTimestamp: 0,
+        data: []
+    },
+    albums: {
+        lastUpdateTimestamp: 0,
+        data: []
+    },
+    artists: {
+        lastUpdateTimestamp: 0,
+        data: []
+    },
+};
 // 统一状态更新方法
 const updateAppLocalData = (path, data) => {
-    // const parts = path.split('.');
-    // let current = app.source.local;
-    
-    // for (let i = 0; i < parts.length - 1; i++) {
-    //     const part = parts[i];
-    //     current[part] = current[part] || {};
-    //     current = current[part];
-    // }
-    
-    // const lastPart = parts[parts.length - 1];
-    // current[lastPart] = {
-    //     data,
-    //     lastUpdateTimestamp: Date.now()
-    // };
+    if (appLocalDataCache[path] !== undefined) {
+        appLocalDataCache[path].data = data;
+        appLocalDataCache[path].lastUpdateTimestamp = Date.now();
+        onCacheUpdateListeners.get(path)?.forEach(callback => callback(data));
+    } else {
+        console.error(`Invalid cache path: ${path}`);
+    }
 };
-
 const setObjectURL = (id, objectURL) => {
     if (objectURLCache.has(id)) {
         objectURLCounter.set(id, objectURLCounter.get(id) + 1);
         return objectURLCache.get(id);
     }
-    
+
     objectURLCache.set(id, objectURL);
     objectURLCounter.set(id, 1);
     return objectURL;
@@ -39,7 +50,7 @@ const getObjectURL = (id) => {
     if (!objectURLCache.has(id)) {
         throw new Error(`Object URL for ${id} is not available.`);
     }
-    
+
     objectURLCounter.set(id, objectURLCounter.get(id) + 1);
     return objectURLCache.get(id);
 };
@@ -95,8 +106,8 @@ const handleAPIRequest = async (key, invokeFunction, params) => {
 // 使用全大写命名常量
 const RESOLUTIONS = {
     ORIGIN: 0,
-    MIN: 46,
-    NORMAL: 46 * 4,
+    MIN: 46*2,
+    NORMAL: 46 * 8,
     HIGH: 1024
 };
 
@@ -110,31 +121,42 @@ const validateResolution = (resolution) => {
     }
     return resolution;
 };
+
+const initApplication =async ()=>{
+    console.log('initApplication');
+    return  await invoke('init_application');
+}
 // 导出API函数
 export default {
     // 获取音乐列表
-    initApplication: () => invoke('init_application'),
+    initApplication,
+    onCacheUpdate: (path,callback) => {
+        let listeners = [];
+        if (onCacheUpdateListeners.has(path)) {
+            listeners = onCacheUpdateListeners.get(path);
+        }
+        onCacheUpdateListeners.set(path, [...listeners, callback]);
+    },
+    getMusicList: async () => {
+        let result = await invoke("get_music_list")
+        updateAppLocalData('musicList', result);
 
-getMusicList: async () => {
-    let result = await invoke("get_music_list")
-    updateAppLocalData('musicList', result);
+        return result;
+    },
 
-    return result;
-},
-
-    enum_resolutions:RESOLUTIONS,
+    enum_resolutions: RESOLUTIONS,
     RESOLUTIONS,
 
     // 获取专辑封面
 
     // 封面获取逻辑
     getAlbumCover: async (albumId, maxResolution = RESOLUTIONS.NORMAL) => {
-        if (albumId < 0) return { objectURL: '', destroyObjectURL: () => {} };
-        
+        if (albumId < 0) return { objectURL: '', destroyObjectURL: () => { } };
+
         const resolution = validateResolution(maxResolution);
-        
-        const key = resolution === RESOLUTIONS.ORIGIN 
-            ? `al_${albumId}` 
+
+        const key = resolution === RESOLUTIONS.ORIGIN
+            ? `al_${albumId}`
             : `al_${albumId}_${resolution}`;
 
         const command = resolution === RESOLUTIONS.ORIGIN
@@ -159,7 +181,7 @@ getMusicList: async () => {
     },
 
     // 获取音乐文件
-    getMusicFile: (songId) => 
+    getMusicFile: (songId) =>
         handleAPIRequest(`mf_${songId}`, "get_music_file", { songId }),
 
 
@@ -173,12 +195,29 @@ getMusicList: async () => {
     addMusicDirs: (dirs) => invoke("add_music_dirs", { newDirs: Array.isArray(dirs) ? dirs : [dirs] }),
     removeMusicDirs: (dirs) => invoke("remove_music_dirs", { dirsToRemove: Array.isArray(dirs) ? dirs : [dirs] }),
     // 刷新音乐缓存
-    refreshMusicCache: async () => await invoke("refresh_music_cache"),
+    refreshMusicCache: async () => {
+        await invoke("refresh_music_cache");
+
+
+        // 获取音乐列表
+        let musicList = await invoke("get_music_list");
+
+        if (musicList.length === 0) {
+            await initApplication();
+            musicList = await invoke("get_music_list");
+        }
+
+        // 更新本地缓存
+        updateAppLocalData('musicList', musicList);
+        updateAppLocalData('folders', await invoke("get_all_music_dirs"));
+        updateAppLocalData('albums', await invoke("get_all_my_albums"));
+        updateAppLocalData('artists', await invoke("get_all_my_artists"));
+    },
 
     // 获取所有专辑
     getAlbums: async () => {
         const result = await invoke("get_all_my_albums");
-        updateAppLocalData('musicList', result);
+        updateAppLocalData('albums', result);
         return result;
     },
 
@@ -191,24 +230,37 @@ getMusicList: async () => {
     },
 
     // 通过ID获取专辑
-    getAlbumById:  (albumId) =>
+    getAlbumById: (albumId) =>
         invoke("get_album_by_id", { albumId: Number(albumId) }),
 
     // 通过ID获取艺术家
-    getArtistById:  (artistId) => 
+    getArtistById: (artistId) =>
         invoke("get_artist_by_id", { artistId: Number(artistId) }),
 
     // 通过专辑ID获取歌曲
-    getAlbumsSongsById: (albumId) => 
+    getAlbumsSongsById: (albumId) =>
         invoke("get_albums_songs_by_id", { albumId: Number(albumId) }),
 
     // 通过艺术家ID获取歌曲
-    getArtistsSongsById: (artistId) => 
+    getArtistsSongsById: (artistId) =>
         invoke("get_artists_songs_by_id", { artistId: Number(artistId) }),
 
     // 销毁对象URL
     destroyObjectURL,
-
+    // 暴露可读写缓存结构
+    get appLocalCache() {
+        return appLocalDataCache;
+    },
+    // 新增缓存写入方法（可选）
+    setAppLocalCache(path, data) {
+        if (appLocalDataCache[path]) {
+            appLocalDataCache[path] = {
+                ...appLocalDataCache[path],
+                ...data,
+                lastUpdateTimestamp: Date.now()
+            };
+        }
+    },
     /**
      * Adds a user's music directory.
      * @param {string} dir - The directory to add.

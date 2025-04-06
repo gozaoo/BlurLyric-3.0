@@ -128,8 +128,9 @@ export default {
     emits: ['conditionChange'],
     methods: {
         conditionChange() {
-
-            this.$emit('conditionChange', this.currentCondition);
+            this.$nextTick(() => {
+                this.$emit('conditionChange', this.currentCondition);
+            });
         }
     }
 };
